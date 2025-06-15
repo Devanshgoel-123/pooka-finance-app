@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 import { useAccount } from "wagmi";
-import { POOKA_ABI } from "@/components/ABI/PookaFinanceABI";
+import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
 import { Abi, parseEther } from "viem";
-import { CONTRACT_ADDRESS_SEPOLIA } from "@/utils/constants";
+import { PERPS_AVAX } from "@/utils/constants";
 import { useEffect, useState } from "react";
 
 
@@ -38,8 +38,8 @@ export const useCreateDeposit=()=>{
     try{
     setQuery(true);
     writeContract({
-            abi: POOKA_ABI as Abi,
-            address:CONTRACT_ADDRESS_SEPOLIA,
+            abi: PERPS_ABI as Abi,
+            address:PERPS_AVAX,
             functionName:"createDeposit",
             args:
             [
