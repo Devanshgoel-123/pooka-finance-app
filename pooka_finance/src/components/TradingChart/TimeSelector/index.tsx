@@ -24,7 +24,6 @@ const TimeSelector: React.FC = () => {
 
   const handleTimeframeChange = (timeframe: TimeFrame) => {
     usePerpStore.getState().setTimeFrame(timeframe);
-    console.log(`Selected timeframe: ${timeframe.value} ${timeframe.label}`);
   };
 
   return (

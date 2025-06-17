@@ -46,7 +46,7 @@ export const useCreateDeposit=()=>{
     })
     }catch(err){
         setQuery(false);
-        console.log("Error depositing for user", err)
+        console.error("Error depositing for user", err)
     }
 }
 

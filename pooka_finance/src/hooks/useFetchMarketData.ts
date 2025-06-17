@@ -48,7 +48,7 @@ export const useFetchMarketData=()=>{
   });
   
   if(isError){
-    console.log("The error is",error)
+    console.error("The error is",error)
   }
 
 

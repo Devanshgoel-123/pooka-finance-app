@@ -57,7 +57,7 @@ export const useOpenPosition=()=>{
     })
     }catch(err){
         setQuery(false);
-        console.log("Error opening position for user", err)
+        console.error("Error opening position for user", err)
     }
 }
 
