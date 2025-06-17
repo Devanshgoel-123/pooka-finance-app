@@ -10,6 +10,8 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { usePerpStore } from "@/store/PerpStore";
 import { Loader2 } from "lucide-react";
 import { useCreateDeposit } from "@/hooks/useCreateDeposit";
+import { useOpenPosition } from "@/hooks/useOpenPosition";
+
 const OrderComponent: React.FC = () => {
   const [positionType, setPositionType] = useState<"Long" | "Short">("Long");
 
@@ -45,18 +47,27 @@ const OrderComponent: React.FC = () => {
 
   const leverageOptions = [1, 2, 3, 4, 5, 10, 15, 20];
 
-  // const {
-  //   openPosition,
-  //   isPending
-  // }=useOpenPosition();
-  const { createDeposit, isLoading } = useCreateDeposit();
-
+  const { createDeposit, isLoading: isDepositLoading } = useCreateDeposit();
+  const { openPosition, isPending: isPositionLoading } = useOpenPosition();
   const handleCreateDeposit = () => {
     // const isLong=positionType==="Long";
     try {
       createDeposit(collateralAmount);
     } catch (err) {
       console.error("Error occured", err);
+    }
+  };
+  const handleOpenPosition = () => {
+    const isLong = positionType === "Long";
+    try {
+      openPosition(
+        selectedPerp,
+        isLong,
+        collateralAmount,
+        leverageOptions[leverageIndex]
+      );
+    } catch (err) {
+      console.error("Error opening position", err);
     }
   };
 
@@ -171,16 +182,31 @@ const OrderComponent: React.FC = () => {
           </div>
         </div>
         {address !== undefined ? (
-          !isLoading ? (
-            <button
-              className="connectWalletButton"
-              onClick={handleCreateDeposit}
-            >
-              Deposit
-            </button>
-          ) : (
-            <Loader2 />
-          )
+          <>
+            {!isDepositLoading ? (
+              <button
+                className="connectWalletButton"
+                onClick={handleCreateDeposit}
+                style={{ marginBottom: "8px" }}
+              >
+                Deposit Collateral
+              </button>
+            ) : (
+              <Loader2 style={{ marginBottom: "8px" }} />
+            )}
+
+            {!isPositionLoading ? (
+              <button
+                className="connectWalletButton"
+                onClick={handleOpenPosition}
+                disabled={!selectedPerp || collateralAmount === "0"}
+              >
+                Open {positionType} Position
+              </button>
+            ) : (
+              <Loader2 />
+            )}
+          </>
         ) : (
           <ConnectButton.Custom>
             {({ openConnectModal, account, authenticationStatus, mounted }) => {
