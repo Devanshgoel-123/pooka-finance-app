@@ -10,7 +10,7 @@ import { createConfig, WagmiProvider } from 'wagmi';
 import { ReactNode } from 'react';
 import { metaMaskWallet, rabbyWallet, bybitWallet} from '@rainbow-me/rainbowkit/wallets';
 import {
-  mainnet,
+  avalancheFuji,
   sepolia
 } from 'wagmi/chains';
 import {
@@ -39,10 +39,10 @@ const connectors=connectorsForWallets(
 
 export const config=createConfig({
   connectors,
-  chains: [mainnet, sepolia],
+  chains: [avalancheFuji, sepolia],
   ssr:true,
   transports:{
-    [mainnet.id]: http(),
+    [avalancheFuji.id]: http(),
     [sepolia.id]: http()
   }
 })
