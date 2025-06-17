@@ -58,7 +58,6 @@ export const Navbar=() => {
                 disconnect()
               }else{
                 useWalletStore.getState().setUserWalletAddress(account?.address as string)
-                console.log("The address is",account?.address)
                 openConnectModal();
               }
             }}

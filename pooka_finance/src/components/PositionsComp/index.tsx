@@ -59,7 +59,6 @@ export const PositionsComponent = () => {
   }
 
   const renderPositionRow = (position: PositionData, index: number) => {
-    console.log("The posiiton data ",position);
    return  <div key={index} className="positionRow">
       <div className="positionCell directionCell">
         <div className="directionContainer">

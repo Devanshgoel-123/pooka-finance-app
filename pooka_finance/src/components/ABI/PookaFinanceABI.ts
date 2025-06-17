@@ -1,7 +1,21 @@
-export const POOKA_ABI = [
+export const PERPS_ABI = [
   {
     inputs: [
-      { internalType: "address", name: "_priceOracle", type: "address" },
+      {
+        internalType: "address",
+        name: "_priceOracle",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "_feeManager",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "_calculator",
+        type: "address",
+      },
     ],
     stateMutability: "nonpayable",
     type: "constructor",
@@ -10,25 +24,19 @@ export const POOKA_ABI = [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
-        internalType: "string",
-        name: "symbol",
-        type: "string",
+        indexed: true,
+        internalType: "address",
+        name: "user",
+        type: "address",
       },
       {
         indexed: false,
-        internalType: "int256",
-        name: "fundingRate",
-        type: "int256",
-      },
-      {
-        indexed: false,
-        internalType: "int256",
-        name: "cumulativeIndex",
-        type: "int256",
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
       },
     ],
-    name: "FundingUpdated",
+    name: "Deposit",
     type: "event",
   },
   {
@@ -53,19 +61,29 @@ export const POOKA_ABI = [
   {
     anonymous: false,
     inputs: [
-      { indexed: true, internalType: "address", name: "user", type: "address" },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
       {
         indexed: false,
         internalType: "string",
         name: "symbol",
         type: "string",
       },
-      { indexed: false, internalType: "int256", name: "pnl", type: "int256" },
       {
         indexed: false,
         internalType: "int256",
-        name: "fundingPaid",
+        name: "pnl",
         type: "int256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "holdingFees",
+        type: "uint256",
       },
     ],
     name: "PositionClosed",
@@ -74,28 +92,12 @@ export const POOKA_ABI = [
   {
     anonymous: false,
     inputs: [
-      { indexed: true, internalType: "address", name: "user", type: "address" },
       {
-        indexed: false,
-        internalType: "string",
-        name: "symbol",
-        type: "string",
+        indexed: true,
+        internalType: "address",
+        name: "user",
+        type: "address",
       },
-      { indexed: false, internalType: "int256", name: "pnl", type: "int256" },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "liquidationPrice",
-        type: "uint256",
-      },
-    ],
-    name: "PositionLiquidated",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      { indexed: true, internalType: "address", name: "user", type: "address" },
       {
         indexed: false,
         internalType: "string",
@@ -120,7 +122,12 @@ export const POOKA_ABI = [
         name: "entryPrice",
         type: "uint256",
       },
-      { indexed: false, internalType: "bool", name: "isLong", type: "bool" },
+      {
+        indexed: false,
+        internalType: "bool",
+        name: "isLong",
+        type: "bool",
+      },
       {
         indexed: false,
         internalType: "uint256",
@@ -132,77 +139,64 @@ export const POOKA_ABI = [
     type: "event",
   },
   {
-    inputs: [],
-    name: "BASE_FUNDING_RATE",
-    outputs: [{ internalType: "int256", name: "", type: "int256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "FUNDING_INTERVAL",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "LIQUIDATION_THRESHOLD",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "MAX_LEVERAGE_DEFAULT",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "PRECISION",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "PRICE_STALENESS_THRESHOLD",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "Withdrawal",
+    type: "event",
   },
   {
     inputs: [
-      { internalType: "string", name: "symbol", type: "string" },
-      { internalType: "uint256", name: "maxLeverage", type: "uint256" },
-      { internalType: "uint256", name: "maintenanceMargin", type: "uint256" },
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
     ],
-    name: "addMarket",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "address", name: "", type: "address" }],
     name: "balances",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "calculator",
+    outputs: [
+      {
+        internalType: "contract PerpsCalculations",
+        name: "",
+        type: "address",
+      },
+    ],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [
-      { internalType: "address", name: "user", type: "address" },
-      { internalType: "string", name: "symbol", type: "string" },
+      {
+        internalType: "string",
+        name: "symbol",
+        type: "string",
+      },
     ],
-    name: "canLiquidate",
-    outputs: [{ internalType: "bool", name: "", type: "bool" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "string", name: "symbol", type: "string" }],
     name: "closePosition",
     outputs: [],
     stateMutability: "nonpayable",
@@ -216,23 +210,33 @@ export const POOKA_ABI = [
     type: "function",
   },
   {
-    inputs: [{ internalType: "address", name: "user", type: "address" }],
-    name: "getBalance",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    inputs: [],
+    name: "feeManager",
+    outputs: [
+      {
+        internalType: "contract PerpsFeeManager",
+        name: "",
+        type: "address",
+      },
+    ],
     stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [{ internalType: "string", name: "symbol", type: "string" }],
-    name: "getMarket",
+    inputs: [
+      {
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
+    ],
+    name: "getBalance",
     outputs: [
-      { internalType: "uint256", name: "currentPrice", type: "uint256" },
-      { internalType: "uint256", name: "priceTimestamp", type: "uint256" },
-      { internalType: "int256", name: "fundingRate", type: "int256" },
-      { internalType: "uint256", name: "totalLongSize", type: "uint256" },
-      { internalType: "uint256", name: "totalShortSize", type: "uint256" },
-      { internalType: "uint256", name: "maxLeverage", type: "uint256" },
-      { internalType: "bool", name: "isActive", type: "bool" },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
     stateMutability: "view",
     type: "function",
@@ -240,53 +244,95 @@ export const POOKA_ABI = [
   {
     inputs: [],
     name: "getMarketSymbols",
-    outputs: [{ internalType: "string[]", name: "", type: "string[]" }],
+    outputs: [
+      {
+        internalType: "string[]",
+        name: "",
+        type: "string[]",
+      },
+    ],
     stateMutability: "view",
     type: "function",
   },
   {
+    inputs: [
+      {
+        internalType: "address",
+        name: "user",
+        type: "address",
+      },
+      {
+        internalType: "string",
+        name: "symbol",
+        type: "string",
+      },
+    ],
     name: "getPosition",
-    type: "function",
-    stateMutability: "view",
-    inputs: [
-      { name: "user", type: "address" },
-      { name: "symbol", type: "string" }
-    ],
-    outputs: [
-      {
-        name: "",
-        type: "tuple",
-        components: [
-          { name: "size", type: "uint256" },
-          { name: "collateral", type: "uint256" },
-          { name: "entryPrice", type: "uint256" },
-          { name: "leverage", type: "uint256" },
-          { name: "isLong", type: "bool" },
-          { name: "isOpen", type: "bool" },
-          { name: "currentPrice", type: "uint256" },
-          { name: "liquidationPrice", type: "uint256" },
-          { name: "unrealizedPnL", type: "int256" },
-          { name: "netPnL", type: "int256" },
-          { name: "canBeLiquidated", type: "bool" },
-        ]
-      }
-    ]
-  }
-  ,
-  {
-    inputs: [
-      { internalType: "address", name: "user", type: "address" },
-      { internalType: "string", name: "symbol", type: "string" },
-    ],
-    name: "getPositionPnL",
     outputs: [
       {
         components: [
-          { internalType: "int256", name: "unrealizedPnL", type: "int256" },
-          { internalType: "int256", name: "fundingPayment", type: "int256" },
-          { internalType: "int256", name: "netPnL", type: "int256" },
+          {
+            internalType: "uint256",
+            name: "size",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "collateral",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "entryPrice",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "leverage",
+            type: "uint256",
+          },
+          {
+            internalType: "bool",
+            name: "isLong",
+            type: "bool",
+          },
+          {
+            internalType: "bool",
+            name: "isOpen",
+            type: "bool",
+          },
+          {
+            internalType: "uint256",
+            name: "currentPrice",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "liquidationPrice",
+            type: "uint256",
+          },
+          {
+            internalType: "int256",
+            name: "unrealizedPnL",
+            type: "int256",
+          },
+          {
+            internalType: "uint256",
+            name: "accruedFees",
+            type: "uint256",
+          },
+          {
+            internalType: "int256",
+            name: "netPnL",
+            type: "int256",
+          },
+          {
+            internalType: "bool",
+            name: "canBeLiquidated",
+            type: "bool",
+          },
         ],
-        internalType: "struct CrossChainPerps.PnLInfo",
+        internalType: "struct PerpsStructs.PositionInfo",
         name: "",
         type: "tuple",
       },
@@ -296,48 +342,89 @@ export const POOKA_ABI = [
   },
   {
     inputs: [
-      { internalType: "address", name: "user", type: "address" },
-      { internalType: "string", name: "symbol", type: "string" },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
-    name: "liquidatePosition",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     name: "marketSymbols",
-    outputs: [{ internalType: "string", name: "", type: "string" }],
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
     stateMutability: "view",
     type: "function",
   },
   {
-    inputs: [{ internalType: "string", name: "", type: "string" }],
+    inputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
     name: "markets",
     outputs: [
-      { internalType: "string", name: "symbol", type: "string" },
-      { internalType: "uint256", name: "maxLeverage", type: "uint256" },
-      { internalType: "uint256", name: "maintenanceMargin", type: "uint256" },
-      { internalType: "int256", name: "fundingRate", type: "int256" },
       {
-        internalType: "int256",
-        name: "cumulativeFundingIndex",
-        type: "int256",
+        internalType: "string",
+        name: "symbol",
+        type: "string",
       },
-      { internalType: "uint256", name: "lastFundingTime", type: "uint256" },
-      { internalType: "uint256", name: "totalLongSize", type: "uint256" },
-      { internalType: "uint256", name: "totalShortSize", type: "uint256" },
-      { internalType: "bool", name: "isActive", type: "bool" },
+      {
+        internalType: "uint256",
+        name: "maxLeverage",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "maintenanceMargin",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "totalLongSize",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "totalShortSize",
+        type: "uint256",
+      },
+      {
+        internalType: "bool",
+        name: "isActive",
+        type: "bool",
+      },
     ],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [
-      { internalType: "string", name: "symbol", type: "string" },
-      { internalType: "uint256", name: "collateralAmount", type: "uint256" },
-      { internalType: "uint256", name: "leverage", type: "uint256" },
-      { internalType: "bool", name: "isLong", type: "bool" },
+      {
+        internalType: "string",
+        name: "symbol",
+        type: "string",
+      },
+      {
+        internalType: "uint256",
+        name: "collateralAmount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "leverage",
+        type: "uint256",
+      },
+      {
+        internalType: "bool",
+        name: "isLong",
+        type: "bool",
+      },
     ],
     name: "openPosition",
     outputs: [],
@@ -347,24 +434,71 @@ export const POOKA_ABI = [
   {
     inputs: [],
     name: "owner",
-    outputs: [{ internalType: "address", name: "", type: "address" }],
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [
-      { internalType: "address", name: "", type: "address" },
-      { internalType: "string", name: "", type: "string" },
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
     ],
     name: "positions",
     outputs: [
-      { internalType: "uint256", name: "size", type: "uint256" },
-      { internalType: "uint256", name: "collateral", type: "uint256" },
-      { internalType: "uint256", name: "entryPrice", type: "uint256" },
-      { internalType: "int256", name: "fundingIndex", type: "int256" },
-      { internalType: "bool", name: "isLong", type: "bool" },
-      { internalType: "bool", name: "isOpen", type: "bool" },
-      { internalType: "uint256", name: "lastUpdateTime", type: "uint256" },
+      {
+        internalType: "uint256",
+        name: "size",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "collateral",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "entryPrice",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "leverage",
+        type: "uint256",
+      },
+      {
+        internalType: "bool",
+        name: "isLong",
+        type: "bool",
+      },
+      {
+        internalType: "bool",
+        name: "isOpen",
+        type: "bool",
+      },
+      {
+        internalType: "uint256",
+        name: "openTime",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "lastFeeTime",
+        type: "uint256",
+      },
     ],
     stateMutability: "view",
     type: "function",
@@ -373,36 +507,23 @@ export const POOKA_ABI = [
     inputs: [],
     name: "priceOracle",
     outputs: [
-      { internalType: "contract PriceOracle", name: "", type: "address" },
+      {
+        internalType: "contract PriceOracle",
+        name: "",
+        type: "address",
+      },
     ],
     stateMutability: "view",
     type: "function",
   },
   {
     inputs: [
-      { internalType: "address", name: "_priceOracle", type: "address" },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
     ],
-    name: "setPriceOracle",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "string", name: "symbol", type: "string" }],
-    name: "toggleMarket",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "string", name: "symbol", type: "string" }],
-    name: "updateFunding",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "uint256", name: "amount", type: "uint256" }],
     name: "withdraw",
     outputs: [],
     stateMutability: "nonpayable",
