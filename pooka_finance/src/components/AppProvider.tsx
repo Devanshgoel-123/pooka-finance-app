@@ -56,7 +56,7 @@ export const AppKitProvider = ({ children }: { children: ReactNode }) => {
           accentColorForeground: 'white',
         })} 
         modalSize='compact'
-        initialChain={sepolia}
+        initialChain={avalancheFuji}
         showRecentTransactions={true}
         >
           {children}

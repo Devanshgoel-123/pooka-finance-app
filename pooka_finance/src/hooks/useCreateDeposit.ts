@@ -40,16 +40,13 @@ export const useCreateDeposit=()=>{
     writeContract({
             abi: PERPS_ABI as Abi,
             address:PERPS_AVAX,
-            functionName:"createDeposit",
-            args:
-            [
-               parseEther(depositAmount)
-            ],
+            functionName:"deposit",
+            args: [], 
             value:parseEther(depositAmount)
     })
     }catch(err){
         setQuery(false);
-        console.log("Error opening position for user", err)
+        console.log("Error depositing for user", err)
     }
 }
 

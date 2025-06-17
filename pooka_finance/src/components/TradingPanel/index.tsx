@@ -25,8 +25,10 @@ const OrderComponent: React.FC = () => {
   })))
 
   const {data, isLoading:isBalanceLoading}=useBalance({
-    address:address as `0x${string}`
+    address:address as `0x${string}`,
+    chainId: 43113, // AVAX Fuji Testnet
   })
+  console.log("data:"+ data );
 
   useEffect(()=>{
     console.log("The address of the user",address)
