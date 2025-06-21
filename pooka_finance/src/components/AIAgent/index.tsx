@@ -3,6 +3,8 @@
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import "./styles.scss"
+import axios from "axios";
+
 
 interface Message {
   id: string
@@ -28,8 +30,7 @@ export const AgentChat: React.FC<AgentChatProps> = ({ onSendMessage, isConnected
     },
   ])
   const [inputMessage, setInputMessage] = useState("")
-  const [isTyping, setIsTyping] = useState(false)
-  //const [isChatMinimized, setIsChatMinimized] = useState(false)
+  const [isTyping, setIsTyping] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -41,9 +42,17 @@ export const AgentChat: React.FC<AgentChatProps> = ({ onSendMessage, isConnected
     scrollToBottom()
   }, [messages])
 
-  const handleSendMessage = () => {
-    if (!inputMessage.trim()) return
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim()) return;
 
+    const response=await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/message`,
+      {
+        text:"I want to open a long position on ETH perp with usdc as collateral 1000, with a 10x leverage on avax chain",
+        agentId:"Sigma"
+      }
+    )
+
+    console.log(response)
     const newMessage: Message = {
       id: Date.now().toString(),
       type: "user",
@@ -55,10 +64,8 @@ export const AgentChat: React.FC<AgentChatProps> = ({ onSendMessage, isConnected
     setInputMessage("")
     setIsTyping(true)
 
-    // Call the parent's onSendMessage function
     onSendMessage?.(inputMessage.trim())
 
-    // Simulate agent typing (you'll replace this with your backend call)
     setTimeout(() => {
       const agentResponse: Message = {
         id: (Date.now() + 1).toString(),
@@ -78,46 +85,22 @@ export const AgentChat: React.FC<AgentChatProps> = ({ onSendMessage, isConnected
     }
   }
 
-  // const handleClearChat = () => {
-  //   setMessages([
-  //     {
-  //       id: "1",
-  //       type: "agent",
-  //       content: "Chat cleared. How can I help you?",
-  //       timestamp: new Date(),
-  //     },
-  //   ])
-  //   onClearChat?.()
-  // }
-
   const formatTime = (date: Date) => {
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
   }
 
   return (
-    <div className="agentChat">
+    <div className="agentChatWrapper">
       <div className="chatHeader">
         <div className="headerInfo">
-          <div className="agentAvatar">🤖</div>
+          <div className="agentAvatar"></div>
           <div className="agentDetails">
-            <span className="agentName">Trading Assistant</span>
+            <span className="agentName">Pooka Agentic</span>
             <span className={`agentStatus ${isConnected ? "online" : "offline"}`}>
               {isConnected ? "Online" : "Offline"}
             </span>
           </div>
         </div>
-        {/* <div className="headerActions">
-          <button className="actionBtn" onClick={handleClearChat} title="Clear Chat">
-            🗑️
-          </button>
-          <button
-            className="actionBtn"
-            onClick={() => setIsChatMinimized(!isChatMinimized)}
-            title={isChatMinimized ? "Expand" : "Minimize"}
-          >
-            {isChatMinimized ? "⬆️" : "⬇️"}
-          </button>
-        </div> */}
       </div>
 
       {
@@ -165,9 +148,6 @@ export const AgentChat: React.FC<AgentChatProps> = ({ onSendMessage, isConnected
               >
                 📤
               </button>
-            </div>
-            <div className="inputFooter">
-              <span className="inputHint">Press Enter to send • Shift+Enter for new line</span>
             </div>
           </div>
         </>

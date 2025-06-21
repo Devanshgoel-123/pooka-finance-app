@@ -1,32 +1,55 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React from "react";
-import { Navbar } from "@/components/Navbar";
-import { TradingChart } from "@/components/TradingChart";
-import TradingPanel from "../components/TradingPanel";
-import { TradingHeader } from "@/components/TradingHeader";
-import { PriceTickerComponent } from "@/components/PriceTicker";
-import { AgentChat } from "../components/AIAgent";
-import "./global.css";
-import "./styles.scss";
-import { PositionsComponent } from "@/components/PositionsComp";
-const Index = () => {
-  return (
-    <div className="tradingAppWrapper">
-      <Navbar />
-      <div className="tradingLayoutWrapper">
-        <TradingHeader />
-        <div className="MidComponentWrapper">
-          <TradingChart />
-          <div className="OrderPlacingColumn">
-            <TradingPanel />
-            {/* <AgentChat /> */}
-          </div>
-        </div>
-        <PositionsComponent/>
-      </div>
-      <PriceTickerComponent />
-    </div>
-  );
-};
+"use client"
 
-export default Index;
+import type React from "react"
+import { useState, useEffect } from "react"
+import { Navigation } from "@/components/HomeNavigation"
+import { CryptoTicker } from "@/components/CryptoTicker"
+import { HeroSection } from "@/components/HeroSection"
+import { StatsSection } from "@/components/StatsSection"
+import { SuperAppSection } from "@/components/SuperAppSection"
+import { BuiltForSection } from "@/components/BuiltForSection"
+import { Footer } from "@/components/HomeFooter"
+import { CTASection } from "@/components/CTASection"
+import "./styles.scss"
+import { useRouter } from "next/navigation"
+
+export const LandingPage= () => {
+  const [currentVolume, setCurrentVolume] = useState<number>(15000000)
+  const [currentUsers, setCurrentUsers] = useState<number>(7200)
+
+  const router=useRouter();
+
+  useEffect(() => {
+    const volumeInterval = setInterval(() => {
+      setCurrentVolume((prev) => prev + Math.floor(Math.random() * 10000))
+    }, 3000)
+
+    const usersInterval = setInterval(() => {
+      setCurrentUsers((prev) => prev + Math.floor(Math.random() * 10))
+    }, 5000)
+
+    return () => {
+      clearInterval(volumeInterval)
+      clearInterval(usersInterval)
+    }
+  }, [])
+
+  const handleTradeNow = () => {
+    router.push("/Trade")
+  }
+
+  return (
+    <div className="HomeWrapper">
+      <Navigation onLaunchApp={handleTradeNow} />
+      <HeroSection onTradeNow={handleTradeNow} />
+      <StatsSection volume={currentVolume} users={currentUsers} />
+      <SuperAppSection />
+      <CryptoTicker />
+      <BuiltForSection />
+      <CTASection onLaunchApp={handleTradeNow} />
+      <Footer />
+    </div>
+  )
+}
+
+export default LandingPage

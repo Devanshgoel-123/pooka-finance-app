@@ -9,8 +9,10 @@ import { useShallow } from 'zustand/react/shallow'
 import { ConnectButton } from "@rainbow-me/rainbowkit"
 import { usePerpStore } from "@/store/PerpStore"
 import { Loader2 } from "lucide-react"
-import { useCreateDeposit } from "@/hooks/useCreateDeposit"
-const OrderComponent: React.FC = () => {
+import { useCreateDeposit } from "@/hooks/useCreateDeposit";
+
+
+export const OrderComponent: React.FC = () => {
   const [positionType, setPositionType]=useState<"Long" | "Short">("Long");
   const {
     address
@@ -186,4 +188,3 @@ const OrderComponent: React.FC = () => {
   )
 }
 
-export default OrderComponent

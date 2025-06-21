@@ -14,13 +14,22 @@ interface ApiData{
     l: number,
     t: number,
     n: number
-  }
+}
+
+interface ApiResponse{ 
+  time: string; 
+  open: number; 
+  high: number; 
+  low: number; 
+  close: number; 
+}
 
 
 
 export async function GET(request:NextRequest) {
     try{
       const { searchParams } = new URL(request.url);
+      console.log(searchParams)
       const perp = searchParams.get("perp");
       const timeFrame = searchParams.get("timeFrame") as "minute" | "day" | "month" | "week" | "hour" | "quarter";
      console.log("THe requested data",perp);
@@ -34,11 +43,9 @@ export async function GET(request:NextRequest) {
    
      const BASE_URL="https://api.polygon.io/v2/aggs/ticker";
      const DATE_TO= getPastDate() || "2025-06-05";
-     console.log("The Dat is",DATE_NOW, DATE_TO)
      const API_KEY=process.env.API_KEY;
      const CURRENCY_TICKER:string=perp.toString().replace("/","");
      const PARTS:"minute" | "day" | "month" | "week" | "hour" | "quarter"= timeFrame !==null ? timeFrame : "day";
-     console.log("The api key is",API_KEY)
      const URL_POLYGON=`${BASE_URL}/X:${CURRENCY_TICKER}/range/1/${PARTS}/${DATE_TO}/${DATE_NOW}?adjusted=true&limit=1000&sort=asc&apiKey=${API_KEY}`;
      console.log(URL_POLYGON)
      const result=await axios.get(URL_POLYGON)
@@ -51,9 +58,11 @@ export async function GET(request:NextRequest) {
         close: item.c, 
       }));
      
+    const cleanedData = ohlcData.filter((d: ApiResponse, i: number, arr: ApiResponse[]) => i === 0 || d.time !== arr[i - 1].time).sort((a:ApiResponse, b:ApiResponse)=>Number(a.time) - Number(b.time));
+
 
      return NextResponse.json(
-        { data: ohlcData },
+        { data: cleanedData },
         { status: 200 }
       );
     }catch(err){
@@ -66,6 +75,3 @@ export async function GET(request:NextRequest) {
 
 }
 
-
-// BTCUSD"
-//X:ETHUSD

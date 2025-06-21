@@ -84,7 +84,7 @@ export const TradingChart = () => {
         const res = await axios.get("/api/OHLCData",{
           params:{
             perp:selectedPerp,
-            timeFrame : timeFrame
+            timeFrame : timeFrame.value
           }
         });
         const data = await res.data;

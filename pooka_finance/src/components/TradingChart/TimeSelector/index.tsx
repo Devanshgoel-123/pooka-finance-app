@@ -1,3 +1,4 @@
+"use client"
 import React from 'react';
 import './styles.scss';
 import { usePerpStore } from '@/store/PerpStore';
