@@ -40,3 +40,10 @@ export interface AgentChatProps {
   onClearChat?: () => void
   isConnected?: boolean
 }
+
+
+export interface Market {
+  symbol: string;
+  name: string;
+  logo: string;
+}

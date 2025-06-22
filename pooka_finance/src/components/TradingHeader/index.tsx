@@ -9,42 +9,12 @@ import { usePerpStore } from "@/store/PerpStore"
 import Image from "next/image"
 import { useFetchMarketData } from "@/hooks/useFetchMarketData"
 import { useShallow } from "zustand/react/shallow"
-
-// interface TradingHeaderProps {
-//   symbol?: string
-//   baseAsset?: string
-//   quoteAsset?: string
-//   currentPrice?: number
-//   priceChange?: number
-//   priceChangePercent?: number
-//   high24h?: number
-//   low24h?: number
-//   funding1h?: number
-//   reqMaintenance?: number
-// }
-
-const markets = [
-  { symbol: 'ETH/USD', name: 'Ethereum Perpetual', logo:"/assets/eth.svg"},
-  { symbol: 'BTC/USD', name: 'Bitcoin Perpetual', logo:"/assets/btc.svg"},
-];
-
-interface Market {
-  symbol: string;
-  name: string;
-  logo: string;
-}
+import { markets } from "@/utils/constants"
+import { Market } from "@/store/types/types";
 
 export const TradingHeader = ({
-  symbol = "BTC/USD",
-  baseAsset = "BTC",
-  quoteAsset = "USD",
-  currentPrice = 104376.26,
   priceChange = -374.74,
   priceChangePercent = -0.36,
-  high24h = 106109.0,
-  low24h = 103700.0,
-  funding1h = 0.0028,
-  reqMaintenance = 2.0,
 }) => {
   const [showDropDown, setShowDropDown] = useState<boolean>(false);
   const [selectedMarket, setSelectedMarket] = useState<Market>(markets[1]);

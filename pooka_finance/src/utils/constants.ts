@@ -15,3 +15,9 @@ export const BTC_TOKEN="/assets/btc.svg";
 export const ETH_TOKEN="/assets/eth.svg";
 export const SOL_TOKEN="/assets/solana.svg";
 export const DOGE_TOKEN="/assets/doge.svg";
+
+export const markets = [
+    { symbol: 'ETH/USD', name: 'Ethereum Perpetual', logo:"/assets/eth.svg"},
+    { symbol: 'BTC/USD', name: 'Bitcoin Perpetual', logo:"/assets/btc.svg"},
+  ];
+  
