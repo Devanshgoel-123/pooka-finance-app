@@ -13,7 +13,7 @@ export interface TimeFrame {
 export type DepositParams = {
   collateral?: number;
   payToken?: string;
-  chainName: string;
+  chainName?: string;
 };
 
 
@@ -23,5 +23,5 @@ export type PositionParams = {
   collateral?: number;
   payToken?: "USDC" | "ETH";
   positionType?: "long" | "short";
-  chainName: string;
+  chainName?: string;
 };

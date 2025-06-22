@@ -29,8 +29,8 @@ export const Navigation: React.FC<NavigationProps> = ({ onLaunchApp }) => {
           <a href="#products" className="navLink">
             Products
           </a>
-          <a href="#community" className="navLink">
-            Community
+          <a href="/Agent" className="navLink">
+            Agent
           </a>
         </div>
 

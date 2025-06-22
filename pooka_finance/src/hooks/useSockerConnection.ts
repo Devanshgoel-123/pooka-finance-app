@@ -1,14 +1,25 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { io, Socket } from "socket.io-client";
 import dotenv from "dotenv";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DepositParams, PositionParams } from "@/store/types/types";
 dotenv.config();
 export const useSocketConnection = () => {
   const [renderElement, setRenderElement]=useState<string | undefined>(undefined);
-  console.log("The websocket error is", process.env.NEXT_PUBLIC_SERVER_URL);
-  let PositionParams:PositionParams={} as PositionParams;
-  let DepositParams:DepositParams={} as DepositParams;
+  const [element, setElement]=useState<"deposit" | "liquidate" | "trade" | null>(null);
+  const positionParams = useRef<PositionParams>({
+    chainName:undefined, 
+    perpName: undefined,
+    leverage: undefined,
+    collateral: undefined,
+    payToken: undefined,
+    positionType: undefined,
+  });
+  const depositParams=useRef<DepositParams>({
+    chainName:undefined,
+    collateral:undefined,
+    payToken:undefined
+  });
   
   const socketURL = process.env.NEXT_PUBLIC_SERVER_URL;
   useEffect(() => {
@@ -30,12 +41,14 @@ export const useSocketConnection = () => {
 
     socket_connections.on("open_position", (data) => {
       console.log("The received data", data);
-      PositionParams=data.PositionParams;
+      positionParams.current=data.position;
+      setElement("trade")
     });
 
     socket_connections.on("deposit_collateral", (data) => {
       console.log("Received deposit_collateral event:", data);
-      DepositParams=data.DepositParams
+      depositParams.current=data.position;
+      setElement("deposit")
     });
 
     socket_connections.on("disconnect", (reason) => {
@@ -51,11 +64,9 @@ export const useSocketConnection = () => {
     };
   }, [socketURL]);
 
-
-
   return {
-    PositionParams,
-    DepositParams,
-
+    positionParams,
+    depositParams,
+    element
   }
 };
