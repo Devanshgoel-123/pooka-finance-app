@@ -9,7 +9,6 @@ import { useShallow } from 'zustand/react/shallow'
 import { ConnectButton } from "@rainbow-me/rainbowkit"
 import { usePerpStore } from "@/store/PerpStore"
 import { Loader2 } from "lucide-react"
-import { useCreateDeposit } from "@/hooks/useCreateDeposit";
 import { useOpenPosition } from "@/hooks/useOpenPosition";
 
 
@@ -44,10 +43,7 @@ export const OrderComponent: React.FC = () => {
 
   const leverageOptions = [1, 2, 3, 4, 5, 10, 15, 20];
 
-  const {
-    createDeposit,
-    isDepositLoading
-  }=useCreateDeposit();
+ 
 
   const {
     openPosition,
@@ -55,15 +51,6 @@ export const OrderComponent: React.FC = () => {
   }=useOpenPosition()
 
   
-  const handleCreateDeposit=()=>{
-    try{
-      createDeposit(
-        collateralAmount,
-      )
-    }catch(err){
-      console.log("Error occured",err)
-    }
-  };
   const handleOpenPosition = () => {
     const isLong = positionType === "Long";
     try {
@@ -94,13 +81,13 @@ export const OrderComponent: React.FC = () => {
         </div>
         <div className="PositionTab">
           <button
-            className={positionType === "Long" ? "activeLong" : ""}
+            className={positionType === "Long" ? "activeLong" : "long"}
             onClick={() => setPositionType("Long")}
           >
             Long
           </button>
           <button
-            className={positionType === "Short" ? "activeShort" : ""}
+            className={positionType === "Short" ? "activeShort" : "short"}
             onClick={() => setPositionType("Short")}
           >
             Short
@@ -193,18 +180,6 @@ export const OrderComponent: React.FC = () => {
         </div>
         {address !== undefined ? (
           <>
-            {!isDepositLoading ? (
-              <button
-                className="connectWalletButton"
-                onClick={handleCreateDeposit}
-                style={{ marginBottom: "8px" }}
-              >
-                Deposit Collateral
-              </button>
-            ) : (
-              <Loader2 style={{ marginBottom: "8px" }} />
-            )}
-
             {!isPositionLoading ? (
               <button
                 className="connectWalletButton"

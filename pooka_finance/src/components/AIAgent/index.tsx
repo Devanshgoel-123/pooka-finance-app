@@ -74,7 +74,7 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
 
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/message`, {
-        text: "I want to deposit 100 usdc on ethereum chain",
+        text: tempMessage,
         agentId: "Sigma",
       });
     } catch (err) {

@@ -11,14 +11,23 @@ import { useFetchMarketData } from "@/hooks/useFetchMarketData"
 import { useShallow } from "zustand/react/shallow"
 import { markets } from "@/utils/constants"
 import { Market } from "@/store/types/types";
+import { useFetchUserBalance } from "@/hooks/useFetchUserBalance";
+import { useAccount } from "wagmi"
+
 
 export const TradingHeader = ({
   priceChange = -374.74,
   priceChangePercent = -0.36,
 }) => {
+  const {
+    address
+  }=useAccount();
   const [showDropDown, setShowDropDown] = useState<boolean>(false);
   const [selectedMarket, setSelectedMarket] = useState<Market>(markets[1]);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const {
+    userDepositbalance
+  }=useFetchUserBalance();
   const {
     maintenanceMargin
   }=usePerpStore(useShallow((state)=>({
@@ -98,6 +107,7 @@ export const TradingHeader = ({
       </div>
 
       <div className="statsSectionTrading">
+        <div className="statsData">
         <div className="statItem">
           <span className="statLabel">24H High</span>
           <span className="statValue">${isLoading ? "0.00" : marketData.price24hHigh.toLocaleString()}</span>
@@ -106,13 +116,20 @@ export const TradingHeader = ({
           <span className="statLabel">24H Low</span>
           <span className="statValue">${isLoading ? "0.00" : marketData.price24hLow.toLocaleString()}</span>
         </div>
-        {/* <div className="statItem">
-          <span className="statLabel">1H Funding</span>
-          <span className="statValue funding">{funding1h.toFixed(4)}%</span>
-        </div> */}
         <div className="statItem">
           <span className="statLabel">Req. Maintenance</span>
           <span className="statValue">{isLoading ? "0.00" : maintenanceMargin.toFixed(1)}%</span>
+        </div>
+        </div>
+        <div className="depositWrapper">
+          <span className="depositHeader">YOUR DEPOSIT :</span>
+          <div className="depositBalance">
+            <Image src={"/assets/usdc.svg"} alt="" height={22} width={22} className="usdcLogo"/>
+          <span>${userDepositbalance===0 ? userDepositbalance.toFixed(2) : userDepositbalance.toFixed(3)}</span>
+         { address && <button className="depositCollateralBtn">
+            Deposit
+          </button>}
+          </div>
         </div>
       </div>
     </div>

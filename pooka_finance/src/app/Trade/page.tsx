@@ -9,12 +9,9 @@ import { OrderComponent } from "@/components/TradingPanel";
 import "../global.css";
 import "./styles.scss";
 import { PositionsComponent } from "@/components/PositionsComp";
-import { useFetchUserBalance } from "@/hooks/useFetchUserBalance";
 
 const Index = () => {
-  const {
-    userDepositBalance
-  }=useFetchUserBalance();
+  
   return (
     <div className="tradingAppWrapper">
       <Navbar />
