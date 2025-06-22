@@ -3,7 +3,7 @@ import { useState } from "react"
 import { useWalletStore } from "@/store/walletStore"
 import { useShallow } from "zustand/react/shallow"
 import { useFetchUserPosition } from "@/hooks/useFetchUserPosition"
-import { TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle } from "lucide-react"
+import { DollarSign, Target} from "lucide-react"
 import "./styles.scss";
 
 interface PositionData {
@@ -21,10 +21,8 @@ interface PositionData {
 }
 
 export const PositionsComponent = () => {
-  const [activeTab, setActiveTab] = useState<"Positions" | "Orders" | "Funding History">("Positions")
-
+  const [activeTab, setActiveTab] = useState<"Positions" | "Orders" | "Funding History">("Positions");
   const { data, error, isError, isLoading } = useFetchUserPosition()
-
   const { address } = useWalletStore(
     useShallow((state) => ({
       address: state.userWalletAddress,
@@ -37,7 +35,6 @@ export const PositionsComponent = () => {
     { key: "Funding History", label: "Funding History" },
   ] as const
 
-  // Helper functions for formatting
   const formatPrice = (price: bigint, decimals = 8): string => {
     if (Number(price) === 0) return "0.00"
     const divisor = BigInt(10 ** decimals)
@@ -48,7 +45,7 @@ export const PositionsComponent = () => {
 
   const formatPnL = (pnl: bigint): string => {
     if (Number(pnl) === 0) return "0.00"
-    const formatted = formatPrice(pnl, 6)
+    const formatted = formatPrice(pnl,15)
     return Number(pnl) > 0 ? `+${formatted}` : formatted
   }
 
@@ -65,19 +62,13 @@ export const PositionsComponent = () => {
           <div className={`directionBadge ${position.isLong ? "long" : "short"}`}>
             {position.isLong ? (
               <>
-                <TrendingUp size={12} />
                 LONG
               </>
             ) : (
               <>
-                <TrendingDown size={12} />
                 SHORT
               </>
             )}
-          </div>
-          <div className="positionStatus">
-            <div className={`statusDot ${position.isOpen ? "open" : "closed"}`} />
-            {position.isOpen ? "Open" : "Closed"}
           </div>
         </div>
       </div>
@@ -121,14 +112,18 @@ export const PositionsComponent = () => {
       </div>
 
       <div className="positionCell riskCell">
-        {position.canBeLiquidated ? (
-          <div className="liquidationWarning">
-            <AlertTriangle size={12} />
-            Risk
+        {position.isOpen ? (
+          <div className="noRisk">
+            Open
           </div>
-        ) : (
+        ) : position.canBeLiquidated ? (
+          <span className="liquidationWarning">-</span>
+        )
+        :
+        (
           <span className="noRisk">-</span>
-        )}
+        )
+      }
       </div>
     </div>
   }
@@ -186,7 +181,7 @@ export const PositionsComponent = () => {
           <div className="headerCell">Liq. Price</div>
           <div className="headerCell">Unrealized PnL</div>
           <div className="headerCell">Net PnL</div>
-          <div className="headerCell">Risk</div>
+          <div className="headerCell">Status</div>
         </div>
         <div className="positionsBody">
           {openPositions.map((position: PositionData, index: number) => renderPositionRow(position, index))}

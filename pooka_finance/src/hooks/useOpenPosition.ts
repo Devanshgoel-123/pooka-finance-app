@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { useAccount } from "wagmi";
-import { useWalletStore } from "@/store/walletStore";
 import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
 import { Abi, parseEther } from "viem";
-import { PERPS_AVAX } from "@/utils/constants";
+import { CONTRACT_ADDRESS_AVAX } from "@/utils/constants";
 import { useEffect, useState } from "react";
 
 export const useOpenPosition = () => {
@@ -31,25 +29,31 @@ export const useOpenPosition = () => {
     symbol: string,
     isLong: boolean,
     collateralAmount: string,
-    leverage: number
-  ) => {
-    console.log(symbol, isLong, collateralAmount, leverage);
-    try {
-      setQuery(true);
-      writeContract({
-        abi: PERPS_ABI as Abi,
-        address: PERPS_AVAX,
-        functionName: "openPosition",
-        args: [symbol, parseEther(collateralAmount), BigInt(leverage), isLong],
-      });
-    } catch (err) {
-      setQuery(false);
-      console.error("Error opening position for user", err);
+    leverage: string
+   )=>{
+    try{
+    setQuery(true);
+    writeContract({
+            abi: PERPS_ABI as Abi,
+            address:CONTRACT_ADDRESS_AVAX,
+            functionName:"openPosition",
+            args:
+            [
+                symbol,
+                parseEther(collateralAmount),
+                BigInt(leverage),
+                isLong
+            ],
+            value:parseEther(collateralAmount)
+    })
+    }catch(err){
+        setQuery(false);
+        console.log("Error opening position for user", err)
     }
   };
 
   return {
     openPosition,
-    isPending: isPending || isConfirming,
+    isPositionLoading: isPending || isConfirming,
   };
 };

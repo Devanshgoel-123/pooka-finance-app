@@ -7,11 +7,6 @@
     overflow: hidden;
   }
   
-  .tickerContainer {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  
   .tickerTitle {
     text-align: center;
     font-size: 3rem;
@@ -181,66 +176,4 @@
     }
   }
   
-  // /* Responsive design */
-  // @media (max-width: 768px) {
-  //   .cryptoTickerSection {
-  //     padding: 4rem 1rem;
-  //   }
-  
-  //   .tickerTitle {
-  //     font-size: 2.5rem;
-  //     margin-bottom: 3rem;
-  //   }
-  
-  //   .tokenCard {
-  //     width: 240px;
-  //     padding: 1.25rem;
-  //   }
-  
-  //   .tokenIconWrapper {
-  //     width: 40px;
-  //     height: 40px;
-  //     font-size: 20px;
-  //   }
-  
-  //   .tokenName {
-  //     font-size: 14px;
-  //   }
-  
-  //   .tokenSymbol {
-  //     font-size: 12px;
-  //   }
-  
-  //   .tokenPrice {
-  //     font-size: 16px;
-  //   }
-  
-  //   .tokenChange {
-  //     font-size: 12px;
-  //     padding: 3px 6px;
-  //   }
-  // }
-  
-  // @media (max-width: 480px) {
-  //   .cryptoTickerSection {
-  //     padding: 3rem 0.5rem;
-  //   }
-  
-  //   .tickerTitle {
-  //     font-size: 2rem;
-  //     margin-bottom: 2rem;
-  //   }
-  
-  //   .tokenCard {
-  //     width: 200px;
-  //     padding: 1rem;
-  //     margin: 0 0.5rem;
-  //   }
-  
-  //   .tokenIconWrapper {
-  //     width: 36px;
-  //     height: 36px;
-  //     font-size: 18px;
-  //   }
-  // }
-  
+ 

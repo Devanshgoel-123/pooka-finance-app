@@ -14,7 +14,15 @@ interface ApiData{
     l: number,
     t: number,
     n: number
-  }
+}
+
+interface ApiResponse{ 
+  time: string; 
+  open: number; 
+  high: number; 
+  low: number; 
+  close: number; 
+}
 
 
 
@@ -47,9 +55,11 @@ export async function GET(request:NextRequest) {
         close: item.c, 
       }));
      
+    const cleanedData = ohlcData.filter((d: ApiResponse, i: number, arr: ApiResponse[]) => i === 0 || d.time !== arr[i - 1].time).sort((a:ApiResponse, b:ApiResponse)=>Number(a.time) - Number(b.time));
+
 
      return NextResponse.json(
-        { data: ohlcData },
+        { data: cleanedData },
         { status: 200 }
       );
     }catch(err){
@@ -62,6 +72,3 @@ export async function GET(request:NextRequest) {
 
 }
 
-
-// BTCUSD"
-//X:ETHUSD

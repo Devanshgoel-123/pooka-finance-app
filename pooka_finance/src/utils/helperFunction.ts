@@ -1,3 +1,4 @@
+
 export const NormalizeContractData=(value:bigint)=>{
     return Number(value)/10**8;
 }
@@ -17,4 +18,41 @@ export const returnFormattedDate=(now:Date):string=>{
     const dd = String(now.getDate()).padStart(2, "0");
   
     return `${yyyy}-${mm}-${dd}`;
+}
+
+
+export const getPerpName=(name:string)=>{
+    if(name.toLowerCase().includes("eth")){
+        return "ETH/USD"
+    }else if(name.toLowerCase().includes('btc') || (name.toLowerCase().includes("bit"))){
+        return "BTC/USD"
+    }else{
+        return "BTC/USD"
+    }
+}
+
+export const getPerpImage=(name:string)=>{
+    if(name.toLowerCase().includes("eth")){
+        return "/assets/eth.svg"
+    }else if(name.toLowerCase().includes('btc') || (name.toLowerCase().includes("bit"))){
+        return "/assets/btc.svg"
+    }else{
+        return "/assets/btc.svg"
+    }
+}
+
+export const getChainImage=(chainName:string)=>{
+    if(chainName.toLowerCase().includes("eth")){
+        return '/assets/eth.svg'
+    }else{
+        return '/assets/avax.svg'
+    }
+}
+
+export const getTokenImage=(token:string)=>{
+    if(token.toLowerCase().includes('u')){
+        return '/assets/usdc.svg'
+    }else{
+        return '/assets/eth.svg'
+    }
 }
