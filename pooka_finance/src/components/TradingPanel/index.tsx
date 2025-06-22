@@ -3,31 +3,29 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import "./styles.scss";
-import { useBalance } from "wagmi";
+import { useAccount, useBalance } from "wagmi";
 import { useWalletStore } from "@/store/walletStore";
-import { useShallow } from "zustand/react/shallow";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { usePerpStore } from "@/store/PerpStore";
-import { Loader2 } from "lucide-react";
+import { useShallow } from 'zustand/react/shallow'
+import { ConnectButton } from "@rainbow-me/rainbowkit"
+import { usePerpStore } from "@/store/PerpStore"
+import { Loader2 } from "lucide-react"
 import { useCreateDeposit } from "@/hooks/useCreateDeposit";
 import { useOpenPosition } from "@/hooks/useOpenPosition";
 
-const OrderComponent: React.FC = () => {
-  const [positionType, setPositionType] = useState<"Long" | "Short">("Long");
 
-  const { address } = useWalletStore(
-    useShallow((state) => ({
-      address: state.userWalletAddress,
-    }))
-  );
-
-  const { selectedPerp } = usePerpStore(
-    useShallow((state) => ({
-      selectedPerp: state.selectedPerp,
-      leverage: state.leverage,
-    }))
-  );
-
+export const OrderComponent: React.FC = () => {
+  const [positionType, setPositionType]=useState<"Long" | "Short">("Long");
+  const [leverageIndex, setLeverageIndex]=useState<number>(0);
+  const {
+    selectedPerp,
+    leverage
+  }=usePerpStore(useShallow((state)=>({
+    selectedPerp:state.selectedPerp,
+    leverage:state.leverage
+  })))
+  const {
+    address
+  }=useAccount()
   const {
     data,
     isLoading: isBalanceLoading,
@@ -43,18 +41,27 @@ const OrderComponent: React.FC = () => {
   useEffect(() => {}, [address, selectedPerp]);
 
   const [collateralAmount, setCollateralAmount] = useState<string>("0");
-  const [leverageIndex, setLeverageIndex] = useState<number>(0);
 
   const leverageOptions = [1, 2, 3, 4, 5, 10, 15, 20];
 
-  const { createDeposit, isLoading: isDepositLoading } = useCreateDeposit();
-  const { openPosition, isPending: isPositionLoading } = useOpenPosition();
-  const handleCreateDeposit = () => {
-    // const isLong=positionType==="Long";
-    try {
-      createDeposit(collateralAmount);
-    } catch (err) {
-      console.error("Error occured", err);
+  const {
+    createDeposit,
+    isDepositLoading
+  }=useCreateDeposit();
+
+  const {
+    openPosition,
+    isPositionLoading
+  }=useOpenPosition()
+
+  
+  const handleCreateDeposit=()=>{
+    try{
+      createDeposit(
+        collateralAmount,
+      )
+    }catch(err){
+      console.log("Error occured",err)
     }
   };
   const handleOpenPosition = () => {
@@ -64,7 +71,7 @@ const OrderComponent: React.FC = () => {
         selectedPerp,
         isLong,
         collateralAmount,
-        leverageOptions[leverageIndex]
+        leverage
       );
     } catch (err) {
       console.error("Error opening position", err);
@@ -143,7 +150,10 @@ const OrderComponent: React.FC = () => {
                   className={`leverageDot ${
                     index === leverageIndex ? "active" : ""
                   } ${index <= leverageIndex ? "filled" : ""}`}
-                  onClick={() => setLeverageIndex(index)}
+                  onClick={() => {
+                    setLeverageIndex(index)
+                    usePerpStore.getState().setLeverage(leverageOptions[index].toString())
+                  }}
                 />
               ))}
             </div>
@@ -233,4 +243,3 @@ const OrderComponent: React.FC = () => {
   );
 };
 
-export default OrderComponent;

@@ -1,5 +1,7 @@
-import React from "react";
-import "./styles.scss";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+"use client"
+import React from 'react';
+import './styles.scss';
 
 interface TradingChartSkeletonProps {
   width?: string;
@@ -12,7 +14,6 @@ export const TradingChartSkeleton: React.FC<TradingChartSkeletonProps> = ({
   showControls = true,
   showPriceLabels = true,
 }) => {
-  // Seeded random function for deterministic values
   const seededRandom = (seed: number): number => {
     const x = Math.sin(seed) * 10000;
     return x - Math.floor(x);
@@ -40,35 +41,13 @@ export const TradingChartSkeleton: React.FC<TradingChartSkeletonProps> = ({
   const generateCandlesticks = () => {
     const candlesticks = [];
     const numCandles = 25;
-    const candleWidth = 12;
     const spacing = 32;
 
     for (let i = 0; i < numCandles; i++) {
       const x = i * spacing + 20;
-      const baseHeight = 120 + seededRandom(i + 200) * 60;
-      const wickHeight = baseHeight + seededRandom(i + 300) * 40;
-      const isGreen = seededRandom(i + 400) > 0.5;
-
+      
       candlesticks.push(
         <g key={i} className="chartSkeleton__candlestick">
-          <line
-            x1={x + candleWidth / 2}
-            y1={50}
-            x2={x + candleWidth / 2}
-            y2={50 + wickHeight}
-            className="chartSkeleton__wick"
-          />
-          <rect
-            x={x}
-            y={50 + (wickHeight - baseHeight) / 2}
-            width={candleWidth}
-            height={baseHeight}
-            className={`chartSkeleton__candleBody ${
-              isGreen
-                ? "chartSkeleton__candleBody--green"
-                : "chartSkeleton__candleBody--red"
-            }`}
-          />
         </g>
       );
     }

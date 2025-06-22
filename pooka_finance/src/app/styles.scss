@@ -1,51 +1,36 @@
 @import "../app/mixin.scss";
-.tradingAppWrapper{
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  padding-bottom: 1rem;
-  width: 100%;
-  justify-content: flex-start;
-  
-  .tradingLayoutWrapper {
-    display: flex;
-    flex-direction: column;
-    max-height: 86%;
-    overflow: auto;
 
-    @include xl{
-      padding-inline: 60px;
-      padding-block: 16px;
-    }
-
-
-    .MidComponentWrapper{
-      display: flex;
-      flex-direction: row;
-      justify-content: flex-start;
-      gap: 10px;
-      width: 100%;
-      margin-bottom: 20px;
-
-      @include xxl{
-        width: 100%;
-      }
-      .OrderBookColumn{
-        width: 50%;
-      }
-  
-      .OrderPlacingColumn{
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-        width: 50%;
-        height: 100%;
-        gap: 10px;
-      }
-    }
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-.tradingLayoutWrapper::-webkit-scrollbar {
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #000000;
+}
+
+body, html {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+
+.HomeWrapper {
+  background-color: #000000;
+  color: #ffffff;
+  width: 100%;
+  min-height: 100vh;
+  height: auto;
+  overflow: auto;
+}
+
+
+::-webkit-scrollbar {
   display: none;
 }

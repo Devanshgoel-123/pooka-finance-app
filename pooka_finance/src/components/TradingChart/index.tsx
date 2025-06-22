@@ -1,71 +1,73 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"
-import React, { useEffect, useRef, useState } from 'react';
-import { createChart, CandlestickSeries } from 'lightweight-charts';
-import './styles.scss';
-import axios from 'axios';
-import { OHLC_DATA } from '@/store/types/types';
-import { usePerpStore } from '@/store/PerpStore';
-import { useShallow } from 'zustand/react/shallow';
-import { TradingChartSkeleton } from '../LoadingComponents/GraphSkeleton';
-import TimeSelector from './TimeSelector';
-
+"use client";
+import React, { useEffect, useRef, useState } from "react";
+import { createChart, CandlestickSeries } from "lightweight-charts";
+import "./styles.scss";
+import axios from "axios";
+import { OHLC_DATA } from "@/store/types/types";
+import { usePerpStore } from "@/store/PerpStore";
+import { useShallow } from "zustand/react/shallow";
+import { TradingChartSkeleton } from "../LoadingComponents/GraphSkeleton";
+import TimeSelector from "./TimeSelector";
 
 export const TradingChart = () => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
-  const [ohlcData, setOhlcData]=useState<OHLC_DATA[] >([]);
-  const [loading, setLoading]=useState<boolean>(true);
+  const [ohlcData, setOhlcData] = useState<OHLC_DATA[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  
-  const {
-    selectedPerp,
-    timeFrame
-  }=usePerpStore(useShallow((state)=>({
-    selectedPerp:state.selectedPerp,
-    timeFrame : state.timeframe
-  })))
+  const { selectedPerp, timeFrame } = usePerpStore(
+    useShallow((state) => ({
+      selectedPerp: state.selectedPerp,
+      timeFrame: state.timeframe,
+    }))
+  );
 
- const myPriceFormatter = Intl.NumberFormat("US", {
-    style: 'currency',
-    currency: 'USD', 
-}).format;
+  const myPriceFormatter = Intl.NumberFormat("US", {
+    style: "currency",
+    currency: "USD",
+  }).format;
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
-   
-    
-    chartRef.current = createChart(chartContainerRef.current, {
-        layout: {
-            background: { color: '#222' },
-            textColor: '#DDD',
-        },
-        grid: {
-            vertLines: { color: '#444' },
-            horzLines: { color: '#444' },
-        },
-        height:400,
-        localization:{
-          priceFormatter:myPriceFormatter
-        }
-    }
-    );
 
-    chartRef.current.priceScale('right').applyOptions({
-      borderColor: '#71649C',
-      autoScale : false,
-      barSpacing:50
-  });
-  
-  chartRef.current.timeScale().applyOptions({
-      borderColor: '#71649C',
+    chartRef.current = createChart(chartContainerRef.current, {
+      layout: {
+        background: { color: "#000000" },
+        textColor: "#E0E0E0",
+      },
+      grid: {
+        vertLines: { color: "#1A1A1A" },
+        horzLines: { color: "#1A1A1A" },
+      },
+      height: 400,
+      localization: {
+        priceFormatter: myPriceFormatter,
+      },
+    });
+
+    chartRef.current.priceScale("right").applyOptions({
+      borderColor: "#1e1e1e",
+      autoScale: false,
+      barSpacing: 50,
+      textColor: "#E0E0E0",
+    });
+
+    chartRef.current.timeScale().applyOptions({
+      borderColor: "#1e1e1e",
       scaleMargins: {
         top: 0.1,
         bottom: 0.2,
-    },
-  });
- 
-    const candleStickSeries = chartRef.current.addSeries(CandlestickSeries, { upColor: '#26a69a', downColor: '#ef5350', borderVisible:true, wickUpColor: '#26a69a', wickDownColor: '#ef5350' });
+      },
+      textColor: "#E0E0E0",
+    });
+
+    const candleStickSeries = chartRef.current.addSeries(CandlestickSeries, {
+      upColor: "#26a69a",
+      downColor: "#ef5350",
+      borderVisible: true,
+      wickUpColor: "#26a69a",
+      wickDownColor: "#ef5350",
+    });
     candleStickSeries.setData(ohlcData);
     chartRef.current.timeScale().fitContent();
 
@@ -76,36 +78,32 @@ export const TradingChart = () => {
     };
   }, [ohlcData]);
 
-
-  useEffect(()=>{
+  useEffect(() => {
     setLoading(true);
     const fetchOHLCData = async () => {
       try {
-        const res = await axios.get("/api/OHLCData",{
-          params:{
-            perp:selectedPerp,
-            timeFrame : timeFrame
-          }
+        const res = await axios.get("/api/OHLCData", {
+          params: {
+            perp: selectedPerp,
+            timeFrame: timeFrame.value,
+          },
         });
         const data = await res.data;
-        setOhlcData(data.data)
-        setLoading(false)
+        setOhlcData(data.data);
+        setLoading(false);
       } catch (err) {
         console.error("Failed to fetch OHLC data:", err);
       }
     };
     fetchOHLCData();
-  },[selectedPerp, timeFrame])
+  }, [selectedPerp, timeFrame]);
 
-
-  return (
-    loading ? (
-        <TradingChartSkeleton />  
-    ) : (
-      <div className="candlestickChartWrapper">
-        <TimeSelector/>
-        <div ref={chartContainerRef} className="chart" />
-      </div>
-    )
+  return loading ? (
+    <TradingChartSkeleton />
+  ) : (
+    <div className="candlestickChartWrapper">
+      <TimeSelector />
+      <div ref={chartContainerRef} className="chart" />
+    </div>
   );
 };

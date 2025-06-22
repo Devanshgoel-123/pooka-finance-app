@@ -3,7 +3,7 @@ import { useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 import { useAccount } from "wagmi";
 import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
 import { Abi, parseEther } from "viem";
-import { PERPS_AVAX } from "@/utils/constants";
+import { CONTRACT_ADDRESS_AVAX} from "@/utils/constants";
 import { useEffect, useState } from "react";
 
 
@@ -39,9 +39,12 @@ export const useCreateDeposit=()=>{
     setQuery(true);
     writeContract({
             abi: PERPS_ABI as Abi,
-            address:PERPS_AVAX,
-            functionName:"deposit",
-            args: [], 
+            address:CONTRACT_ADDRESS_AVAX,
+            functionName:"createDeposit",
+            args:
+            [
+               parseEther(depositAmount)
+            ],
             value:parseEther(depositAmount)
     })
     }catch(err){
@@ -52,7 +55,7 @@ export const useCreateDeposit=()=>{
 
    return {
     createDeposit,
-    isLoading:isPending
+    isDepositLoading:isPending
    }
 
 }
