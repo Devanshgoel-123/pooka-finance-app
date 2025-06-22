@@ -2,9 +2,9 @@
 import {useReadContracts } from "wagmi"
 import { useAccount } from "wagmi";
 import { useWalletStore } from "@/store/walletStore";
-import { POOKA_ABI } from "@/components/ABI/PookaFinanceABI";
+import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
 import { Abi, parseEther } from "viem";
-import { CONTRACT_ADDRESS_SEPOLIA } from "@/utils/constants";
+import { PERPS_AVAX } from "@/utils/constants";
 import { useEffect, useState } from "react";
 import { MARKET_SYMBOLS } from "@/utils/constants";
 
@@ -16,8 +16,8 @@ export const useFetchUserPosition=()=>{
     { symbol: 'BTC/USD', name: 'Bitcoin Perpetual', logo:"/assets/btc.svg"},
   ];
   const contractCalls = markets.map((market) => ({
-    abi: POOKA_ABI as Abi,
-    address: CONTRACT_ADDRESS_SEPOLIA as `0x${string}`,
+    abi: PERPS_ABI as Abi,
+    address: PERPS_AVAX as `0x${string}`,
     functionName: 'getPosition',
     args: [
         address,

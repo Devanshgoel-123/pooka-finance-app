@@ -2,7 +2,7 @@
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi"
 import { useAccount } from "wagmi";
 import { useWalletStore } from "@/store/walletStore";
-import { POOKA_ABI } from "@/components/ABI/PookaFinanceABI";
+import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
 import { Abi, parseEther } from "viem";
 import { useEffect, useState } from "react";
 import { CONTRACT_ADDRESS_AVAX } from "@/utils/constants";
@@ -39,8 +39,8 @@ export const useClosePosition=()=>{
     try{
     setQuery(true);
     writeContract({
-            abi: POOKA_ABI as Abi,
             address:CONTRACT_ADDRESS_AVAX,
+            abi: PERPS_ABI as Abi,
             functionName:"closePosition",
             args:
             [

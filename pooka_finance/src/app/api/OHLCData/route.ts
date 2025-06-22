@@ -63,7 +63,7 @@ export async function GET(request:NextRequest) {
         { status: 200 }
       );
     }catch(err){
-        console.log(err)
+        console.error(err)
         return NextResponse.json(
             { error: "Error fetching data from Polygon API" },
             { status: 400 }
