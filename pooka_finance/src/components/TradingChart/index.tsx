@@ -90,7 +90,6 @@ export const TradingChart = () => {
           },
         });
         const data = await res.data;
-        console.log("OHLC Data:", data.data);
         setOhlcData(data.data);
         setLoading(false);
       } catch (err) {

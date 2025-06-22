@@ -31,7 +31,6 @@ export const OrderComponent: React.FC = () => {
   })
 
   useEffect(()=>{
-    console.log("The address of the user",address)
   },[address, selectedPerp])
 
   const [collateralAmount, setCollateralAmount] = useState<string>("0")
@@ -39,17 +38,12 @@ export const OrderComponent: React.FC = () => {
 
   const leverageOptions = [1,2,3,4,5,10,15,20]
 
-  // const {
-  //   openPosition,
-  //   isPending
-  // }=useOpenPosition();
   const {
     createDeposit,
     isLoading
   }=useCreateDeposit();
 
   const handleCreateDeposit=()=>{
-    // const isLong=positionType==="Long";
     try{
       createDeposit(
         collateralAmount,
@@ -59,7 +53,6 @@ export const OrderComponent: React.FC = () => {
     }
   }
 
-  console.log("THe address is",address)
 
   return (
     <div className="orderComponent">

@@ -29,10 +29,8 @@ interface ApiResponse{
 export async function GET(request:NextRequest) {
     try{
       const { searchParams } = new URL(request.url);
-      console.log(searchParams)
       const perp = searchParams.get("perp");
       const timeFrame = searchParams.get("timeFrame") as "minute" | "day" | "month" | "week" | "hour" | "quarter";
-     console.log("THe requested data",perp);
      if(perp===undefined || perp==="" || perp===null) {
       return NextResponse.json(
         { error: `Error fetching data from Polygon API because of invalid perp name: ${perp}` },
@@ -47,7 +45,6 @@ export async function GET(request:NextRequest) {
      const CURRENCY_TICKER:string=perp.toString().replace("/","");
      const PARTS:"minute" | "day" | "month" | "week" | "hour" | "quarter"= timeFrame !==null ? timeFrame : "day";
      const URL_POLYGON=`${BASE_URL}/X:${CURRENCY_TICKER}/range/1/${PARTS}/${DATE_TO}/${DATE_NOW}?adjusted=true&limit=1000&sort=asc&apiKey=${API_KEY}`;
-     console.log(URL_POLYGON)
      const result=await axios.get(URL_POLYGON)
 
      const ohlcData = result.data.results.map((item:ApiData) => ({

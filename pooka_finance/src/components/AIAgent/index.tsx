@@ -161,7 +161,12 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
     <div className="agentChatWrapper">
       <div className="chatHeader">
         <div className="headerInfo">
-          <div className="crossIcon" onClick={() => { router.push('/')}}>
+          <div
+            className="crossIcon"
+            onClick={() => {
+              router.push("/");
+            }}
+          >
             <RxCross1 />
           </div>
           <div className="agentAvatar">
@@ -201,7 +206,6 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
                     useWalletStore
                       .getState()
                       .setUserWalletAddress(account?.address as string);
-                    console.log("The address is", account?.address);
                     openConnectModal();
                   }
                 }}

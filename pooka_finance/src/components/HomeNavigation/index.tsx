@@ -10,6 +10,7 @@ interface NavigationProps {
 }
 
 export const Navigation: React.FC<NavigationProps> = ({ onLaunchApp }) => {
+ 
   return (
     <nav className="navigation">
       <div className="navContainer">

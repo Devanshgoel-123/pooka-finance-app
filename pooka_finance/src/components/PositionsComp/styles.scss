@@ -1,7 +1,7 @@
 @import "../../app/mixin.scss";
 
 .positionsComponent {
-  background-color: #111000;
+  background-color: rgb(1, 1, 1);
   border-radius: 12px;
   border: 1px solid #2a2a2a;
   color: #ffffff;
@@ -9,6 +9,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  font-family: "Manrope";
 }
 
 .tabsContainer {
@@ -68,7 +69,6 @@
   animation: fadeIn 0.2s ease-in-out;
 }
 
-// Loading State
 .loadingState {
   display: flex;
   flex-direction: column;
@@ -144,20 +144,20 @@
 
 .positionsHeader {
   display: grid;
-  grid-template-columns: 140px 90px 120px 120px 120px 110px 110px 140px 120px 80px;
-  background: #2a2a2a;
+  grid-template-columns: 140px 90px 120px 120px 120px 110px 110px 140px 120px 110px;
+  background: #050505;
   border-bottom: 1px solid #333333;
   padding: 0;
 }
 
 .headerCell {
   padding: 12px 8px;
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 600;
   display: flex;
   justify-content: center;
   align-items: center;
-  color: #888888;
+  color: #a6a6a6;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-right: 1px solid #333333;
@@ -168,12 +168,12 @@
 }
 
 .positionsBody {
-  background: #222222;
+  background: #040404;
 }
 
 .positionRow {
   display: grid;
-  grid-template-columns: 140px 90px 120px 120px 120px 110px 110px 140px 120px 80px;
+  grid-template-columns: 140px 90px 120px 120px 120px 110px 110px 140px 120px 110px;
   border-bottom: 1px solid #333333;
   transition: background-color 0.2s ease;
 
@@ -215,12 +215,13 @@
 .directionContainer {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   width: 100%;
 }
 
 .cellValue {
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 500;
   color: #ffffff;
   text-align: center;
@@ -230,9 +231,9 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 8px;
+  padding: 10px 18px;
   border-radius: 4px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   width: fit-content;
@@ -286,17 +287,19 @@
 }
 
 .noRisk {
-  color: #666666;
-  font-size: 12px;
+  color: #7bf179;
+  font-size: 18px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 2px solid #4c4c4c;
 }
 
 .pnlValue {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   text-align: right;
 }
 
-// Animations
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -337,7 +340,7 @@
   }
 
   .directionBadge {
-    font-size: 9px;
+    font-size: 14px;
     padding: 3px 6px;
   }
 }
