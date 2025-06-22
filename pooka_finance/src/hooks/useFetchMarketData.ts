@@ -30,7 +30,7 @@ export const useFetchMarketData=()=>{
   } = useReadContract({
     abi: PRICE_ORACLE_ABI as Abi,
     address:CONTRACT_ADDRESS_PRICE_FEED_AVAX as `0x${string}`,
-    functionName: 'get24hData',
+    functionName: 'getPrice',
     args: [
         selectedPerp
     ],
@@ -39,11 +39,8 @@ export const useFetchMarketData=()=>{
         refetchInterval:30000 
     }
   });
-  
-  if(isError){
-    console.error("The error is",error)
-  }
 
+  console.log(data);
 
   const marketData:MarketData= !isLoading && !isError && data && Array.isArray(data) ?{
     currentPrice: NormalizeContractData((data as bigint[])[0]) as number || 0,

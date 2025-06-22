@@ -1,5 +1,4 @@
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { useAccount } from "wagmi";
 import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
 import { Abi, parseEther } from "viem";
 import { CONTRACT_ADDRESS_AVAX } from "@/utils/constants";
@@ -7,7 +6,6 @@ import { useEffect, useState } from "react";
 
 export const useOpenPosition = () => {
   const [query, setQuery] = useState<boolean>(false);
-  const { address } = useAccount();
   const { writeContract, data: hash, error, isPending } = useWriteContract();
 
   const { isLoading: isConfirming } = useWaitForTransactionReceipt({

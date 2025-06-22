@@ -1,3 +1,4 @@
+import { PERP_MM } from "./constants";
 
 export const NormalizeContractData=(value:bigint)=>{
     return Number(value)/10**8;
@@ -54,5 +55,25 @@ export const getTokenImage=(token:string)=>{
         return '/assets/usdc.svg'
     }else{
         return '/assets/eth.svg'
+    }
+}
+
+
+export const getPositionSize=(leverage:string, collateral:string)=>{
+   return Number(leverage)*Number(collateral);
+}
+
+export const getLiquidationPrice=(collateral:string, leverage:string, perpName:string)=>{
+    const maintenance_margin=getMaintenanceMargin(perpName);
+    const positionAmount=Number(collateral)*Number(leverage);
+    const liquidationPrice=positionAmount*(maintenance_margin);
+    return liquidationPrice
+}
+
+export const getMaintenanceMargin=(perpName:string)=>{
+    if(perpName.toLowerCase().includes("eth")){
+        return (PERP_MM.ETH/100)
+    }else{
+        return (PERP_MM.BTC/100)
     }
 }

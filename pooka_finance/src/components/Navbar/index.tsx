@@ -51,7 +51,7 @@ export const Navbar=() => {
         const ready = mounted && authenticationStatus !== "loading";
         return (
           <button
-            className="connectWalletButton"
+            className={isConnected ? "connectedWallet" : "connectWalletButton"}
             onClick={()=>{
               if(account?.address){
                 useWalletStore.getState().setUserWalletAddress(undefined)

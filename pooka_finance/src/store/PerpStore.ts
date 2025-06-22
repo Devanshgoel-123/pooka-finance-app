@@ -7,11 +7,13 @@ interface PerpStore{
     maintenanceMargin : number;
     timeframe:TimeFrame;
     actionType:string | undefined;
+    mobileOption:string;
     setMaintenanceMargin: (maintenanceMargin : number) => void;
     setSelectedPerp:(perp:string)=>void;
     setLeverage:(leverage:string)=>void;
     setTimeFrame:(timeframe:TimeFrame)=>void;
     setActionType:(action:string)=>void;
+    setMobileOption:(name:string)=>void;
 }
 
 
@@ -22,6 +24,7 @@ export const usePerpStore=create<PerpStore>((set) => ({
         value:"day",
         label:"3D"
     },
+    mobileOption:"chart",
     maintenanceMargin:PERP_MM.BTC,
     actionType:undefined,
     setSelectedPerp: (perp:string)=>{
@@ -47,6 +50,11 @@ export const usePerpStore=create<PerpStore>((set) => ({
     setActionType:(action:string)=>{
         set(()=>({
             actionType:action
+        }))
+    },
+    setMobileOption:(name:string)=>{
+        set(()=>({
+            mobileOption:name
         }))
     }
 }))

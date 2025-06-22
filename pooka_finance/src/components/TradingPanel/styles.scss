@@ -8,6 +8,7 @@
   color: #ffffff;
   font-family: "Manrope", sans-serif;
   max-width: 100%;
+  transition: all ease-in-out 0.5s;
 }
 
 .tabContainer {
@@ -18,6 +19,16 @@
   padding: 2px;
   margin-bottom: 20px;
   gap: 15px;
+}
+
+.balanceContainer{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap:3px;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .PositionTab, .MarketTab {
@@ -275,7 +286,7 @@
 .orderDetails {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 14px;
   padding: 12px 0;
   border-top: 1px solid #3a3a3a;
 }
@@ -284,20 +295,33 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+
+  .detailLabel {
+    color: #888888;
+    font-size: 14px;
+  }
+  
+  
+  .detailValue {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 500;
+    flex-direction: row;
+    display: flex;
+    gap: 5px;
+    .usdcLogoTradingPanel{
+      display: flex;
+  
+      flex-direction: row;
+      border-radius: 50%;
+    }
+  }
 }
 
-.detailLabel {
-  color: #888888;
-  font-size: 13px;
-}
 
-.detailValue {
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 500;
-}
 
-.connectWalletButton {
+.connectWalletButton, .insufficientDepositBtn {
   background-color: #67ef65;
   color: black;
   border: none;
@@ -309,6 +333,10 @@
   min-width: 200px;
   border: 1px solid #313131;
   transition: background-color 0.2s ease;
+}
+
+.insufficientDepositBtn{
+  background-color: #3a3a3a;
 }
 
 .connectWalletButton:hover {

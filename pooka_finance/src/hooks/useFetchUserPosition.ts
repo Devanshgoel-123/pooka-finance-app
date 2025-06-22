@@ -37,6 +37,7 @@ export const useFetchUserPosition=()=>{
     }
   });
 
+  console.log(data)
 
    return {
     data,
