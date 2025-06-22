@@ -25,3 +25,18 @@ export type PositionParams = {
   positionType?: "long" | "short";
   chainName?: string;
 };
+
+export interface Message {
+  id: string;
+  type: "user" | "agent";
+  content: string;
+  timestamp: Date;
+  action:"query" | "response" | "trade" | "deposit";
+  params?: DepositParams | PositionParams;
+}
+
+export interface AgentChatProps {
+  onSendMessage?: (message: string) => void
+  onClearChat?: () => void
+  isConnected?: boolean
+}

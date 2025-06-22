@@ -7,6 +7,7 @@ import "./styles.scss"
 import { getTokenImage } from "@/utils/helperFunction"
 import { getChainImage } from "@/utils/helperFunction"
 import { DepositParams } from "@/store/types/types"
+import { LoadingSpinner } from "@/common/LoadingSpinner"
 
 interface DepositCardProps {
   params: DepositParams
@@ -15,7 +16,7 @@ interface DepositCardProps {
 
 export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = false }) => {
   const [isHovered, setIsHovered] = useState(false)
-
+  
   const formatCurrency = (amount: number | undefined) => {
     if (!amount) return "0"
     return new Intl.NumberFormat("en-US", {
@@ -40,10 +41,7 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="cardHeader">
-        <div className="depositInfo">
-          <div className="depositTitle">Deposit Collateral</div>
-          <div className="depositSubtitle">Add funds to your trading account</div>
-        </div>
+        <div className="depositTitle">Deposit Collateral</div>
         <div className="chainInfo">
           <Image
             src={getChainImage(params.chainName || "eth")}
@@ -56,8 +54,7 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
         </div>
       </div>
 
-      <div className="cardBody">
-        <div className="parameterGrid">
+      <div className="cardBodyDeposit">
           <div className="parameter mainParameter">
             <div className="paramLabel">Deposit Amount</div>
             <div className="paramValue">
@@ -108,18 +105,6 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
               <span className="networkName">{params?.chainName?.toUpperCase()}</span>
             </div>
           </div>
-        </div>
-
-        <div className="depositSummary">
-          <div className="summaryItem">
-            <span className="summaryLabel">{"You're depositing"}</span>
-            <span className="summaryValue">{formatTokenAmount(params.collateral, params.payToken)}</span>
-          </div>
-          <div className="summaryItem">
-            <span className="summaryLabel">Estimated value</span>
-            <span className="summaryValue">{formatCurrency(params.collateral)}</span>
-          </div>
-        </div>
       </div>
 
       <div className="cardFooter">
@@ -130,22 +115,11 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
         >
           {isLoading ? (
             <>
-              <div className="loadingSpinner"></div>
+              <LoadingSpinner/>
               <span>Processing Deposit...</span>
             </>
           ) : (
-            <>
-              <span>Confirm Deposit</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M12 2V22M17 5H9.5C8.11929 5 7 6.11929 7 7.5C7 8.88071 8.11929 10 9.5 10H14.5C15.8807 10 17 11.1193 17 12.5C17 13.8807 15.8807 15 14.5 15H5M17 19H7"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </>
+           "Confirm Deposit"
           )}
         </button>
       </div>

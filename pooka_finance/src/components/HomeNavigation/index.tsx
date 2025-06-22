@@ -3,6 +3,7 @@
 import type React from "react"
 import "./styles.scss"
 import Link from "next/link";
+import Image from "next/image";
 
 interface NavigationProps {
   onLaunchApp?: () => void
@@ -14,7 +15,7 @@ export const Navigation: React.FC<NavigationProps> = ({ onLaunchApp }) => {
       <div className="navContainer">
         <div className="logo">
           <div className="logoIcon">
-            <span className="logoPlaceholder">LOGO</span>
+            <Image src={"/assets/logo.svg"} className="logoPlaceholder" height={45} width={45} alt="logo"/>
           </div>
           <span className="logoText">PookaFinance</span>
         </div>
