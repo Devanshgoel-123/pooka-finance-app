@@ -14,6 +14,7 @@ import { Market } from "@/store/types/types";
 import { useFetchUserDepositBalance } from "@/hooks/useFetchUserBalance";
 import { useAccount } from "wagmi"
 import { useCreateDeposit } from "@/hooks/useCreateDeposit"
+import { useFetchTokenPriceInUsd } from "@/hooks/useFetchPriceInUsd"
 
 
 export const TradingHeader = ({
@@ -26,6 +27,7 @@ export const TradingHeader = ({
   const {
     createDeposit
   }=useCreateDeposit();
+
 
   const [showDropDown, setShowDropDown] = useState<boolean>(false);
   const [selectedMarket, setSelectedMarket] = useState<Market>(markets[1]);
@@ -131,11 +133,6 @@ export const TradingHeader = ({
           <div className="depositBalance">
             <Image src={"/assets/usdc.svg"} alt="" height={22} width={22} className="usdcLogo"/>
           <span>${userDepositbalance===0 ? userDepositbalance.toFixed(2) : userDepositbalance.toFixed(3)}</span>
-         { address && <button className="depositCollateralBtn" onClick={async ()=>{
-            // await createDeposit()
-         }}>
-            Deposit
-          </button>}
           </div>
         </div>
       </div>

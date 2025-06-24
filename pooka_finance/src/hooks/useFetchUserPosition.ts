@@ -18,7 +18,7 @@ export const useFetchUserPosition=()=>{
   const contractCalls = markets.map((market) => ({
     abi: PERPS_ABI as Abi,
     address: CONTRACT_ADDRESS_AVAX as `0x${string}`,
-    functionName: 'getPosition',
+    functionName: 'positions',
     args: [
         address,
         market.symbol
@@ -37,7 +37,7 @@ export const useFetchUserPosition=()=>{
     }
   });
 
-  console.log(data)
+  console.log("The user positions are",data)
 
    return {
     data,

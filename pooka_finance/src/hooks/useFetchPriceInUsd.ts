@@ -1,38 +1,50 @@
+import { useAccount, useReadContract } from "wagmi";
+import { PRICE_ORACLE_ABI } from "@/components/ABI/PriceOracleABI";
+import {
+  CONTRACT_ADDRESS_PRICE_FEED_AVAX,
+  LINK_TOKEN_AVAX,
+  NATIVE_TOKEN_AVAX,
+  PRICE_MM_TOKEN,
+  USDC_TOKEN_AVAX,
+  USDC_TOKEN_SEPOLIA,
+} from "@/utils/constants";
 
-import { useAccount, useReadContract } from "wagmi"
-import { PRICE_ORACLE_ABI } from "@/components/ABI/PriceOracleABI"
-import { CONTRACT_ADDRESS_PRICE_FEED_AVAX } from "@/utils/constants"
-
-interface Props{
-    tokenName:string
+interface Props {
+  token: string;
 }
 
-export const useFetchTokenPriceInUsd=({
-    tokenName
-}:Props)=>{
-    const {
-        address
-    }=useAccount();
-    const {
-        data,
-        isError,
-        isSuccess,
-        isFetching
-    }=useReadContract({
-        abi:PRICE_ORACLE_ABI,
-        address:CONTRACT_ADDRESS_PRICE_FEED_AVAX,
-        account:address,
-        args:[
-            tokenName
-        ]
-    });
+export const useFetchTokenPriceInUsd = ({ token }: Props) => {
+  const { address } = useAccount();
 
-    console.log(`The price for ${tokenName} is ${data}`);
-    return {
-        data,
-        isError,
-        isSuccess,
-        isFetching
+  let feedName: string = "";
+
+  if (token === NATIVE_TOKEN_AVAX) {
+    feedName = PRICE_MM_TOKEN.NATIVE_TOKEN_AVAX;
+  } else if (token === LINK_TOKEN_AVAX) {
+    feedName = PRICE_MM_TOKEN.LINK_TOKEN_AVAX;
+  } else {
+    feedName = PRICE_MM_TOKEN.NATIVE_TOKEN_SEPOLIA;
+  }
+
+  const { data, error } = useReadContract({
+    abi: PRICE_ORACLE_ABI,
+    address: CONTRACT_ADDRESS_PRICE_FEED_AVAX,
+    functionName: "getPrice",
+    account: address,
+    args: [feedName],
+    query:{
+        enabled:address !== undefined && token !== USDC_TOKEN_AVAX && token !== USDC_TOKEN_SEPOLIA
     }
+  });
 
-}
+  let tokenPriceInUsd: number | undefined;
+
+  if(Array.isArray(data)) {
+    tokenPriceInUsd=Number(data[0])/10**8;
+  }
+   console.log(tokenPriceInUsd)
+  return {
+    tokenPriceInUsd,
+    error,
+  };
+};

@@ -87,6 +87,9 @@ export const TokenSelector = () => {
                 alt={selectedTokenData.name}
                 height={25}
                 width={25}
+                style={{
+                  borderRadius:"50%"
+                }}
               />
             </div>
           ) : (
@@ -97,6 +100,9 @@ export const TokenSelector = () => {
                 src={currentTokens[0]?.icon || "/assets/usdc.svg"}
                 alt='Select token'
                 className='tokenLogo'
+                style={{
+                  borderRadius:"50%"
+                }}
               />
             </div>
           )}

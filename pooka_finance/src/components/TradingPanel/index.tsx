@@ -12,11 +12,12 @@ import { Loader2 } from "lucide-react"
 import { useOpenPosition } from "@/hooks/useOpenPosition";
 import { useFetchUserDepositBalance} from "@/hooks/useFetchUserBalance";
 import { getLiquidationPrice, getPositionSize, tokenImageForAddress } from "@/utils/helperFunction";
-import { FEE_PERCENTAGE, USDC_TOKEN } from "@/utils/constants";
+import { FEE_PERCENTAGE, USDC_TOKEN, USDC_TOKEN_AVAX, USDC_TOKEN_SEPOLIA } from "@/utils/constants";
 import { avalancheFuji} from "viem/chains";
 import Image from "next/image";
 import { TokenSelector } from "./TokenSelector";
 import { useCreateDeposit } from "@/hooks/useCreateDeposit";
+import { useFetchTokenPriceInUsd } from "@/hooks/useFetchPriceInUsd";
 
 export const OrderComponent: React.FC = () => {
   const {
@@ -25,6 +26,7 @@ export const OrderComponent: React.FC = () => {
   const [positionType, setPositionType]=useState<"Long" | "Short">("Long");
   const [leverageIndex, setLeverageIndex]=useState<number>(0);
   const [activeTab, setActiveTab]=useState<number>(0);
+  const [estimatedPrice, setEstimatedPrice]=useState<number>(0);
   const {
     selectedPerp,
     leverage,
@@ -58,7 +60,6 @@ export const OrderComponent: React.FC = () => {
 
   const leverageOptions = [1, 2, 3];
 
- 
 
   const {
     openPosition,
@@ -69,6 +70,23 @@ export const OrderComponent: React.FC = () => {
     createDeposit,
     createCrossChainDeposit,
   }=useCreateDeposit()
+
+  const {
+    tokenPriceInUsd
+  }=useFetchTokenPriceInUsd({
+    token:payToken
+  })
+
+  useEffect(()=>{
+    if(!tokenPriceInUsd || !payToken) return;
+    if(payToken === USDC_TOKEN_SEPOLIA || payToken === USDC_TOKEN_AVAX){
+      setEstimatedPrice(Number(collateralAmount))
+      return;
+    }
+    const priceOfToken=Number(tokenPriceInUsd)*Number(collateralAmount);
+    console.log(priceOfToken);
+    setEstimatedPrice(priceOfToken)
+  },[tokenPriceInUsd, payToken, collateralAmount])
 
   
   const handleOpenPosition = () => {
@@ -95,11 +113,10 @@ export const OrderComponent: React.FC = () => {
     if (isBalanceLoading) return "Fetching Balance";
     if (!data) return "Balance: 0.0000";
 
-    const balance = Number(data.value) / 10 ** Number(data.decimals);
     return <div className="balanceContainer">
       <span>Your Balance:</span>
       <Image src={tokenImageForAddress(payToken)} height={14} width={14} alt="" className="tokenLogo"/>
-     <span>{balance.toFixed(4)};</span>
+     <span>{userDepositbalance.toFixed(4)};</span>
     </div>
   };
 
@@ -133,7 +150,7 @@ export const OrderComponent: React.FC = () => {
 
   const RenderButtonTextDepositTab=()=>{
       return <button
-      className="connectWalletButton"
+      className={Number(collateralAmount)===0 ? `insufficientDepositBtn` : `connectWalletButton`}
       disabled={Number(collateralAmount)===0}
       onClick={async ()=>{
         if(chainId===avalancheFuji.id){
@@ -143,9 +160,11 @@ export const OrderComponent: React.FC = () => {
         }
       }}
       >
-      Deposit
+    {Number(collateralAmount)===0 ? `Enter Amount` : `Deposit`}
       </button>
   }
+
+
 
   return (
     <div className="orderComponent">
@@ -168,7 +187,6 @@ export const OrderComponent: React.FC = () => {
         </div>
 
         <div className="inputContainer">
-          <TokenSelector/>
           <input
             type="text"
             value={collateralAmount}
@@ -323,6 +341,14 @@ export const OrderComponent: React.FC = () => {
           }}>
             MAX
           </button>
+        </div>
+
+        <div className="valueContainer">
+          <span className="estimatedText">Estd Value : </span>
+          <div className="valueText" >
+            <Image className="tokenLogo" height={25} width={25} src={USDC_TOKEN} alt=""/>
+            {estimatedPrice.toFixed(4)}
+          </div>
         </div>
         {address !== undefined ? (
           <>

@@ -31,7 +31,7 @@ export const PositionsComponent = () => {
 
   const tabs = [
     { key: "Positions", label: "Positions" },
-    { key: "Orders", label: "Orders" },
+    // { key: "Orders", label: "Orders" },
     { key: "Funding History", label: "Funding History" },
   ] as const
 

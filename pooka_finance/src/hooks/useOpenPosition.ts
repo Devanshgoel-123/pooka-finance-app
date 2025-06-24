@@ -1,6 +1,6 @@
 import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
-import { Abi, parseEther } from "viem";
+import { Abi,parseUnits } from "viem";
 import { CONTRACT_ADDRESS_AVAX } from "@/utils/constants";
 import { useEffect, useState } from "react";
 
@@ -28,25 +28,18 @@ export const useOpenPosition = () => {
     isLong: boolean,
     collateralAmount: string,
     leverage: string
-   )=>{
-    try{
-    setQuery(true);
-    writeContract({
-            abi: PERPS_ABI as Abi,
-            address:CONTRACT_ADDRESS_AVAX,
-            functionName:"openPosition",
-            args:
-            [
-                symbol,
-                parseEther(collateralAmount),
-                BigInt(leverage),
-                isLong
-            ],
-            value:parseEther(collateralAmount)
-    })
-    }catch(err){
-        setQuery(false);
-        console.log("Error opening position for user", err)
+  ) => {
+    try {
+      setQuery(true);
+      writeContract({
+        abi: PERPS_ABI as Abi,
+        address: CONTRACT_ADDRESS_AVAX,
+        functionName: "openPosition",
+        args: [symbol, parseUnits(collateralAmount,6), BigInt(leverage), isLong],
+      });
+    } catch (err) {
+      setQuery(false);
+      console.log("Error opening position for user", err);
     }
   };
 
