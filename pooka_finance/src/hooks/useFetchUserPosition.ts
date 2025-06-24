@@ -4,7 +4,7 @@ import { useAccount } from "wagmi";
 import { useWalletStore } from "@/store/walletStore";
 import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
 import { Abi, parseEther } from "viem";
-import { PERPS_AVAX } from "@/utils/constants";
+import { CONTRACT_ADDRESS_AVAX } from "@/utils/constants";
 import { useEffect, useState } from "react";
 import { MARKET_SYMBOLS } from "@/utils/constants";
 
@@ -17,7 +17,7 @@ export const useFetchUserPosition=()=>{
   ];
   const contractCalls = markets.map((market) => ({
     abi: PERPS_ABI as Abi,
-    address: PERPS_AVAX as `0x${string}`,
+    address: CONTRACT_ADDRESS_AVAX as `0x${string}`,
     functionName: 'getPosition',
     args: [
         address,
@@ -37,6 +37,7 @@ export const useFetchUserPosition=()=>{
     }
   });
 
+  console.log(data)
 
    return {
     data,

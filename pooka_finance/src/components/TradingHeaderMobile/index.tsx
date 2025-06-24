@@ -2,7 +2,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, act } from "react"
 import "./styles.scss"
 import { MARKET_SYMBOLS, PERP_MM } from "@/utils/constants"
 import { usePerpStore } from "@/store/PerpStore"
@@ -15,7 +15,16 @@ import { useFetchUserBalance } from "@/hooks/useFetchUserBalance";
 import { useAccount } from "wagmi"
 
 
-export const TradingHeader = ({
+const button_array=[
+  {
+    text:"chart"
+  },
+  {
+    text:"Trade"
+  }
+]
+
+export const TradingHeaderMobile = ({
   priceChange = -374.74,
   priceChangePercent = -0.36,
 }) => {
@@ -25,6 +34,7 @@ export const TradingHeader = ({
   const [showDropDown, setShowDropDown] = useState<boolean>(false);
   const [selectedMarket, setSelectedMarket] = useState<Market>(markets[1]);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [activeTab, setActiveTab]=useState<string>("chart");
   const {
     userDepositbalance
   }=useFetchUserBalance();
@@ -47,7 +57,6 @@ export const TradingHeader = ({
         setShowDropDown(false);
       }
     };
-
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
@@ -70,19 +79,20 @@ export const TradingHeader = ({
   };
 
   return (
-    <div className="tradingHeader">
+    <div className="tradingHeaderMobile">
+      <div className="statsSectionTrading">
       <div className="priceSection">
-        <div className="symbolContainerDesktop" ref={dropdownRef}>
+        <div className="symbolContainer" ref={dropdownRef}>
           <div className="symbolIcon">
             <Image height={30} width={30} src={selectedMarket.logo} alt="image" className="mt-2"/>
             </div>
-          <div className="symbolInfoDesktop" onClick={toggleDropdown}>
+          <div className="symbolInfo" onClick={toggleDropdown}>
             <span className="symbolText">{selectedMarket.symbol}</span>
             <div className={`symbolDropdown ${showDropDown ? 'open' : ''}`}>▼</div>
           </div>
           
           {showDropDown && (
-            <div className="dropdownMenuDesktop">
+            <div className="dropdownMenu">
               {markets.map((market) => (
                 <div
                   key={market.symbol}
@@ -97,7 +107,7 @@ export const TradingHeader = ({
           )}
         </div>
 
-        <div className="priceInfoDesktop">
+        <div className="priceInfo">
           <div className="currentPrice">${isLoading ? "0.00" : marketData.currentPrice.toLocaleString()}</div>
           <div className={`priceChange ${isPositive ? "positive" : "negative"}`}>
             {isPositive ? "+" : ""}
@@ -105,8 +115,6 @@ export const TradingHeader = ({
           </div>
         </div>
       </div>
-
-      <div className="statsSectionTradingDesktop">
         <div className="statsData">
         <div className="statItem">
           <span className="statLabel">24H High</span>
@@ -121,16 +129,31 @@ export const TradingHeader = ({
           <span className="statValue">{isLoading ? "0.00" : maintenanceMargin.toFixed(1)}%</span>
         </div>
         </div>
-        <div className="depositWrapper">
-          <span className="depositHeader">YOUR DEPOSIT :</span>
+      </div>
+      <div className="depositWrapperMobile">
+        <div className="buttonContainer">
+          {
+            button_array.map((item, index:number)=>{
+              return <button className={`selectBtn ${item.text === activeTab ? "active" : "inActive"}`} key={index} onClick={()=>{
+                setActiveTab(item.text)
+                usePerpStore.getState().setMobileOption(item.text)
+              }}>
+                {item.text.toUpperCase()}
+              </button>
+            })
+          }
+        </div>
+        <>
+        <span className="depositHeader">YOUR DEPOSIT :</span>
           <div className="depositBalance">
             <Image src={"/assets/usdc.svg"} alt="" height={22} width={22} className="usdcLogo"/>
           <span>${userDepositbalance===0 ? userDepositbalance.toFixed(2) : userDepositbalance.toFixed(3)}</span>
-         { address && <button className="depositCollateralBtn">
+         { address && <button className="depositCollateralBtn ">
             Deposit
           </button>}
           </div>
-        </div>
+        </>
+         
       </div>
     </div>
   )

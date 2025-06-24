@@ -9,9 +9,11 @@ import { useShallow } from 'zustand/react/shallow'
 import { ConnectButton } from "@rainbow-me/rainbowkit"
 import { usePerpStore } from "@/store/PerpStore"
 import { Loader2 } from "lucide-react"
-import { useCreateDeposit } from "@/hooks/useCreateDeposit";
 import { useOpenPosition } from "@/hooks/useOpenPosition";
-
+import { useFetchUserBalance } from "@/hooks/useFetchUserBalance";
+import { getLiquidationPrice, getPositionSize } from "@/utils/helperFunction";
+import { AVAX_TOKEN, FEE_PERCENTAGE, USDC_TOKEN } from "@/utils/constants";
+import Image from "next/image";
 
 export const OrderComponent: React.FC = () => {
   const [positionType, setPositionType]=useState<"Long" | "Short">("Long");
@@ -25,7 +27,8 @@ export const OrderComponent: React.FC = () => {
   })))
   const {
     address
-  }=useAccount()
+  }=useAccount();
+
   const {
     data,
     isLoading: isBalanceLoading,
@@ -33,21 +36,23 @@ export const OrderComponent: React.FC = () => {
   } = useBalance({
     address: address as `0x${string}`,
     query: {
-      enabled: !!address, // Only fetch when address exists
+      enabled: !!address,
     },
   });
+
+  const {
+    userDepositbalance
+  }=useFetchUserBalance();
+
   console.error("Balance Error:" + balanceError);
 
   useEffect(() => {}, [address, selectedPerp]);
 
   const [collateralAmount, setCollateralAmount] = useState<string>("0");
 
-  const leverageOptions = [1, 2, 3, 4, 5, 10, 15, 20];
+  const leverageOptions = [1, 2, 3];
 
-  const {
-    createDeposit,
-    isDepositLoading
-  }=useCreateDeposit();
+ 
 
   const {
     openPosition,
@@ -55,15 +60,6 @@ export const OrderComponent: React.FC = () => {
   }=useOpenPosition()
 
   
-  const handleCreateDeposit=()=>{
-    try{
-      createDeposit(
-        collateralAmount,
-      )
-    }catch(err){
-      console.log("Error occured",err)
-    }
-  };
   const handleOpenPosition = () => {
     const isLong = positionType === "Long";
     try {
@@ -78,13 +74,45 @@ export const OrderComponent: React.FC = () => {
     }
   };
 
+  const handleMaxPosition=()=>{
+    if(!userDepositbalance) return;
+    const userMaxDeposit=userDepositbalance.toString();
+    setCollateralAmount(userMaxDeposit)
+  }
+
   const formatBalance = () => {
     if (isBalanceLoading) return "Fetching Balance";
     if (!data) return "Balance: 0.0000";
 
     const balance = Number(data.value) / 10 ** Number(data.decimals);
-    return `Your Balance: ${data.symbol} ${balance.toFixed(4)}`;
+    return <div className="balanceContainer">
+      <span>Your Balance:</span>
+      <Image src={AVAX_TOKEN} height={14} width={14} alt=""/>
+     <span>{balance.toFixed(4)};</span>
+    </div>
   };
+
+
+  const RenderButtonText=()=>{
+    const collateral=Number(collateralAmount);
+    if( collateral > Number(userDepositbalance)){
+      return <button
+      className="insufficientDepositBtn"
+      onClick={handleOpenPosition}
+      disabled={true}
+      >
+        Insufficient Deposit
+      </button>
+    }else{
+      return <button
+      className="connectWalletButton"
+      onClick={handleOpenPosition}
+      disabled={!selectedPerp || collateralAmount === "0"}
+    >
+      {collateral === 0 ? "Enter Amount" : `Open ${positionType} Position`}
+    </button>
+    }
+  }
 
   return (
     <div className="orderComponent">
@@ -94,13 +122,13 @@ export const OrderComponent: React.FC = () => {
         </div>
         <div className="PositionTab">
           <button
-            className={positionType === "Long" ? "activeLong" : ""}
+            className={positionType === "Long" ? "activeLong" : "long"}
             onClick={() => setPositionType("Long")}
           >
             Long
           </button>
           <button
-            className={positionType === "Short" ? "activeShort" : ""}
+            className={positionType === "Short" ? "activeShort" : "short"}
             onClick={() => setPositionType("Short")}
           >
             Short
@@ -126,13 +154,15 @@ export const OrderComponent: React.FC = () => {
             className="orderInput"
             placeholder="0"
           />
-          <button className="maxButton">
-            MAX <span className="maxIcon">$</span>
+          <button className="maxButton" onClick={()=>{
+            handleMaxPosition()
+          }}>
+            MAX
           </button>
         </div>
 
         <div className="leverageSection">
-          <label className="formLabel">Select Leverage upto 20X</label>
+          <label className="formLabel">Select Leverage upto 3X</label>
           <div className="leverageContainer">
             <div className="leverageProgressBar">
               <div className="leverageProgressLine"></div>
@@ -176,43 +206,36 @@ export const OrderComponent: React.FC = () => {
         <div className="orderDetails">
           <div className="detailRow">
             <span className="detailLabel">Est. Position Size</span>
-            <span className="detailValue">--</span>
+            <span className="detailValue">
+            <Image src={USDC_TOKEN} height={18} width={18} alt="" className="usdcLogoTradingPanel"/>
+              {
+                getPositionSize(leverage, collateralAmount).toFixed(4)
+              }
+            </span>
           </div>
           <div className="detailRow">
             <span className="detailLabel">Liq. Price</span>
-            <span className="detailValue">--</span>
+            <span className="detailValue">
+              <Image src={USDC_TOKEN} height={18} width={18} alt="" className="usdcLogoTradingPanel"/>
+              {
+                getLiquidationPrice(collateralAmount, leverage, selectedPerp).toFixed(4)
+              }
+              </span>
           </div>
           <div className="detailRow">
-            <span className="detailLabel">Max. Slippage</span>
-            <span className="detailValue">0.08%</span>
-          </div>
-          <div className="detailRow">
-            <span className="detailLabel">Trading Fee</span>
-            <span className="detailValue">--</span>
+            <span className="detailLabel">Trading Fee (1%)</span>
+            <span className="detailValue">
+            <Image src={USDC_TOKEN} height={18} width={18} alt="" className="usdcLogoTradingPanel"/>
+              {
+               (FEE_PERCENTAGE*getPositionSize(leverage, collateralAmount)).toFixed(4)
+              }
+            </span>
           </div>
         </div>
         {address !== undefined ? (
           <>
-            {!isDepositLoading ? (
-              <button
-                className="connectWalletButton"
-                onClick={handleCreateDeposit}
-                style={{ marginBottom: "8px" }}
-              >
-                Deposit Collateral
-              </button>
-            ) : (
-              <Loader2 style={{ marginBottom: "8px" }} />
-            )}
-
             {!isPositionLoading ? (
-              <button
-                className="connectWalletButton"
-                onClick={handleOpenPosition}
-                disabled={!selectedPerp || collateralAmount === "0"}
-              >
-                Open {positionType} Position
-              </button>
+              RenderButtonText()
             ) : (
               <Loader2 />
             )}

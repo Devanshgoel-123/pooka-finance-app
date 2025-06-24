@@ -14,6 +14,10 @@
     max-height: 86%;
     overflow: auto;
     background-color: black;
+    padding-inline: 30px;
+    padding-top: 20px;
+    gap: 15px;
+
     @include xl{
       padding-inline: 60px;
       padding-block: 16px;
@@ -27,6 +31,10 @@
       gap: 10px;
       width: 100%;
       margin-bottom: 20px;
+
+      @include md{
+        justify-content: center;
+      }
 
       @include xxl{
         width: 100%;

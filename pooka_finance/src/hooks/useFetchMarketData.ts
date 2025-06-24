@@ -1,15 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import {useReadContracts } from "wagmi"
-import { useAccount } from "wagmi";
-import { useWalletStore } from "@/store/walletStore";
-import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
-import { Abi, parseEther } from "viem";
-import { PRICE_ORACLE_AVAX } from "@/utils/constants";
-import { use, useEffect, useState } from "react";
+
+import { Abi } from "viem";
+import { CONTRACT_ADDRESS_PRICE_FEED_AVAX } from "@/utils/constants";
 import { useReadContract } from "wagmi";
 import { usePerpStore } from "@/store/PerpStore";
 import { useShallow } from "zustand/react/shallow";
-import { stat } from "fs";
 import { PRICE_ORACLE_ABI } from "@/components/ABI/PriceOracleABI";
 import { NormalizeContractData } from "@/utils/helperFunction";
 
@@ -22,7 +16,6 @@ interface MarketData{
 }
 
 export const useFetchMarketData=()=>{
-  const [query, setQuery]=useState<boolean>(false);
   const {
     selectedPerp
   }=usePerpStore(useShallow((state)=>({
@@ -36,8 +29,8 @@ export const useFetchMarketData=()=>{
     isError,
   } = useReadContract({
     abi: PRICE_ORACLE_ABI as Abi,
-    address:PRICE_ORACLE_AVAX as `0x${string}`,
-    functionName: 'get24hData',
+    address:CONTRACT_ADDRESS_PRICE_FEED_AVAX as `0x${string}`,
+    functionName: 'getPrice',
     args: [
         selectedPerp
     ],
@@ -46,11 +39,8 @@ export const useFetchMarketData=()=>{
         refetchInterval:30000 
     }
   });
-  
-  if(isError){
-    console.error("The error is",error)
-  }
 
+  console.log(data);
 
   const marketData:MarketData= !isLoading && !isError && data && Array.isArray(data) ?{
     currentPrice: NormalizeContractData((data as bigint[])[0]) as number || 0,
