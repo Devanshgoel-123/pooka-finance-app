@@ -1,4 +1,4 @@
-import { PERP_MM } from "@/utils/constants";
+import {CONTRACT_ADDRESS_AVAX, PERP_MM, USDC_TOKEN_AVAX } from "@/utils/constants";
 import {create} from "zustand";
 import { TimeFrame } from "./types/types";
 interface PerpStore{
@@ -8,12 +8,16 @@ interface PerpStore{
     timeframe:TimeFrame;
     actionType:string | undefined;
     mobileOption:string;
+    perps_contract_address:string;
+    payToken:string;
     setMaintenanceMargin: (maintenanceMargin : number) => void;
     setSelectedPerp:(perp:string)=>void;
     setLeverage:(leverage:string)=>void;
     setTimeFrame:(timeframe:TimeFrame)=>void;
     setActionType:(action:string)=>void;
     setMobileOption:(name:string)=>void;
+    setPayToken:(address:string)=>void;
+    setPerpsContractAddress:(address:string)=>void;
 }
 
 
@@ -24,9 +28,16 @@ export const usePerpStore=create<PerpStore>((set) => ({
         value:"day",
         label:"3D"
     },
+    payToken:USDC_TOKEN_AVAX,
+    perps_contract_address:CONTRACT_ADDRESS_AVAX,
     mobileOption:"chart",
     maintenanceMargin:PERP_MM.BTC,
     actionType:undefined,
+    setPerpsContractAddress:(address:string)=>{
+        set(()=>({
+            perps_contract_address:address
+        }))
+    },
     setSelectedPerp: (perp:string)=>{
     set(()=>({
         selectedPerp:perp
@@ -56,5 +67,10 @@ export const usePerpStore=create<PerpStore>((set) => ({
         set(()=>({
             mobileOption:name
         }))
+    },
+    setPayToken:(address:string)=>{
+       set(()=>({
+        payToken:address
+       }))
     }
 }))

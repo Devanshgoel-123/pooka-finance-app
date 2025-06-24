@@ -11,7 +11,7 @@ import { useFetchMarketData } from "@/hooks/useFetchMarketData"
 import { useShallow } from "zustand/react/shallow"
 import { markets } from "@/utils/constants"
 import { Market } from "@/store/types/types";
-import { useFetchUserBalance } from "@/hooks/useFetchUserBalance";
+import { useFetchUserDepositBalance } from "@/hooks/useFetchUserBalance";
 import { useAccount } from "wagmi"
 
 
@@ -37,7 +37,7 @@ export const TradingHeaderMobile = ({
   const [activeTab, setActiveTab]=useState<string>("chart");
   const {
     userDepositbalance
-  }=useFetchUserBalance();
+  }=useFetchUserDepositBalance();
   const {
     maintenanceMargin
   }=usePerpStore(useShallow((state)=>({

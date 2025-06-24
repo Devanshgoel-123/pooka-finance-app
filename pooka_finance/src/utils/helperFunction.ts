@@ -1,4 +1,4 @@
-import { PERP_MM } from "./constants";
+import { AVAX_TOKEN, ETH_TOKEN, NATIVE_TOKEN_AVAX, NATIVE_TOKEN_SEPOLIA, PERP_MM, USDC_TOKEN, USDC_TOKEN_AVAX, USDC_TOKEN_SEPOLIA } from "./constants";
 
 export const NormalizeContractData=(value:bigint)=>{
     return Number(value)/10**8;
@@ -50,6 +50,18 @@ export const getChainImage=(chainName:string)=>{
     }
 }
 
+
+export const tokenImageForAddress=(address:string)=>{
+    if(address === USDC_TOKEN_SEPOLIA || address===USDC_TOKEN_AVAX){
+        return USDC_TOKEN
+    }else if(address === NATIVE_TOKEN_AVAX){
+        return AVAX_TOKEN
+    }else if(address === NATIVE_TOKEN_SEPOLIA){
+        return ETH_TOKEN
+    }else{
+        return ETH_TOKEN
+    }
+}
 export const getTokenImage=(token:string)=>{
     if(token.toLowerCase().includes('u')){
         return '/assets/usdc.svg'

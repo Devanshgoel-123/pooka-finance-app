@@ -3,27 +3,36 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import "./styles.scss";
-import { useAccount, useBalance } from "wagmi";
+import { useAccount, useBalance} from "wagmi";
 import { useWalletStore } from "@/store/walletStore";
 import { useShallow } from 'zustand/react/shallow'
 import { ConnectButton } from "@rainbow-me/rainbowkit"
 import { usePerpStore } from "@/store/PerpStore"
 import { Loader2 } from "lucide-react"
 import { useOpenPosition } from "@/hooks/useOpenPosition";
-import { useFetchUserBalance } from "@/hooks/useFetchUserBalance";
-import { getLiquidationPrice, getPositionSize } from "@/utils/helperFunction";
-import { AVAX_TOKEN, FEE_PERCENTAGE, USDC_TOKEN } from "@/utils/constants";
+import { useFetchUserDepositBalance} from "@/hooks/useFetchUserBalance";
+import { getLiquidationPrice, getPositionSize, tokenImageForAddress } from "@/utils/helperFunction";
+import { FEE_PERCENTAGE, USDC_TOKEN } from "@/utils/constants";
+import { avalancheFuji} from "viem/chains";
 import Image from "next/image";
+import { TokenSelector } from "./TokenSelector";
+import { useCreateDeposit } from "@/hooks/useCreateDeposit";
 
 export const OrderComponent: React.FC = () => {
+  const {
+     chainId
+  }=useAccount();
   const [positionType, setPositionType]=useState<"Long" | "Short">("Long");
   const [leverageIndex, setLeverageIndex]=useState<number>(0);
+  const [activeTab, setActiveTab]=useState<number>(0);
   const {
     selectedPerp,
-    leverage
+    leverage,
+    payToken
   }=usePerpStore(useShallow((state)=>({
     selectedPerp:state.selectedPerp,
-    leverage:state.leverage
+    leverage:state.leverage,
+    payToken:state.payToken
   })))
   const {
     address
@@ -32,7 +41,6 @@ export const OrderComponent: React.FC = () => {
   const {
     data,
     isLoading: isBalanceLoading,
-    error: balanceError,
   } = useBalance({
     address: address as `0x${string}`,
     query: {
@@ -42,9 +50,7 @@ export const OrderComponent: React.FC = () => {
 
   const {
     userDepositbalance
-  }=useFetchUserBalance();
-
-  console.error("Balance Error:" + balanceError);
+  }=useFetchUserDepositBalance();
 
   useEffect(() => {}, [address, selectedPerp]);
 
@@ -58,6 +64,11 @@ export const OrderComponent: React.FC = () => {
     openPosition,
     isPositionLoading
   }=useOpenPosition()
+
+  const {
+    createDeposit,
+    createCrossChainDeposit,
+  }=useCreateDeposit()
 
   
   const handleOpenPosition = () => {
@@ -87,7 +98,7 @@ export const OrderComponent: React.FC = () => {
     const balance = Number(data.value) / 10 ** Number(data.decimals);
     return <div className="balanceContainer">
       <span>Your Balance:</span>
-      <Image src={AVAX_TOKEN} height={14} width={14} alt=""/>
+      <Image src={tokenImageForAddress(payToken)} height={14} width={14} alt="" className="tokenLogo"/>
      <span>{balance.toFixed(4)};</span>
     </div>
   };
@@ -95,48 +106,58 @@ export const OrderComponent: React.FC = () => {
 
   const RenderButtonText=()=>{
     const collateral=Number(collateralAmount);
-    if( collateral > Number(userDepositbalance)){
+    const userBalance=Number(userDepositbalance);
+    if( collateral > userBalance){
       return <button
       className="insufficientDepositBtn"
-      onClick={handleOpenPosition}
-      disabled={true}
+      onClick={()=>setActiveTab(1)}
       >
         Insufficient Deposit
       </button>
     }else{
       return <button
-      className="connectWalletButton"
-      onClick={handleOpenPosition}
-      disabled={!selectedPerp || collateralAmount === "0"}
+      className={collateral===0 ? `insufficientDepositBtn` : `connectWalletButton`}
+      onClick={()=>{
+        if(collateral===0 || userBalance === 0){
+          setActiveTab(1)
+        }else{
+          handleOpenPosition()
+        }
+      }}
+      disabled={!selectedPerp}
     >
-      {collateral === 0 ? "Enter Amount" : `Open ${positionType} Position`}
+      {collateral === 0 || userBalance === 0 ? "Deposit First" : `Open ${positionType} Position`}
     </button>
     }
   }
 
+  const RenderButtonTextDepositTab=()=>{
+      return <button
+      className="connectWalletButton"
+      disabled={Number(collateralAmount)===0}
+      onClick={async ()=>{
+        if(chainId===avalancheFuji.id){
+          await createDeposit(collateralAmount, payToken)
+        }else{
+          await createCrossChainDeposit(collateralAmount)
+        }
+      }}
+      >
+      Deposit
+      </button>
+  }
+
   return (
     <div className="orderComponent">
+      {/* TabContainer */}
       <div className="tabContainer">
         <div className="MarketTab">
-          <button className="activeLong">Market</button>
-        </div>
-        <div className="PositionTab">
-          <button
-            className={positionType === "Long" ? "activeLong" : "long"}
-            onClick={() => setPositionType("Long")}
-          >
-            Long
-          </button>
-          <button
-            className={positionType === "Short" ? "activeShort" : "short"}
-            onClick={() => setPositionType("Short")}
-          >
-            Short
-          </button>
+          <button className={!activeTab ? "activeLong" : "inActiveBtn"} onClick={()=>setActiveTab(0)}>Market</button>
+          <button className={activeTab ? "activeLong" : "inActiveBtn"} onClick={()=>setActiveTab(1)}>Deposit</button>
         </div>
       </div>
-
-      <div className="orderForm">
+      {/* Market Compoenent */}
+     {activeTab === 0 ? <div className="orderForm">
         <div className="formRow">
           <label className="formLabel">You Pay</label>
           {!isBalanceLoading ? (
@@ -147,6 +168,7 @@ export const OrderComponent: React.FC = () => {
         </div>
 
         <div className="inputContainer">
+          <TokenSelector/>
           <input
             type="text"
             value={collateralAmount}
@@ -232,6 +254,20 @@ export const OrderComponent: React.FC = () => {
             </span>
           </div>
         </div>
+        <div className="PositionTab">
+          <button
+            className={positionType === "Long" ? "activeLong" : "long"}
+            onClick={() => setPositionType("Long")}
+          >
+            Long
+          </button>
+          <button
+            className={positionType === "Short" ? "activeShort" : "short"}
+            onClick={() => setPositionType("Short")}
+          >
+            Short
+          </button>
+        </div>
         {address !== undefined ? (
           <>
             {!isPositionLoading ? (
@@ -262,6 +298,64 @@ export const OrderComponent: React.FC = () => {
           </ConnectButton.Custom>
         )}
       </div>
+      :
+      <div className="DepositComponent">
+        <div className="formRow">
+          <label className="formLabel">You Pay</label>
+          {!isBalanceLoading ? (
+            <div className="availableBalance">{formatBalance()}</div>
+          ) : (
+            "Fetching Balance"
+          )}
+        </div>
+
+        <div className="inputContainer">
+          <TokenSelector/>
+          <input
+            type="text"
+            value={collateralAmount}
+            onChange={(e) => setCollateralAmount(e.target.value)}
+            className="orderInput"
+            placeholder="0"
+          />
+          <button className="maxButton" onClick={()=>{
+            handleMaxPosition()
+          }}>
+            MAX
+          </button>
+        </div>
+        {address !== undefined ? (
+          <>
+            {!isPositionLoading ? (
+              RenderButtonTextDepositTab()
+            ) : (
+              <Loader2 />
+            )}
+          </>
+        ) : (
+          <ConnectButton.Custom>
+            {({ openConnectModal, account, authenticationStatus, mounted }) => {
+              const ready = mounted && authenticationStatus !== "loading";
+              return (
+                <button
+                  className="connectWalletButton"
+                  onClick={() => {
+                    openConnectModal();
+                    useWalletStore
+                      .getState()
+                      .setUserWalletAddress(account?.address as string);
+                  }}
+                  disabled={!ready}
+                >
+                  Connect Wallet
+                </button>
+              );
+            }}
+          </ConnectButton.Custom>
+        )}
+
+      </div>
+    }
     </div>
   );
 };

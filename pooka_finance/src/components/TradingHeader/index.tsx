@@ -11,8 +11,9 @@ import { useFetchMarketData } from "@/hooks/useFetchMarketData"
 import { useShallow } from "zustand/react/shallow"
 import { markets } from "@/utils/constants"
 import { Market } from "@/store/types/types";
-import { useFetchUserBalance } from "@/hooks/useFetchUserBalance";
+import { useFetchUserDepositBalance } from "@/hooks/useFetchUserBalance";
 import { useAccount } from "wagmi"
+import { useCreateDeposit } from "@/hooks/useCreateDeposit"
 
 
 export const TradingHeader = ({
@@ -22,12 +23,16 @@ export const TradingHeader = ({
   const {
     address
   }=useAccount();
+  const {
+    createDeposit
+  }=useCreateDeposit();
+
   const [showDropDown, setShowDropDown] = useState<boolean>(false);
   const [selectedMarket, setSelectedMarket] = useState<Market>(markets[1]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const {
     userDepositbalance
-  }=useFetchUserBalance();
+  }=useFetchUserDepositBalance();
   const {
     maintenanceMargin
   }=usePerpStore(useShallow((state)=>({
@@ -126,7 +131,9 @@ export const TradingHeader = ({
           <div className="depositBalance">
             <Image src={"/assets/usdc.svg"} alt="" height={22} width={22} className="usdcLogo"/>
           <span>${userDepositbalance===0 ? userDepositbalance.toFixed(2) : userDepositbalance.toFixed(3)}</span>
-         { address && <button className="depositCollateralBtn">
+         { address && <button className="depositCollateralBtn" onClick={async ()=>{
+            // await createDeposit()
+         }}>
             Deposit
           </button>}
           </div>

@@ -4,13 +4,11 @@ import {PERPS_ABI} from "@/components/ABI/PookaFinanceABI";
 import { Abi} from "viem";
 import { CONTRACT_ADDRESS_AVAX} from "@/utils/constants";
 
-export const useFetchUserBalance = () =>{
+export const useFetchUserDepositBalance = () =>{
   const {address, isConnected}=useAccount();
 
   const {
     data,
-    isSuccess,
-    isError
   } = useReadContract({
     abi: PERPS_ABI as Abi,
     address: CONTRACT_ADDRESS_AVAX as `0x${string}`,
@@ -22,9 +20,9 @@ export const useFetchUserBalance = () =>{
       enabled:isConnected
     }
   });
-
-  console.log("The balance of user is", data, isSuccess, isError);
-   const userDepositbalance=Number(data)/10**18 || 0;
+  console.log("The user deposit balance is", data);
+   const userDepositbalance=Number(data)/10**6 || 0;
+  
    return {
     userDepositbalance
    }   

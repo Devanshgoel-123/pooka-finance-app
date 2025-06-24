@@ -1,60 +1,51 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi"
+import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { useAccount } from "wagmi";
-import { useWalletStore } from "@/store/walletStore";
 import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
 import { Abi, parseEther } from "viem";
 import { useEffect, useState } from "react";
 import { CONTRACT_ADDRESS_AVAX } from "@/utils/constants";
 
+export const useClosePosition = () => {
+  const [query, setQuery] = useState<boolean>(false);
+  const { address } = useAccount();
+  const { writeContract, data: hash, error, isPending } = useWriteContract();
 
-export const useClosePosition=()=>{
-  const [query, setQuery]=useState<boolean>(false);
-  const {address}=useAccount();
-   const {
-    writeContract,
-    data:hash,
-    error,
-    isPending
-   }=useWriteContract();
-
-   const {isLoading:isConfirming}=useWaitForTransactionReceipt({
+  const { isLoading: isConfirming } = useWaitForTransactionReceipt({
     hash,
-    query:{
-        enabled:query
+    query: {
+      enabled: query,
+    },
+  });
+
+  useEffect(() => {
+    if (hash && isConfirming) {
+      alert(
+        `Traxn sent successfully with hash:${hash} for closing user's Position`
+      );
+    } else if (error) {
+      alert(
+        `Unable to send the traxn to close User's Position:${error.message}`
+      );
     }
-   })
+  }, [error, hash, isConfirming]);
 
-   useEffect(()=>{
-    if(hash && isConfirming){
-        alert(`Traxn sent successfully with hash:${hash} for closing user's Position`)
-    }else if(error){
-        alert(`Unable to send the traxn to close User's Position:${error.message}`)
+  const closeUserPosition = async (symbol: string) => {
+    try {
+      setQuery(true);
+      writeContract({
+        address: CONTRACT_ADDRESS_AVAX,
+        abi: PERPS_ABI as Abi,
+        functionName: "closePosition",
+        args: [symbol],
+      });
+    } catch (err) {
+      setQuery(false);
+      console.log("Error opening position for user", err);
     }
-   },[error, hash, isConfirming])
+  };
 
-   const closeUserPosition=async (
-    symbol: string
-   )=>{
-    try{
-    setQuery(true);
-    writeContract({
-            address:CONTRACT_ADDRESS_AVAX,
-            abi: PERPS_ABI as Abi,
-            functionName:"closePosition",
-            args:
-            [
-                symbol,
-            ]
-    })
-    }catch(err){
-        setQuery(false);
-        console.log("Error opening position for user", err)
-    }
-}
-
-   return {
-    closeUserPosition
-   }
-
-}
+  return {
+    closeUserPosition,
+  };
+};
