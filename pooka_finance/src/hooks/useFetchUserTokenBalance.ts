@@ -9,7 +9,6 @@ export const useFetchUserTokenBalance = ({
   tokenAddress:string
 }) =>{
   const { address, isConnected }=useAccount();
-console.log("The balance is", tokenAddress)
   const {
     data,
   } = useReadContract({

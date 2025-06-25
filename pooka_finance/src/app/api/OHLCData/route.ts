@@ -16,14 +16,6 @@ interface ApiData{
     n: number
 }
 
-interface ApiResponse{ 
-  time: string; 
-  open: number; 
-  high: number; 
-  low: number; 
-  close: number; 
-}
-
 
 
 export async function GET(request:NextRequest) {
@@ -44,22 +36,21 @@ export async function GET(request:NextRequest) {
      const API_KEY=process.env.API_KEY;
      const CURRENCY_TICKER:string=perp.toString().replace("/","");
      const PARTS:"minute" | "day" | "month" | "week" | "hour" | "quarter"= timeFrame !==null ? timeFrame : "day";
-     const URL_POLYGON=`${BASE_URL}/X:${CURRENCY_TICKER}/range/1/${PARTS}/${DATE_TO}/${DATE_NOW}?adjusted=true&limit=1000&sort=asc&apiKey=${API_KEY}`;
+     const URL_POLYGON=`${BASE_URL}/X:${CURRENCY_TICKER}/range/1/${PARTS}/${DATE_TO}/${DATE_NOW}?adjusted=true&sort=asc&apiKey=${API_KEY}`;
      const result=await axios.get(URL_POLYGON)
 
      const ohlcData = result.data.results.map((item:ApiData) => ({
-        time: new Date(item.t).toISOString().split("T")[0],
+        time: Math.floor(new Date(item.t).getTime() / 1000),
         open: item.o, 
         high: item.h, 
         low: item.l, 
         close: item.c, 
       }));
      
-    const cleanedData = ohlcData.filter((d: ApiResponse, i: number, arr: ApiResponse[]) => i === 0 || d.time !== arr[i - 1].time).sort((a:ApiResponse, b:ApiResponse)=>Number(a.time) - Number(b.time));
-
-
+    // const cleanedData = ohlcData.filter((d: ApiResponse, i: number, arr: ApiResponse[]) => i === 0 || d.time !== arr[i - 1].time).sort((a:ApiResponse, b:ApiResponse)=>Number(a.time) - Number(b.time));
+     console.log(ohlcData)
      return NextResponse.json(
-        { data: cleanedData },
+        { data: ohlcData },
         { status: 200 }
       );
     }catch(err){

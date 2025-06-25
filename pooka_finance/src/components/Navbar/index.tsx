@@ -6,12 +6,14 @@ import "./styles.scss"
 import { ConnectButton } from "@rainbow-me/rainbowkit"
 import { useWalletStore } from "@/store/walletStore";
 import { useAccount, useDisconnect } from "wagmi"
+import { useRouter } from "next/navigation";
+
 export const Navbar=() => {
   const [activeNav, setActiveNav] = useState("Dashboard");
   const {address, isConnected}=useAccount();
   const { disconnect } = useDisconnect();
-  const navItems = ["Dashboard", "Markets", "Portfolio"];
-
+  const navItems = ["Dashboard", "Agent"];
+  const router=useRouter();
   useEffect(() => {
     useWalletStore.getState().setUserWalletAddress(
       isConnected ? address : undefined
@@ -31,7 +33,10 @@ export const Navbar=() => {
             <button
               key={item}
               className={`nav-link ${activeNav === item ? "active" : ""}`}
-              onClick={() => setActiveNav(item)}
+              onClick={() => {
+                setActiveNav(item)
+                router.push(item)
+              }}
             >
               {item}
             </button>

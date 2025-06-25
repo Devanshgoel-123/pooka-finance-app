@@ -3,18 +3,19 @@ import React, { useEffect, useRef, useState } from "react";
 import { createChart, CandlestickSeries } from "lightweight-charts";
 import "./styles.scss";
 import axios from "axios";
-import { OHLC_DATA } from "@/store/types/types";
 import { usePerpStore } from "@/store/PerpStore";
 import { useShallow } from "zustand/react/shallow";
 import { TradingChartSkeleton } from "../LoadingComponents/GraphSkeleton";
 import TimeSelector from "./TimeSelector";
-
+import { OhlcData } from "lightweight-charts";
 export const TradingChart = () => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
-  const [ohlcData, setOhlcData] = useState<OHLC_DATA[]>([]);
+  const [ohlcData, setOhlcData] = useState<OhlcData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const { selectedPerp, timeFrame } = usePerpStore(
+  const {
+     selectedPerp,
+    timeFrame } = usePerpStore(
     useShallow((state) => ({
       selectedPerp: state.selectedPerp,
       timeFrame: state.timeframe,
@@ -40,10 +41,10 @@ export const TradingChart = () => {
         horzLines: { color: "#1A1A1A" },
       },
       height: 400,
-      // width:chartWidth,
       autoSize:true,
       localization: {
         priceFormatter: myPriceFormatter,
+        // timeFormatter: myTimeFormatter,
       },
     });
 

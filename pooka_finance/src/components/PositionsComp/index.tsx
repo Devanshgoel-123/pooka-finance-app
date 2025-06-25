@@ -10,7 +10,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit"
 import { PositionRow } from "./PositionRow"
 export const PositionsComponent = () => {
   const [activeTab, setActiveTab] = useState<"Positions" | "Orders" | "Funding History">("Positions");
-  const { ETH, BTC, error, isError, isLoading } = useFetchUserPosition()
+  const {  error, isError, isLoading, userPositions } = useFetchUserPosition()
   const { address } = useWalletStore(
     useShallow((state) => ({
       address: state.userWalletAddress,
@@ -26,7 +26,7 @@ export const PositionsComponent = () => {
 
 
   const renderPositionRow = (position: PositionData, index: number) => {
-    return <PositionRow position={position} index={index} />
+    return <PositionRow position={position} index={index} key={index}/>
   }
 
   const renderPositionsContent = () => {
@@ -46,55 +46,8 @@ export const PositionsComponent = () => {
         </div>
       )
     }
-    
-    if (!BTC || (Array.isArray(BTC) && BTC.length === 0)) {
-      return (
-        <div className="emptyState">
-          <DollarSign size={32} className="emptyIcon" />
-          <span className="emptyStateText">No open positions</span>
-          <span className="emptyStateSubtext">Your trading positions will appear here</span>
-        </div>
-      )
-    }    
-
-    const eth_positions = Array.isArray(ETH) ? [ETH] : [[ETH]];
-    const btc_position = Array.isArray(BTC) ? [BTC] : [[BTC]];
-
-    const formattedEthPositions: PositionData[] = eth_positions.map((item: unknown) => {
-      const typedItem = item as [bigint, bigint, bigint, bigint, boolean, boolean, bigint, bigint];
-      return {
-        perpName:"ETH/USD",
-        size: typedItem[0],
-        collateral: typedItem[1],
-        entryPrice: typedItem[2],
-        leverage: typedItem[3],
-        isLong: typedItem[4],
-        isOpen: typedItem[5],
-        openTime: typedItem[6],
-        lastFeeTime: typedItem[7],
-      };
-    });
-
-    const formattedBtcPositions:PositionData[] = btc_position.map((item: unknown) => {
-      const typedItem = item as [bigint, bigint, bigint, bigint, boolean, boolean, bigint, bigint];
-      return {
-        perpName:"BTC/USD",
-        size: typedItem[0],
-        collateral: typedItem[1],
-        entryPrice: typedItem[2],
-        leverage: typedItem[3],
-        isLong: typedItem[4],
-        isOpen: typedItem[5],
-        openTime: typedItem[6],
-        lastFeeTime: typedItem[7],
-      };
-    });
-   
-    const openPositionsEth: PositionData[] = (formattedEthPositions as PositionData[]).filter((item)=>item.collateral > 0)
-    const openPositionBtc: PositionData[] = (formattedBtcPositions as PositionData[]).filter((item)=>item.collateral > 0)
-    
-    const openPositions:PositionData[]=[...openPositionBtc, ...openPositionsEth];
-    if (openPositions.length === 0) {
+  
+    if (userPositions.length === 0) {
       return (
         <div className="emptyState">
           <DollarSign size={32} className="emptyIcon" />
@@ -117,7 +70,7 @@ export const PositionsComponent = () => {
           <div className="headerCell">Status</div>
         </div>
         <div className="positionsBody">
-          {openPositions.map((position: PositionData, index: number) => renderPositionRow(position, index))}
+          {userPositions.map((position: PositionData, index: number) => renderPositionRow(position, index))}
         </div>
       </div>
     )

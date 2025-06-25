@@ -39,8 +39,6 @@ export const useFetchMarketData=()=>{
     },
   });
 
-  console.log("Fetched market Data",data);
-
   const marketData:MarketData= !isLoading && !isError && data && Array.isArray(data) ?{
     currentPrice: NormalizeContractData((data as bigint[])[0]) as number || 0,
     price24hHigh: NormalizeContractData((data as bigint[])[1]) as number || 0,

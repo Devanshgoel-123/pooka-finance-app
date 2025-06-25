@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import type React from "react";
@@ -21,6 +22,9 @@ import { LoadingSpinner } from "@/common/LoadingSpinner";
 import { ChainSelector } from "./ChainSelector";
 import { useFetchUserTokenBalance } from "@/hooks/useFetchUserTokenBalance";
 import { handleCheckNativeToken } from "@/utils/helperFunction";
+import { useCreateCrossChainDeposit } from "@/hooks/useCreateCrossChainDeposit";
+import { useSendApprovalTraxn } from "@/hooks/useSendApproval";
+import { useWithdrawAmount } from "@/hooks/useWithdrawAmount";
 export const OrderComponent: React.FC = () => {
   const {
      chainId,
@@ -32,7 +36,14 @@ export const OrderComponent: React.FC = () => {
   const [leverageIndex, setLeverageIndex]=useState<number>(0);
   const [activeTab, setActiveTab]=useState<number>(0);
   const [estimatedPrice, setEstimatedPrice]=useState<number>(0);
-  
+  const [loading, setIsLoading]=useState<boolean>(false);
+  const [depositTab, setDepositTab]=useState<boolean>(true);
+  const [withdrawAmount, setWithDrawAmount]=useState<string>("");
+  const [collateralAmount, setCollateralAmount] = useState<string>("");
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const leverageOptions = [1, 2, 3];
+  const [withdrawLoader, setWithdrawLoader]=useState<boolean>(false);
+
   const {
     selectedPerp,
     leverage,
@@ -44,8 +55,9 @@ export const OrderComponent: React.FC = () => {
     payToken:state.payToken,
     payChain:state.payChain
   })))
+
   const {
-    address
+    address, isConnected
   }=useAccount();
 
   const {
@@ -54,6 +66,20 @@ export const OrderComponent: React.FC = () => {
     tokenAddress:payToken
   })
   
+  const handleApprovalCallBack = async () => {
+    if (payChain === avalancheFuji.id) {
+      if(handleCheckNativeToken(payToken)){
+        await createDeposit(collateralAmount, payToken);
+      }else{
+        await createDeposit(collateralAmount, payToken);
+      }
+    } else if (payChain === sepolia.id) {
+      await createCrossChainDeposit(collateralAmount);
+    } else {
+      console.error('Unsupported chain selected');
+    }
+  };
+
   const {
     data:userNativeBalance
   }=useBalance({
@@ -77,27 +103,41 @@ export const OrderComponent: React.FC = () => {
     userDepositbalance
   }=useFetchUserDepositBalance();
 
-
-  const [collateralAmount, setCollateralAmount] = useState<string>("0");
-
-  const leverageOptions = [1, 2, 3];
-
-
   const {
     openPosition,
     isPositionLoading
-  }=useOpenPosition()
+  }=useOpenPosition();
+
+  const {
+    sendApprovalTraxn,
+    isError
+  }=useSendApprovalTraxn({
+    callBackFunction:handleApprovalCallBack
+  })
 
   const {
     createDeposit,
+    isDepositLoading,
+    isDepositError
+  }=useCreateDeposit();
+
+  const {
     createCrossChainDeposit,
-  }=useCreateDeposit()
+    isCrossChainDepositLoading,
+    isCrossChainError
+  }=useCreateCrossChainDeposit();
 
   const {
     tokenPriceInUsd
   }=useFetchTokenPriceInUsd({
     token:payToken
   })
+
+  const {
+    withdrawUserAmount,
+    isWithdrawError, 
+    isWithdrawSuccess
+  }=useWithdrawAmount()
 
   useEffect(()=>{
     if(!tokenPriceInUsd || !payToken || !payChain) return;
@@ -111,6 +151,17 @@ export const OrderComponent: React.FC = () => {
 
   
  
+  useEffect(()=>{
+    if(isCrossChainDepositLoading || isDepositLoading || isError || isDepositError || isCrossChainError){
+      setIsLoading(false)
+    }
+  },[isCrossChainDepositLoading, isDepositLoading,isError, isDepositError, isCrossChainError])
+
+  useEffect(()=>{
+    if(isWithdrawError || isWithdrawSuccess){
+      setWithdrawLoader(false)
+    }
+  },[isWithdrawError, isWithdrawSuccess])
 
   const handleOpenPosition = () => {
     const isLong = positionType === "Long";
@@ -130,6 +181,21 @@ export const OrderComponent: React.FC = () => {
     if(!userDepositbalance) return;
     const userMaxDeposit=userDepositbalance.toString();
     setCollateralAmount(userMaxDeposit)
+  }
+
+  const handleSelect = (option:string) => {
+    if (option === "Deposit") {
+      setDepositTab(true);
+    } else {
+      setDepositTab(false);
+    }
+    setActiveTab(1);
+    setShowDropdown(false);
+  };
+
+  const handleMaxWithdraw=()=>{
+    if(!userDepositbalance) return;
+    setWithDrawAmount(userDepositbalance.toString());
   }
 
   const formatBalance = () => {
@@ -170,41 +236,69 @@ export const OrderComponent: React.FC = () => {
     </button>
     }
   }
+  
+
+const renderDepositButton=()=>{
+  return (
+    loading ?
+    <div className="bg-[#7bf179] p-[12px] w-[100%] flex flex-row justify-center rounded-[12px]">
+    <LoadingSpinner/>
+    </div> :
+  <button
+  className={Number(collateralAmount)===0 ? `insufficientDepositBtn` : `connectWalletButton`}
+  disabled={Number(collateralAmount)===0}
+  onClick={async ()=>{
+    if(payChain !== chainId){
+      switchChain({
+        chainId:payChain
+      })
+      return 
+    }
+    console.log(payChain, payToken, chainId)
+    setIsLoading(true);
+    try {
+      if (payChain === avalancheFuji.id) {
+        if(handleCheckNativeToken(payToken)){
+          await createDeposit(collateralAmount, payToken);
+        }else{
+          await sendApprovalTraxn(collateralAmount, payToken,payChain);
+        }
+      } else if (payChain === sepolia.id) {
+        await sendApprovalTraxn(collateralAmount, payToken, payChain);
+      } else {
+        console.error('Unsupported chain selected');
+      }
+    } catch (error) {
+      console.error('Error during deposit:', error);
+    }
+  }}
+  >
+ {Number(collateralAmount)===0 ? `Enter Amount` : payChain === chainId ? `Deposit` : `Switch Chain`}
+  </button>
+)
+}
+
+const renderWithDrawButton=()=>{
+  return ( withdrawLoader ?  
+  <div className="bg-[#7bf179] p-[12px] w-[100%] flex flex-row justify-center rounded-[12px]">
+  <LoadingSpinner/>
+  </div> 
+  :
+   <button
+    className={Number(withdrawAmount)===0 || Number(withdrawAmount) > userDepositbalance? `insufficientDepositBtn` : `connectWalletButton`}
+    disabled={Number(withdrawAmount)===0 || Number(withdrawAmount) > userDepositbalance}
+    onClick={async ()=>{
+      setWithdrawLoader(true);
+      withdrawUserAmount(withdrawAmount)
+    }}
+    >
+   {Number(withdrawAmount)===0 ? `Enter Withdraw Amount` : Number(withdrawAmount) > userDepositbalance ? `Insufficient Deposit` : `Withdraw Amount`}
+    </button>
+    )}
+ 
 
   const RenderButtonTextDepositTab=()=>{
-      return <button
-      className={Number(collateralAmount)===0 ? `insufficientDepositBtn` : `connectWalletButton`}
-      disabled={Number(collateralAmount)===0}
-      onClick={async ()=>{
-        console.log(payChain, payToken, chainId)
-        try {
-          if (payChain === avalancheFuji.id) {
-            if (chainId !== payChain) {
-              switchChain({
-                chainId: payChain
-              });
-            }
-            await createDeposit(collateralAmount, payToken);
-          } else if (payChain === sepolia.id) {
-            if (chainId !== payChain) {
-              switchChain({
-                chainId: sepolia.id
-              });
-            }
-            await createCrossChainDeposit(collateralAmount);
-            switchChain({
-              chainId:avalancheFuji.id
-            })
-          } else {
-            console.error('Unsupported chain selected');
-          }
-        } catch (error) {
-          console.error('Error during deposit:', error);
-        }
-      }}
-      >
-    {Number(collateralAmount)===0 ? `Enter Amount` : `Deposit`}
-      </button>
+      return  depositTab ? renderDepositButton() : renderWithDrawButton()
   }
 
 
@@ -214,7 +308,22 @@ export const OrderComponent: React.FC = () => {
       <div className="tabContainer">
         <div className="MarketTab">
           <button className={!activeTab ? "activeLong" : "inActiveBtn"} onClick={()=>setActiveTab(0)}>Market</button>
-          <button className={activeTab ? "activeLong" : "inActiveBtn"} onClick={()=>setActiveTab(1)}>Deposit</button>
+          {/* <button className={activeTab ? "activeLong" : "inActiveBtn"} onClick={()=>setActiveTab(1)}>{depositTab ? "Deposit" :"Withdraw"}</button> */}
+          <div className="dropdownWrapper">
+        <button
+          className={activeTab ? "activeLong" : "inActiveBtn"}
+          onClick={() => setShowDropdown(!showDropdown)}
+        >
+          More
+        </button>
+
+        {showDropdown && (
+          <div className="dropdownMenu">
+            <div onClick={() => handleSelect("Deposit")}>Deposit</div>
+            <div onClick={() => handleSelect("Withdraw")}>Withdraw</div>
+          </div>
+        )}
+      </div>
         </div>
       </div>
      {activeTab === 0 ? <div className="orderForm">
@@ -362,6 +471,14 @@ export const OrderComponent: React.FC = () => {
       </div>
       :
       <div className="DepositComponent">
+        <div className="tabContainer" style={{
+          marginBottom:0
+        }}>
+        <div className="MarketTab" >
+          <button className={depositTab ? "activeLong" : "inActiveBtn"} onClick={()=>setDepositTab(true)}>Deposit</button>
+          <button className={!depositTab ? "activeLong" : "inActiveBtn"} onClick={()=>setDepositTab(false)}>Withdraw</button>
+        </div>
+      </div>
         <div className="formRow">
           <label className="formLabel">You Pay</label>
           {!isBalanceLoading ? (
@@ -372,32 +489,44 @@ export const OrderComponent: React.FC = () => {
         </div>
 
         <div className="inputContainer">
-         
           <input
             type="text"
-            value={collateralAmount}
-            onChange={(e) => setCollateralAmount(e.target.value)}
+            value={!depositTab ? withdrawAmount :collateralAmount}
+            onChange={(e) => {
+              if(!depositTab){
+                setWithDrawAmount(e.target.value)
+              }else{
+                setCollateralAmount(e.target.value)
+              }             
+            }}
             className="orderInput"
             placeholder="0"
           />
-           <div className="selectorComponent">
+          { depositTab && isConnected && <div className="selectorComponent">
           <ChainSelector/>
           <TokenSelector/>
-          </div>
+          </div>}
           <button className="maxButton" onClick={()=>{
-            handleMaxPosition()
+            if(!depositTab){
+              handleMaxWithdraw()
+            }else{
+              handleMaxPosition()
+            }
+          
           }}>
             MAX
           </button>
         </div>
 
-        <div className="valueContainer">
+       {depositTab && <div className="valueContainer">
           <span className="estimatedText">Estd Value : </span>
           <div className="valueText" >
             <Image className="tokenLogo" height={25} width={25} src={USDC_TOKEN} alt=""/>
             {estimatedPrice.toFixed(4)}
           </div>
-        </div>
+        </div>}
+
+        
         {address !== undefined ? (
           <>
             {!isPositionLoading ? (
