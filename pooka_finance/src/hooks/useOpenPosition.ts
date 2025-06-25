@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 export const useOpenPosition = () => {
   const [query, setQuery] = useState<boolean>(false);
-  const { writeContract, data: hash, error, isPending } = useWriteContract();
+  const { writeContract, data: hash, error, isPending, isError } = useWriteContract();
 
   const { isLoading: isConfirming } = useWaitForTransactionReceipt({
     hash,
@@ -31,6 +31,7 @@ export const useOpenPosition = () => {
   ) => {
     try {
       setQuery(true);
+      console.log(symbol, collateralAmount, leverage, isLong)
       writeContract({
         abi: PERPS_ABI as Abi,
         address: CONTRACT_ADDRESS_AVAX,
@@ -45,6 +46,6 @@ export const useOpenPosition = () => {
 
   return {
     openPosition,
-    isPositionLoading: isPending || isConfirming,
+    isPositionLoading: isPending || isConfirming || isError,
   };
 };

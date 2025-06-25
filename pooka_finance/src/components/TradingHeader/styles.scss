@@ -18,7 +18,7 @@
   }
 
   @include xxl{
-    width: 50%;
+   
   }
 }
 
@@ -44,6 +44,12 @@
     transition: background-color 0.2s ease;
     position: relative;
     margin-right: 20px;
+
+    @include xxl{
+      width: 200px;
+      gap: 4px;
+      
+    }
   }
   
   .symbolContainer:hover {
@@ -54,6 +60,14 @@
     font-size: 20px;
     color: #f7931a;
     font-weight: bold;
+
+    .tokenLogoPerp{
+      @include xxl{
+        height: 35px;
+        width: 35px;
+        margin-top: 5px;
+      }
+    }
   }
   
   .symbolInfoDesktop{
@@ -62,12 +76,19 @@
     gap: 6px;
     flex: 1;
     justify-content: space-between;
+    @include xxl{
+      justify-content: flex-start;
+    }
   }
   
   .symbolText {
     font-size: 16px;
     font-weight: 600;
     color: #ffffff;
+    @include xxl{
+      font-size: 20px;
+      margin-left: 10px;
+    }
   }
   
   .symbolDropdown {
@@ -143,11 +164,20 @@
     font-size: 24px;
     font-weight: 700;
     color: #ffffff;
+
+    @include xxl{
+      font-size: 28px;
+    }
   }
   
   .priceChange {
     font-size: 18px;
     font-weight: 600;
+
+    @include xxl{
+      font-size: 22px;
+      margin-top:4px;
+    }
   }
   
   .priceChange.positive {
@@ -181,18 +211,33 @@
     display: flex;
     flex-direction: row;
     gap: 10px;
+
+    @include xxl{
+      gap: 40px;
+    }
     .statItem {
       display: flex;
       flex-direction: column;
       gap: 4px;
       text-align: center;
       justify-content: center;
+
+      @include xxl{
+        gap: 2px;
+      }
+      
     }
     
     .statLabel {
       font-size: 14px;
       color: #888888;
       font-weight: 500;
+      margin: 0;
+
+      @include xxl{
+        font-size: 18px;
+        margin-bottom: 5px;
+      }
     }
     
     .statValue {
@@ -215,6 +260,10 @@
     padding: 12px 15px;
     gap: 10px;
     align-items: center;
+
+    @include xxl{
+      padding: 15px 30px;
+    }
 
     .depositHeader{
       font-size: 18px;

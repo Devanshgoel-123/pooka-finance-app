@@ -36,11 +36,10 @@ export const useFetchMarketData=()=>{
     ],
     query:{
         enabled: selectedPerp!=="",
-        refetchInterval:30000 
-    }
+    },
   });
 
-  console.log(data);
+  console.log("Fetched market Data",data);
 
   const marketData:MarketData= !isLoading && !isError && data && Array.isArray(data) ?{
     currentPrice: NormalizeContractData((data as bigint[])[0]) as number || 0,

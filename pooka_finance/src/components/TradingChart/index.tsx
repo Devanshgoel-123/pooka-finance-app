@@ -14,13 +14,13 @@ export const TradingChart = () => {
   const chartRef = useRef<any>(null);
   const [ohlcData, setOhlcData] = useState<OHLC_DATA[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
   const { selectedPerp, timeFrame } = usePerpStore(
     useShallow((state) => ({
       selectedPerp: state.selectedPerp,
       timeFrame: state.timeframe,
     }))
   );
+
 
   const myPriceFormatter = Intl.NumberFormat("US", {
     style: "currency",
@@ -40,6 +40,8 @@ export const TradingChart = () => {
         horzLines: { color: "#1A1A1A" },
       },
       height: 400,
+      // width:chartWidth,
+      autoSize:true,
       localization: {
         priceFormatter: myPriceFormatter,
       },
@@ -66,6 +68,7 @@ export const TradingChart = () => {
       downColor: "#ef5350",
       borderVisible: true,
       wickUpColor: "#26a69a",
+      width:"100%",
       wickDownColor: "#ef5350",
     });
     candleStickSeries.setData(ohlcData);

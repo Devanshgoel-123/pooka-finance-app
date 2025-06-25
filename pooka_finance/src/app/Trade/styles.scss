@@ -38,6 +38,7 @@
 
       @include xxl{
         width: 100%;
+        gap: 60px
       }
       .OrderBookColumn{
         width: 50%;
@@ -50,6 +51,11 @@
         width: 50%;
         height: 100%;
         gap: 10px;
+
+        @include xxl{
+          justify-content: flex-end;
+          width: 25%;
+        }
       }
     }
   }

@@ -40,10 +40,11 @@ export const useFetchUserPosition=()=>{
   console.log("The user positions are",data)
 
    return {
-    data,
-    error,
-    isError,
-    isLoading
-   }   
+      ETH: (data ?? [])[0] || [],
+      BTC: (data ?? [])[1] || [],
+      error,
+      isError,
+      isLoading
+   };   
 
 }

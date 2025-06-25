@@ -22,7 +22,9 @@ export const useFetchTokenPriceInUsd = ({ token }: Props) => {
     feedName = PRICE_MM_TOKEN.NATIVE_TOKEN_AVAX;
   } else if (token === LINK_TOKEN_AVAX) {
     feedName = PRICE_MM_TOKEN.LINK_TOKEN_AVAX;
-  } else {
+  } else if (!token.toLowerCase().includes("0x")){
+    feedName = token
+  }else{
     feedName = PRICE_MM_TOKEN.NATIVE_TOKEN_SEPOLIA;
   }
 

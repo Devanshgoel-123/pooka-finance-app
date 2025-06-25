@@ -143,7 +143,7 @@ export const OrderComponent: React.FC = () => {
       }}
       disabled={!selectedPerp}
     >
-      {collateral === 0 || userBalance === 0 ? "Deposit First" : `Open ${positionType} Position`}
+      {userBalance === 0 ? "Deposit First" : collateral === 0 ? "Enter Amount" : `Open ${positionType} Position`}
     </button>
     }
   }

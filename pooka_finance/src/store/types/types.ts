@@ -17,6 +17,7 @@ export type DepositParams = {
 };
 
 export interface PositionData {
+  perpName:string;
   size: bigint;
   collateral: bigint;
   entryPrice: bigint;

@@ -81,7 +81,7 @@ export const TradingHeader = ({
       <div className="priceSection">
         <div className="symbolContainerDesktop" ref={dropdownRef}>
           <div className="symbolIcon">
-            <Image height={30} width={30} src={selectedMarket.logo} alt="image" className="mt-2"/>
+            <Image height={30} width={30} src={selectedMarket.logo} alt="image" className="tokenLogoPerp"/>
             </div>
           <div className="symbolInfoDesktop" onClick={toggleDropdown}>
             <span className="symbolText">{selectedMarket.symbol}</span>
