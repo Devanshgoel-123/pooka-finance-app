@@ -23,21 +23,9 @@ export const PositionsComponent = () => {
     { key: "Funding History", label: "Funding History" },
   ] as const
 
-  
-  // const formatPnL = (pnl: bigint): string => {
-  //   if (Number(pnl) === 0) return "0.00"
-  //   const formatted = formatPrice(pnl,15)
-  //   return Number(pnl) > 0 ? `+${formatted}` : formatted
-  // }
 
-  // const getPnLColor = (pnl: bigint): string => {
-  //   if (Number(pnl.toString()) > 0) return "#7bf179"
-  //   if (Number(pnl) < 0) return "#ff6b6b"
-  //   return "#888888"
-  // }
 
   const renderPositionRow = (position: PositionData, index: number) => {
-    console.log("The position is", position)
     return <PositionRow position={position} index={index} />
   }
 
@@ -72,7 +60,6 @@ export const PositionsComponent = () => {
     const eth_positions = Array.isArray(ETH) ? [ETH] : [[ETH]];
     const btc_position = Array.isArray(BTC) ? [BTC] : [[BTC]];
 
-    console.log(eth_positions, btc_position);
     const formattedEthPositions: PositionData[] = eth_positions.map((item: unknown) => {
       const typedItem = item as [bigint, bigint, bigint, bigint, boolean, boolean, bigint, bigint];
       return {
@@ -107,7 +94,6 @@ export const PositionsComponent = () => {
     const openPositionBtc: PositionData[] = (formattedBtcPositions as PositionData[]).filter((item)=>item.collateral > 0)
     
     const openPositions:PositionData[]=[...openPositionBtc, ...openPositionsEth];
-    console.log("The open positions finally are", openPositions)
     if (openPositions.length === 0) {
       return (
         <div className="emptyState">
@@ -127,7 +113,7 @@ export const PositionsComponent = () => {
           <div className="headerCell">Entry Price</div>
           <div className="headerCell">Leverage</div>
           <div className="headerCell">PNL</div>
-          <div className="headerCell">Last Fee Time</div>
+          <div className="headerCell">Current Price</div>
           <div className="headerCell">Status</div>
         </div>
         <div className="positionsBody">

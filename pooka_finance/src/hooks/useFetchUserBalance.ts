@@ -20,7 +20,6 @@ export const useFetchUserDepositBalance = () =>{
       enabled:isConnected
     }
   });
-  console.log("The user deposit balance is", data);
    const userDepositbalance=Number(data)/10**6 || 0;
   
    return {

@@ -36,9 +36,6 @@ export const useFetchUserPosition=()=>{
         enabled:isConnected && (address!==undefined)
     }
   });
-
-  console.log("The user positions are",data)
-
    return {
       ETH: (data ?? [])[0] || [],
       BTC: (data ?? [])[1] || [],

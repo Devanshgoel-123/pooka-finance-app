@@ -376,7 +376,15 @@
   gap: 10px;
 
   .inputContainer{
-    margin-bottom: 40px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+
+    .selectorComponent{
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
   }
 }
 

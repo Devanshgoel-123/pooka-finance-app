@@ -3,7 +3,7 @@
 import type React from "react";
 import { useEffect, useState } from "react";
 import "./styles.scss";
-import { useAccount, useBalance} from "wagmi";
+import { useAccount, useBalance, useSwitchChain} from "wagmi";
 import { useWalletStore } from "@/store/walletStore";
 import { useShallow } from 'zustand/react/shallow'
 import { ConnectButton } from "@rainbow-me/rainbowkit"
@@ -12,34 +12,57 @@ import { useOpenPosition } from "@/hooks/useOpenPosition";
 import { useFetchUserDepositBalance} from "@/hooks/useFetchUserBalance";
 import { getLiquidationPrice, getPositionSize, tokenImageForAddress } from "@/utils/helperFunction";
 import { FEE_PERCENTAGE, USDC_TOKEN, USDC_TOKEN_AVAX, USDC_TOKEN_SEPOLIA } from "@/utils/constants";
-import { avalancheFuji} from "viem/chains";
+import { avalancheFuji, sepolia} from "viem/chains";
 import Image from "next/image";
 import { TokenSelector } from "./TokenSelector";
 import { useCreateDeposit } from "@/hooks/useCreateDeposit";
 import { useFetchTokenPriceInUsd } from "@/hooks/useFetchPriceInUsd";
 import { LoadingSpinner } from "@/common/LoadingSpinner";
-
+import { ChainSelector } from "./ChainSelector";
+import { useFetchUserTokenBalance } from "@/hooks/useFetchUserTokenBalance";
+import { handleCheckNativeToken } from "@/utils/helperFunction";
 export const OrderComponent: React.FC = () => {
   const {
-     chainId
+     chainId,
   }=useAccount();
+  const {
+    switchChain
+  }=useSwitchChain()
   const [positionType, setPositionType]=useState<"Long" | "Short">("Long");
   const [leverageIndex, setLeverageIndex]=useState<number>(0);
   const [activeTab, setActiveTab]=useState<number>(0);
   const [estimatedPrice, setEstimatedPrice]=useState<number>(0);
+  
   const {
     selectedPerp,
     leverage,
-    payToken
+    payToken,
+    payChain
   }=usePerpStore(useShallow((state)=>({
     selectedPerp:state.selectedPerp,
     leverage:state.leverage,
-    payToken:state.payToken
+    payToken:state.payToken,
+    payChain:state.payChain
   })))
   const {
     address
   }=useAccount();
 
+  const {
+    userTokenBalance
+  }=useFetchUserTokenBalance({
+    tokenAddress:payToken
+  })
+  
+  const {
+    data:userNativeBalance
+  }=useBalance({
+    address:payToken as `0x${string}`,
+    chainId:payChain,
+    query:{
+      enabled:handleCheckNativeToken(payToken)
+    }
+  })
   const {
     data,
     isLoading: isBalanceLoading,
@@ -54,7 +77,6 @@ export const OrderComponent: React.FC = () => {
     userDepositbalance
   }=useFetchUserDepositBalance();
 
-  useEffect(() => {}, [address, selectedPerp]);
 
   const [collateralAmount, setCollateralAmount] = useState<string>("0");
 
@@ -78,17 +100,18 @@ export const OrderComponent: React.FC = () => {
   })
 
   useEffect(()=>{
-    if(!tokenPriceInUsd || !payToken) return;
+    if(!tokenPriceInUsd || !payToken || !payChain) return;
     if(payToken === USDC_TOKEN_SEPOLIA || payToken === USDC_TOKEN_AVAX){
       setEstimatedPrice(Number(collateralAmount))
       return;
     }
     const priceOfToken=Number(tokenPriceInUsd)*Number(collateralAmount);
-    console.log(priceOfToken);
     setEstimatedPrice(priceOfToken)
-  },[tokenPriceInUsd, payToken, collateralAmount])
+  },[tokenPriceInUsd, payToken, collateralAmount, payChain])
 
   
+ 
+
   const handleOpenPosition = () => {
     const isLong = positionType === "Long";
     try {
@@ -116,7 +139,7 @@ export const OrderComponent: React.FC = () => {
     return <div className="balanceContainer">
       <span>Your Balance:</span>
       <Image src={tokenImageForAddress(payToken)} height={14} width={14} alt="" className="tokenLogo"/>
-     <span>{userDepositbalance.toFixed(4)};</span>
+     <span>{handleCheckNativeToken(payToken) ? userNativeBalance?.value :userTokenBalance.toFixed(4)};</span>
     </div>
   };
 
@@ -153,10 +176,30 @@ export const OrderComponent: React.FC = () => {
       className={Number(collateralAmount)===0 ? `insufficientDepositBtn` : `connectWalletButton`}
       disabled={Number(collateralAmount)===0}
       onClick={async ()=>{
-        if(chainId===avalancheFuji.id){
-          await createDeposit(collateralAmount, payToken)
-        }else{
-          await createCrossChainDeposit(collateralAmount)
+        console.log(payChain, payToken, chainId)
+        try {
+          if (payChain === avalancheFuji.id) {
+            if (chainId !== payChain) {
+              switchChain({
+                chainId: payChain
+              });
+            }
+            await createDeposit(collateralAmount, payToken);
+          } else if (payChain === sepolia.id) {
+            if (chainId !== payChain) {
+              switchChain({
+                chainId: sepolia.id
+              });
+            }
+            await createCrossChainDeposit(collateralAmount);
+            switchChain({
+              chainId:avalancheFuji.id
+            })
+          } else {
+            console.error('Unsupported chain selected');
+          }
+        } catch (error) {
+          console.error('Error during deposit:', error);
         }
       }}
       >
@@ -168,14 +211,12 @@ export const OrderComponent: React.FC = () => {
 
   return (
     <div className="orderComponent">
-      {/* TabContainer */}
       <div className="tabContainer">
         <div className="MarketTab">
           <button className={!activeTab ? "activeLong" : "inActiveBtn"} onClick={()=>setActiveTab(0)}>Market</button>
           <button className={activeTab ? "activeLong" : "inActiveBtn"} onClick={()=>setActiveTab(1)}>Deposit</button>
         </div>
       </div>
-      {/* Market Compoenent */}
      {activeTab === 0 ? <div className="orderForm">
         <div className="formRow">
           <label className="formLabel">You Pay</label>
@@ -331,7 +372,7 @@ export const OrderComponent: React.FC = () => {
         </div>
 
         <div className="inputContainer">
-          <TokenSelector/>
+         
           <input
             type="text"
             value={collateralAmount}
@@ -339,6 +380,10 @@ export const OrderComponent: React.FC = () => {
             className="orderInput"
             placeholder="0"
           />
+           <div className="selectorComponent">
+          <ChainSelector/>
+          <TokenSelector/>
+          </div>
           <button className="maxButton" onClick={()=>{
             handleMaxPosition()
           }}>

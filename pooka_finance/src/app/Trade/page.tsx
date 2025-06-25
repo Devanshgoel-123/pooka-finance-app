@@ -20,7 +20,6 @@ const Index = () => {
     }))
   );
   const screenWidth: number = window.innerWidth;
-  console.log(screenWidth)
 
   return (
     <div className="tradingAppWrapper">

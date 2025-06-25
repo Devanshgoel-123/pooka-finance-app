@@ -31,7 +31,6 @@ export const useOpenPosition = () => {
   ) => {
     try {
       setQuery(true);
-      console.log(symbol, collateralAmount, leverage, isLong)
       writeContract({
         abi: PERPS_ABI as Abi,
         address: CONTRACT_ADDRESS_AVAX,

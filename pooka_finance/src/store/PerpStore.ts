@@ -1,6 +1,7 @@
 import {CONTRACT_ADDRESS_AVAX, PERP_MM, USDC_TOKEN_AVAX } from "@/utils/constants";
 import {create} from "zustand";
 import { TimeFrame } from "./types/types";
+import { avalancheFuji } from "viem/chains";
 interface PerpStore{
     selectedPerp:string;
     leverage:string;
@@ -10,6 +11,7 @@ interface PerpStore{
     mobileOption:string;
     perps_contract_address:string;
     payToken:string;
+    payChain:number;
     setMaintenanceMargin: (maintenanceMargin : number) => void;
     setSelectedPerp:(perp:string)=>void;
     setLeverage:(leverage:string)=>void;
@@ -18,6 +20,7 @@ interface PerpStore{
     setMobileOption:(name:string)=>void;
     setPayToken:(address:string)=>void;
     setPerpsContractAddress:(address:string)=>void;
+    setPayChain:(chainId:number)=>void;
 }
 
 
@@ -28,6 +31,7 @@ export const usePerpStore=create<PerpStore>((set) => ({
         value:"day",
         label:"3D"
     },
+    payChain:avalancheFuji.id,
     payToken:USDC_TOKEN_AVAX,
     perps_contract_address:CONTRACT_ADDRESS_AVAX,
     mobileOption:"chart",
@@ -72,5 +76,10 @@ export const usePerpStore=create<PerpStore>((set) => ({
        set(()=>({
         payToken:address
        }))
+    },
+    setPayChain:(chainId:number)=>{
+        set(()=>({
+            payChain:chainId
+        }))
     }
 }))

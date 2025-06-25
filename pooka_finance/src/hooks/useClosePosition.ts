@@ -11,7 +11,7 @@ export const useClosePosition = () => {
   const { address } = useAccount();
   const { writeContract, data: hash, error, isPending } = useWriteContract();
 
-  const { isLoading: isConfirming } = useWaitForTransactionReceipt({
+  const { isLoading: isConfirming, isSuccess:success } = useWaitForTransactionReceipt({
     hash,
     query: {
       enabled: query,
@@ -47,5 +47,7 @@ export const useClosePosition = () => {
 
   return {
     closeUserPosition,
+    isConfirming, 
+    success
   };
 };

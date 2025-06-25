@@ -38,13 +38,14 @@ export const useFetchTokenPriceInUsd = ({ token }: Props) => {
         enabled:address !== undefined && token !== USDC_TOKEN_AVAX && token !== USDC_TOKEN_SEPOLIA
     }
   });
-
+  console.log(data, error)
   let tokenPriceInUsd: number | undefined;
 
-  if(Array.isArray(data)) {
+  if(Array.isArray(data) && data!==null) {
     tokenPriceInUsd=Number(data[0])/10**8;
+  }else{
+    tokenPriceInUsd=1;
   }
-   console.log(tokenPriceInUsd)
   return {
     tokenPriceInUsd,
     error,

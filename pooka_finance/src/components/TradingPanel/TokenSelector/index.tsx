@@ -1,22 +1,27 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './styles.scss';
 import Image from 'next/image';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount} from 'wagmi';
 import { avalancheFuji, sepolia } from 'viem/chains';
 import { NATIVE_TOKEN_AVAX, USDC_TOKEN_SEPOLIA, USDC_TOKEN_AVAX, LINK_TOKEN_AVAX } from '@/utils/constants';
 import { usePerpStore } from '@/store/PerpStore';
+import { useShallow } from 'zustand/react/shallow';
 
 export const TokenSelector = () => {
   const { isConnected } = useAccount();
-  const chainId = useChainId(); 
   const [selectedToken, setSelectedToken] = useState<string>('');
   const [isOpen, setIsOpen] = useState(false);
   const [currentTokens, setCurrentTokens] = useState<{ name: string; icon: string; address:string}[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const {
+    payChain
+  }=usePerpStore(useShallow((state)=>({
+    payChain:state.payChain
+  })))
 
   const tokens: Record<number, { name: string; icon: string; address:string }[]> = {
     [avalancheFuji.id]: [
-      { name: 'Usdc', icon: '/assets/usdc.svg', address:USDC_TOKEN_AVAX },
+      { name: 'Usdc', icon: '/assets/usdc.svg', address:USDC_TOKEN_AVAX }, // USDC first
       { name: 'Link', icon: '/assets/link.svg', address:LINK_TOKEN_AVAX },
       { name: 'Avax', icon: '/assets/avax.svg', address:NATIVE_TOKEN_AVAX },
     ],
@@ -26,19 +31,26 @@ export const TokenSelector = () => {
   };
 
   useEffect(() => {
-    if (chainId === undefined || !isConnected) {
-      setCurrentTokens([]);
-      setSelectedToken('');
+
+    if (!payChain || (payChain !== avalancheFuji.id && payChain !== sepolia.id)) {
       return;
     }
 
-    const tokensForChain = tokens[chainId] || [];
+    const tokensForChain = tokens[payChain] || [];
     setCurrentTokens(tokensForChain);
     
-    if (selectedToken && !tokensForChain.find(token => token.name === selectedToken)) {
-      setSelectedToken('');
+    const isCurrentTokenValid = tokensForChain.some(token => token.name === selectedToken);
+    
+    if (!selectedToken || !isCurrentTokenValid) {
+      if (tokensForChain.length > 0) {
+        const defaultToken = tokensForChain[0]; // This will be USDC for both chains
+        setSelectedToken(defaultToken.name);
+        // Set the token in the store
+        usePerpStore.getState().setPayToken(defaultToken.address);
+      }
     }
-  }, [chainId, isConnected, selectedToken]);
+    
+  }, [payChain, isConnected]);
 
   const handleTokenSelect = (tokenSymbol: string, tokenAddress:string) => {
     usePerpStore.getState().setPayToken(tokenAddress)
@@ -62,7 +74,6 @@ export const TokenSelector = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-
 
   if (currentTokens.length === 0) {
     return (
@@ -91,19 +102,11 @@ export const TokenSelector = () => {
                   borderRadius:"50%"
                 }}
               />
+              <span>{selectedTokenData.name.toUpperCase()}</span>
             </div>
           ) : (
             <div className="placeholder">
-              <Image
-                height={25}
-                width={25}
-                src={currentTokens[0]?.icon || "/assets/usdc.svg"}
-                alt='Select token'
-                className='tokenLogo'
-                style={{
-                  borderRadius:"50%"
-                }}
-              />
+              <span>Select Token:</span>
             </div>
           )}
           <div className={`dropdownArrow ${isOpen ? 'open' : ''}`}>
@@ -126,6 +129,7 @@ export const TokenSelector = () => {
                   width={25}
                   className='tokenLogo'
                 />
+                <span>{token.name}</span>
               </div>
             ))}
           </div>

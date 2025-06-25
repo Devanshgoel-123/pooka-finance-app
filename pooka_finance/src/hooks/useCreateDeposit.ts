@@ -95,6 +95,7 @@ export const useCreateDeposit = () => {
   };
 
   const createCrossChainDeposit = async (depositAmount: string) => {
+    console.log("Calling cross chain Deposit", depositAmount)
     try {
       setQuery(true);
       writeContract({

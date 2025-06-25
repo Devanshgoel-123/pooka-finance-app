@@ -1,4 +1,4 @@
-import { AVAX_TOKEN, ETH_TOKEN, NATIVE_TOKEN_AVAX, NATIVE_TOKEN_SEPOLIA, PERP_MM, USDC_TOKEN, USDC_TOKEN_AVAX, USDC_TOKEN_SEPOLIA } from "./constants";
+import { AVAX_TOKEN, ETH_TOKEN, LINK_TOKEN, LINK_TOKEN_AVAX, NATIVE_TOKEN_AVAX, NATIVE_TOKEN_SEPOLIA, PERP_MM, USDC_TOKEN, USDC_TOKEN_AVAX, USDC_TOKEN_SEPOLIA } from "./constants";
 
 export const NormalizeContractData=(value:bigint)=>{
     return Number(value)/10**8;
@@ -58,8 +58,10 @@ export const tokenImageForAddress=(address:string)=>{
         return AVAX_TOKEN
     }else if(address === NATIVE_TOKEN_SEPOLIA){
         return ETH_TOKEN
+    }else if(address === LINK_TOKEN_AVAX){
+        return LINK_TOKEN
     }else{
-        return ETH_TOKEN
+        return USDC_TOKEN
     }
 }
 export const getTokenImage=(token:string)=>{
@@ -89,3 +91,11 @@ export const getMaintenanceMargin=(perpName:string)=>{
         return (PERP_MM.BTC/100)
     }
 }
+
+
+export const handleCheckNativeToken=(tokenAddress:string)=>{
+    if (tokenAddress === USDC_TOKEN_AVAX || tokenAddress ===USDC_TOKEN_SEPOLIA || tokenAddress ===LINK_TOKEN_AVAX){
+      return false
+    }
+    return true
+   }

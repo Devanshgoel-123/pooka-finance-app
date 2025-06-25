@@ -4,6 +4,7 @@ import { USDC_TOKEN } from "@/utils/constants"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 import "./styles.scss"
+import { useClosePosition } from "@/hooks/useClosePosition"
 
 interface Props{
     position:PositionData,
@@ -31,11 +32,15 @@ export const PositionRow=({
         token:position.perpName
     })
 
+
+    const {
+      closeUserPosition,
+      isConfirming,
+      success
+    }=useClosePosition();
     useEffect(()=>{
         const fetchPnl=()=>{
             if (!tokenPriceInUsd) return 0;
-      
-            console.log(tokenPriceInUsd, position.entryPrice, position.size);
         
             const formattedEntryPrice: number = Number(position.entryPrice) / 10**8;
         
@@ -51,9 +56,7 @@ export const PositionRow=({
         fetchPnl()
     },[tokenPriceInUsd, position.perpName])
 
-   
-
-    console.log("Tje token price in usd is", tokenPriceInUsd);
+  
     return (
         <div key={index} className="positionRow">
       <div className="positionCell directionCell">
@@ -90,23 +93,35 @@ export const PositionRow=({
 
       <div className="positionCell">
         <div className={"cellValue"} style={{
-            color:pnl > 0 ? `#7bf179`:`#ff6b6b`
+            color:pnl >= 0 ? `#7bf179`:`#ff6b6b`
         }}>
             <Image height={22} width={22} src={USDC_TOKEN} alt=""/>
-            <span>{pnl > 0 ? `+`:`-`}  {pnl.toFixed(4)}</span>
+            <span>{pnl >= 0 ? `+`:`-`}  {pnl.toFixed(4)}</span>
             </div>
       </div>
 
       <div className="positionCell">
-        <div className="cellValue">{new Date(Number(position.lastFeeTime)*1000).toLocaleString().split(",")[0]}</div>
+        <div className="cellValue">{tokenPriceInUsd ? `$${(tokenPriceInUsd.toFixed(3))}` : "$0.000"}</div>
       </div>
 
 
       <div className="positionCell riskCell">
         {position.isOpen ? (
-          <div className="noRisk">
-            Open
+          <div className="openPositionsTab">
+          {/* <div className="noRisk">
+            Open 
+          </div> */}
+          <button
+          className="closePosition"
+           onClick={()=>{
+            closeUserPosition(position.perpName)
+          }}
+          disabled={isConfirming || success}
+          >
+          Close Position
+        </button>
           </div>
+          
         ) : 
           <span className="liquidationWarning">Closed</span>
       }

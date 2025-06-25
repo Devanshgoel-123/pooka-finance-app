@@ -164,6 +164,8 @@
     font-weight: 500;
     width: fit-content;
   }
+
+  
   
   .noRisk {
     color: #7bf179;
@@ -275,4 +277,15 @@
   .positionsComponent:hover {
     border-color: #3a3a3a;
     transition: border-color 0.3s ease;
+  }
+
+  .closePosition{
+    display: flex;
+    flex-direction: row;
+    padding: 8px 10px;
+    cursor: pointer;
+    background-color: #580808;
+    border: none;
+    border-radius: 12px;
+    color: #d5d5d5;
   }

@@ -1,56 +1,62 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './styles.scss';
 import Image from 'next/image';
-import { useAccount, useChainId } from 'wagmi';
+import { useAccount} from 'wagmi';
 import { avalancheFuji, sepolia } from 'viem/chains';
-import { NATIVE_TOKEN_AVAX, USDC_TOKEN_SEPOLIA, USDC_TOKEN_AVAX } from '@/utils/constants';
+import { usePerpStore } from '@/store/PerpStore';
+import { useShallow } from 'zustand/react/shallow';
 
-export const TokenSelector = () => {
+interface ChainInterface {
+  name: string;
+  icon: string;
+  chainId: number;
+}
+
+export const ChainSelector = () => {
   const { isConnected } = useAccount();
-  const chainId = useChainId(); 
-  const [selectedToken, setSelectedToken] = useState<string>('');
+  const {
+    payChain
+  } = usePerpStore(useShallow((state) => ({
+    payChain: state.payChain
+  })));
+
+  const chains: ChainInterface[] = [
+    { name: 'Avax', icon: '/assets/avax.svg', chainId: avalancheFuji.id }, // Move Avax first
+    { name: 'Sepolia', icon: '/assets/eth.svg', chainId: sepolia.id }, 
+  ];
+  
+  const [selectedChain, setSelectedChain] = useState<ChainInterface | null>(null);
   const [isOpen, setIsOpen] = useState(false);
-  const [currentTokens, setCurrentTokens] = useState<{ name: string; icon: string }[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const tokens: Record<number, { name: string; icon: string; address:string }[]> = {
-    [avalancheFuji.id]: [
-      { name: 'Usdc', icon: '/assets/usdc.svg', address:USDC_TOKEN_AVAX },
-      // { name: 'Link', icon: '/assets/link.svg' },
-      { name: 'Avax', icon: '/assets/avax.svg', address:NATIVE_TOKEN_AVAX },
-    ],
-    [sepolia.id]: [
-      { name: 'Usdc', icon: '/assets/usdc.svg', address:USDC_TOKEN_SEPOLIA },
-      // Add more Sepolia tokens here
-    ]
-  };
-
-  // Update tokens when chain changes
   useEffect(() => {
-    if (chainId === undefined || !isConnected) {
-      setCurrentTokens([]);
-      setSelectedToken('');
+    if (!isConnected) return;
+    if (!payChain) {
+      const defaultChain = chains[0];
+      setSelectedChain(defaultChain);
+      usePerpStore.getState().setPayChain(defaultChain.chainId);
       return;
     }
-    
-    const tokensForChain = tokens[chainId] || [];
-    setCurrentTokens(tokensForChain);
-    
-    if (selectedToken && !tokensForChain.find(token => token.name === selectedToken)) {
-      setSelectedToken('');
-    }
-  }, [chainId, isConnected, selectedToken]);
 
-  const handleTokenSelect = (tokenSymbol: string) => {
-    setSelectedToken(tokenSymbol);
-    setIsOpen(false);
+    const chainFromId = chains.find(chain => chain.chainId === payChain);
+    if (chainFromId) {
+      setSelectedChain(chainFromId);
+    }
+  }, [payChain, isConnected]);
+
+  const handleChainSelect = (chainName: string) => {
+    const selectedChainClicked = chains.find(item => item.name === chainName);
+    if (selectedChainClicked) {
+      setSelectedChain(selectedChainClicked);
+      usePerpStore.getState().setPayChain(selectedChainClicked.chainId);
+      setIsOpen(false);
+    }
   };
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -64,44 +70,26 @@ export const TokenSelector = () => {
     };
   }, []);
 
-  // Don't render if not connected or no chain ID
-  if (!isConnected || chainId === undefined) return null;
-
-  // Don't render if no tokens available for current chain
-  if (currentTokens.length === 0) {
-    return (
-      <div className="tokenSelector">
-        <div className="noTokensMessage">
-          No tokens available for this network
-        </div>
-      </div>
-    );
-  }
-
-  const selectedTokenData = currentTokens.find(token => token.name === selectedToken);
+  if (!isConnected) return null;
 
   return (
     <div className="tokenSelector" ref={dropdownRef}>
       <div className="customSelect" onClick={toggleDropdown}>
         <div className="selectTrigger">
-          {selectedTokenData ? (
+          {selectedChain ? (
             <div className="selectedOption">
               <Image
-                src={selectedTokenData.icon}
-                alt={selectedTokenData.name}
                 height={25}
                 width={25}
+                src={selectedChain.icon}
+                alt={selectedChain.name}
+                className='tokenLogo'
               />
+              <span>{selectedChain.name}</span>
             </div>
           ) : (
             <div className="placeholder">
-              <Image
-                height={25}
-                width={25}
-                src={currentTokens[0]?.icon || "/assets/usdc.svg"}
-                alt='Select token'
-                className='tokenLogo'
-              />
+              <span>Select Chain:</span>
             </div>
           )}
           <div className={`dropdownArrow ${isOpen ? 'open' : ''}`}>
@@ -111,19 +99,20 @@ export const TokenSelector = () => {
 
         {isOpen && (
           <div className="dropdownMenu">
-            {currentTokens.map((token) => (
+            {chains.map((chain) => (
               <div
-                key={token.name}
-                className={`dropdownOption ${selectedToken === token.name? 'selected' : ''}`}
-                onClick={() => handleTokenSelect(token.name)}
+                key={chain.name}
+                className={`dropdownOptionChain ${selectedChain?.name === chain.name ? 'selected' : ''}`}
+                onClick={() => handleChainSelect(chain.name)}
               >
                 <Image
-                  src={token.icon}
-                  alt={token.name}
+                  src={chain.icon}
+                  alt={chain.name}
                   height={25}
                   width={25}
                   className='tokenLogo'
                 />
+                <span>{chain.name}</span>
               </div>
             ))}
           </div>

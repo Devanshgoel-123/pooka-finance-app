@@ -49,7 +49,6 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
 
   useEffect(() => {
     scrollToBottom();
-    console.log("The messages are", messages);
   }, [messages]);
 
   const handleSendMessage = async () => {
