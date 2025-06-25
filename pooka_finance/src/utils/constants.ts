@@ -35,6 +35,7 @@ export const SOL_TOKEN="/assets/solana.svg";
 export const DOGE_TOKEN="/assets/doge.svg";
 export const USDC_TOKEN="/assets/usdc.svg";
 export const AVAX_TOKEN="/assets/avax.svg";
+export const LINK_TOKEN="/assets/link.svg";
 
 export const markets = [
     { symbol: 'ETH/USD', name: 'Ethereum Perpetual', logo:"/assets/eth.svg"},

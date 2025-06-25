@@ -5,20 +5,16 @@ import { useShallow } from "zustand/react/shallow"
 import { useFetchUserPosition } from "@/hooks/useFetchUserPosition"
 import { DollarSign, Target} from "lucide-react"
 import "./styles.scss";
+import { PositionData } from "@/store/types/types"
 
-interface PositionData {
-  canBeLiquidated: boolean
-  collateral: bigint
-  currentPrice: bigint
-  entryPrice: bigint
-  isLong: boolean
-  isOpen: boolean
-  leverage: bigint
-  liquidationPrice: bigint
-  netPnL: bigint
-  size: bigint
-  unrealizedPnL: bigint
-}
+// uint256 sizeUSD;        // Position size in USD (6 decimals)
+//         uint256 collateralUSDC; // Collateral in USDC (6 decimals)
+//         uint256 entryPrice;     // Entry price (8 decimals from oracle)
+//         uint256 leverage;       // Leverage multiplier
+//         bool isLong;           // Position direction
+//         bool isOpen;           // Position status
+//         uint256 openTime;      // Opening timestamp
+//         uint256 lastFeeTime; 
 
 export const PositionsComponent = () => {
   const [activeTab, setActiveTab] = useState<"Positions" | "Orders" | "Funding History">("Positions");
@@ -43,19 +39,20 @@ export const PositionsComponent = () => {
     return `${wholePart.toString()}.${fractionalPart.toString().padStart(decimals, "0").slice(0, 2)}`
   }
 
-  const formatPnL = (pnl: bigint): string => {
-    if (Number(pnl) === 0) return "0.00"
-    const formatted = formatPrice(pnl,15)
-    return Number(pnl) > 0 ? `+${formatted}` : formatted
-  }
+  // const formatPnL = (pnl: bigint): string => {
+  //   if (Number(pnl) === 0) return "0.00"
+  //   const formatted = formatPrice(pnl,15)
+  //   return Number(pnl) > 0 ? `+${formatted}` : formatted
+  // }
 
-  const getPnLColor = (pnl: bigint): string => {
-    if (Number(pnl.toString()) > 0) return "#7bf179"
-    if (Number(pnl) < 0) return "#ff6b6b"
-    return "#888888"
-  }
+  // const getPnLColor = (pnl: bigint): string => {
+  //   if (Number(pnl.toString()) > 0) return "#7bf179"
+  //   if (Number(pnl) < 0) return "#ff6b6b"
+  //   return "#888888"
+  // }
 
   const renderPositionRow = (position: PositionData, index: number) => {
+    console.log("The position is", position)
    return  <div key={index} className="positionRow">
       <div className="positionCell directionCell">
         <div className="directionContainer">
@@ -74,11 +71,11 @@ export const PositionsComponent = () => {
       </div>
 
       <div className="positionCell">
-        <div className="cellValue">${(Number(position.size)/10**10).toFixed(3)}</div>
+        <div className="cellValue">${(Number(position.size)/10**6).toFixed(3)}</div>
       </div>
 
       <div className="positionCell">
-        <div className="cellValue">{position.leverage.toString()}x</div>
+        <div className="cellValue">${(Number(position.collateral)/10**6).toFixed(3)}</div>
       </div>
 
       <div className="positionCell">
@@ -86,43 +83,48 @@ export const PositionsComponent = () => {
       </div>
 
       <div className="positionCell">
+        <div className="cellValue">{position.leverage.toString()}x</div>
+      </div>
+
+      <div className="positionCell">
+        <div className="cellValue">{new Date(Number(position.openTime)*1000).toLocaleString().split(",")[0]}</div>
+      </div>
+
+      <div className="positionCell">
+        <div className="cellValue">{new Date(Number(position.lastFeeTime)*1000).toLocaleString().split(",")[0]}</div>
+      </div>
+
+      {/* <div className="positionCell">
         <div className="cellValue">${formatPrice(position.currentPrice)}</div>
-      </div>
+      </div> */}
 
-      <div className="positionCell">
-        <div className="cellValue">{Number(formatPrice(position.collateral))/10**10}</div>
-      </div>
+    
 
-      <div className="positionCell">
+      {/* <div className="positionCell">
         <div className="cellValue">
           {Number(position.liquidationPrice) > 0 ? `$${formatPrice(position.liquidationPrice)}` : "N/A"}
         </div>
-      </div>
+      </div> */}
 
-      <div className="positionCell pnlCell">
+      {/* <div className="positionCell pnlCell">
         <div className="cellValue pnlValue" style={{ color: getPnLColor(position.unrealizedPnL) }}>
           ${formatPnL(position.unrealizedPnL)}
         </div>
-      </div>
+      </div> */}
 
-      <div className="positionCell pnlCell">
+      {/* <div className="positionCell pnlCell">
         <div className="cellValue pnlValue" style={{ color: getPnLColor(position.netPnL) }}>
           ${formatPnL(position.netPnL)}
         </div>
-      </div>
+      </div> */}
 
       <div className="positionCell riskCell">
         {position.isOpen ? (
           <div className="noRisk">
             Open
           </div>
-        ) : position.canBeLiquidated ? (
-          <span className="liquidationWarning">-</span>
-        )
-        :
-        (
-          <span className="noRisk">-</span>
-        )
+        ) : 
+          <span className="liquidationWarning">Closed</span>
       }
       </div>
     </div>
@@ -145,7 +147,7 @@ export const PositionsComponent = () => {
         </div>
       )
     }
-
+    console.log(data, Array.isArray(data));
     if (!data || (Array.isArray(data) && data.length === 0)) {
       return (
         <div className="emptyState">
@@ -154,10 +156,24 @@ export const PositionsComponent = () => {
           <span className="emptyStateSubtext">Your trading positions will appear here</span>
         </div>
       )
-    }
+    }    
 
     const positions = Array.isArray(data) ? data : [data]
-    const openPositions: PositionData[] = (positions as PositionData[]).filter((pos: PositionData) => pos.isOpen)
+    const formattedPositions: PositionData[] = positions.map((item: unknown) => {
+      const typedItem = item as [bigint, bigint, bigint, bigint, boolean, boolean, bigint, bigint];
+      return {
+        size: typedItem[0],
+        collateral: typedItem[1],
+        entryPrice: typedItem[2],
+        leverage: typedItem[3],
+        isLong: typedItem[4],
+        isOpen: typedItem[5],
+        openTime: typedItem[6],
+        lastFeeTime: typedItem[7],
+      };
+    });
+
+    const openPositions: PositionData[] = (formattedPositions as PositionData[]).filter((item)=>item.collateral > 0)
 
     if (openPositions.length === 0) {
       return (
@@ -172,15 +188,13 @@ export const PositionsComponent = () => {
     return (
       <div className="positionsTable">
         <div className="positionsHeader">
-          <div className="headerCell">Position</div>
+          <div className="headerCell">Type</div>
           <div className="headerCell">Size</div>
-          <div className="headerCell">Leverage</div>
-          <div className="headerCell">Entry</div>
-          <div className="headerCell">Current</div>
           <div className="headerCell">Collateral</div>
-          <div className="headerCell">Liq. Price</div>
-          <div className="headerCell">Unrealized PnL</div>
-          <div className="headerCell">Net PnL</div>
+          <div className="headerCell">Entry Price</div>
+          <div className="headerCell">Leverage</div>
+          <div className="headerCell">Open Time</div>
+          <div className="headerCell">Last Fee Time</div>
           <div className="headerCell">Status</div>
         </div>
         <div className="positionsBody">

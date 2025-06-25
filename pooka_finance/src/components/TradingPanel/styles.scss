@@ -398,3 +398,14 @@
     color: #929292;
   }
 }
+
+.loadingDiv{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  background-color: #6ae168;
+  border-radius: 12px;
+  padding: 5px 12px;
+}

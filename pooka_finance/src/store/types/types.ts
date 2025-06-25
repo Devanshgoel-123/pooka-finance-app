@@ -16,6 +16,18 @@ export type DepositParams = {
   chainName?: string;
 };
 
+export interface PositionData {
+  size: bigint;
+  collateral: bigint;
+  entryPrice: bigint;
+  leverage: bigint;
+  isLong: boolean;
+  isOpen: boolean;
+  openTime:bigint;
+  lastFeeTime:bigint;
+}
+
+
 
 export type PositionParams = {
   perpName?: string;

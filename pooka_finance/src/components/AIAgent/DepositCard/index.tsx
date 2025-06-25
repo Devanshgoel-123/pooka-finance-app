@@ -8,6 +8,7 @@ import { getTokenImage } from "@/utils/helperFunction"
 import { getChainImage } from "@/utils/helperFunction"
 import { DepositParams } from "@/store/types/types"
 import { LoadingSpinner } from "@/common/LoadingSpinner"
+import { useCreateDeposit } from "@/hooks/useCreateDeposit"
 
 interface DepositCardProps {
   params: DepositParams
@@ -15,7 +16,8 @@ interface DepositCardProps {
 }
 
 export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = false }) => {
-  const [isHovered, setIsHovered] = useState(false)
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+
   
   const formatCurrency = (amount: number | undefined) => {
     if (!amount) return "0"
@@ -31,7 +33,20 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
     return `${amount.toLocaleString()} ${token.toUpperCase()}`
   }
 
+  const {
+    createDeposit,
+    createCrossChainDeposit,
+    isDepositLoading
+  }=useCreateDeposit();
+
+
   const handleDeposit = () => {
+   if(params.collateral===undefined || params.payToken===undefined || params.chainName) return
+   if(params.chainName?.toLowerCase().includes("eth")){
+    createCrossChainDeposit(params.collateral.toString())
+   }else{
+    createDeposit(params.collateral.toString(), params.payToken)
+   }
   }
 
   return (
@@ -113,10 +128,9 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
           onClick={handleDeposit}
           disabled={isLoading || !params.collateral || params.collateral <= 0}
         >
-          {isLoading ? (
+          {isDepositLoading ? (
             <>
               <LoadingSpinner/>
-              <span>Processing Deposit...</span>
             </>
           ) : (
            "Confirm Deposit"

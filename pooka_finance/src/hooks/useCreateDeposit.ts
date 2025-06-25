@@ -20,7 +20,7 @@ export const useCreateDeposit = () => {
   const [query, setQuery] = useState<boolean>(false);
   const { writeContract, data: hash, error, isPending } = useWriteContract();
 
-  const { isLoading: isConfirming } = useWaitForTransactionReceipt({
+  const { isLoading: isConfirming, isSuccess} = useWaitForTransactionReceipt({
     hash,
     query: {
       enabled: query,
@@ -28,7 +28,7 @@ export const useCreateDeposit = () => {
   });
 
   useEffect(() => {
-    if (hash && isConfirming) {
+    if (hash && isConfirming && isSuccess) {
       alert(`Traxn sent successfully with hash:${hash}`);
     } else if (error) {
       alert(`Unable to send the traxn:${error.message}`);

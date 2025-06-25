@@ -78,6 +78,14 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
         agentId: "Sigma",
       });
     } catch (err) {
+      const errorMessage: Message = {
+        id: Date.now().toString(),
+        type: "agent",
+        content: "Sorry We are facing some issues here. Can you please try again later?",
+        timestamp: new Date(),
+        action: "response",
+      };
+      setMessages((prev) => [...prev, errorMessage]);
       console.error("Error sending message:", err);
     } finally {
       setIsTyping(false);

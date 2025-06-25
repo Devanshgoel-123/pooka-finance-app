@@ -8,7 +8,6 @@ import { useWalletStore } from "@/store/walletStore";
 import { useShallow } from 'zustand/react/shallow'
 import { ConnectButton } from "@rainbow-me/rainbowkit"
 import { usePerpStore } from "@/store/PerpStore"
-import { Loader2 } from "lucide-react"
 import { useOpenPosition } from "@/hooks/useOpenPosition";
 import { useFetchUserDepositBalance} from "@/hooks/useFetchUserBalance";
 import { getLiquidationPrice, getPositionSize, tokenImageForAddress } from "@/utils/helperFunction";
@@ -18,6 +17,7 @@ import Image from "next/image";
 import { TokenSelector } from "./TokenSelector";
 import { useCreateDeposit } from "@/hooks/useCreateDeposit";
 import { useFetchTokenPriceInUsd } from "@/hooks/useFetchPriceInUsd";
+import { LoadingSpinner } from "@/common/LoadingSpinner";
 
 export const OrderComponent: React.FC = () => {
   const {
@@ -291,7 +291,10 @@ export const OrderComponent: React.FC = () => {
             {!isPositionLoading ? (
               RenderButtonText()
             ) : (
-              <Loader2 />
+              <div className="loadingDiv">
+                <LoadingSpinner/>
+              </div>
+             
             )}
           </>
         ) : (
@@ -355,7 +358,9 @@ export const OrderComponent: React.FC = () => {
             {!isPositionLoading ? (
               RenderButtonTextDepositTab()
             ) : (
-              <Loader2 />
+              <div className="loadingDiv">
+                <LoadingSpinner/>
+              </div>
             )}
           </>
         ) : (

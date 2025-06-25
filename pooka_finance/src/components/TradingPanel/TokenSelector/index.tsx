@@ -3,7 +3,7 @@ import './styles.scss';
 import Image from 'next/image';
 import { useAccount, useChainId } from 'wagmi';
 import { avalancheFuji, sepolia } from 'viem/chains';
-import { NATIVE_TOKEN_AVAX, USDC_TOKEN_SEPOLIA, USDC_TOKEN_AVAX } from '@/utils/constants';
+import { NATIVE_TOKEN_AVAX, USDC_TOKEN_SEPOLIA, USDC_TOKEN_AVAX, LINK_TOKEN_AVAX } from '@/utils/constants';
 import { usePerpStore } from '@/store/PerpStore';
 
 export const TokenSelector = () => {
@@ -17,7 +17,7 @@ export const TokenSelector = () => {
   const tokens: Record<number, { name: string; icon: string; address:string }[]> = {
     [avalancheFuji.id]: [
       { name: 'Usdc', icon: '/assets/usdc.svg', address:USDC_TOKEN_AVAX },
-      // { name: 'Link', icon: '/assets/link.svg' },
+      { name: 'Link', icon: '/assets/link.svg', address:LINK_TOKEN_AVAX },
       { name: 'Avax', icon: '/assets/avax.svg', address:NATIVE_TOKEN_AVAX },
     ],
     [sepolia.id]: [

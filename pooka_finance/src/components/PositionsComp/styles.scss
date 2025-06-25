@@ -147,14 +147,16 @@
 }
 
 .positionsHeader {
-  display: grid;
-  grid-template-columns: 140px 90px 120px 120px 120px 110px 110px 140px 120px 110px;
+  display:flex;
+  flex-direction: row;
+  justify-content: space-between;
   background: #050505;
   border-bottom: 1px solid #333333;
   padding: 0;
 }
 
 .headerCell {
+  width: 15%;
   padding: 12px 8px;
   font-size: 14px;
   font-weight: 600;
@@ -176,8 +178,9 @@
 }
 
 .positionRow {
-  display: grid;
-  grid-template-columns: 140px 90px 120px 120px 120px 110px 110px 140px 120px 110px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
   border-bottom: 1px solid #333333;
   transition: background-color 0.2s ease;
 
@@ -192,11 +195,21 @@
 
 .positionCell {
   padding: 12px 8px;
+  display: flex;
+  width: 15%;
+  flex-direction: row;
   border-right: 1px solid #333333;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 60px;
+
+  .cellValue {
+    font-size: 15px;
+    font-weight: 500;
+    color: #ffffff;
+    text-align: center;
+  }
 
   &:last-child {
     border-right: none;
@@ -224,12 +237,7 @@
   width: 100%;
 }
 
-.cellValue {
-  font-size: 15px;
-  font-weight: 500;
-  color: #ffffff;
-  text-align: center;
-}
+
 
 .directionBadge {
   display: flex;
@@ -277,11 +285,11 @@
   }
 }
 
-.liquidationWarning {
+.liquidationWarning, .noRisk {
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 8px;
+  padding: 6px 12px;
   background: rgba(255, 107, 107, 0.15);
   color: #ff6b6b;
   border-radius: 4px;
@@ -292,10 +300,7 @@
 
 .noRisk {
   color: #7bf179;
-  font-size: 18px;
-  padding: 12px;
-  border-radius: 12px;
-  border: 2px solid #4c4c4c;
+  background-color: #013802;
 }
 
 .pnlValue {
@@ -320,34 +325,7 @@
   100% { transform: rotate(360deg); }
 }
 
-// Responsive Design
-@media (max-width: 1200px) {
-  .positionsHeader,
-  .positionRow {
-    grid-template-columns: 120px 80px 70px 90px 90px 100px 100px 110px 110px 70px;
-  }
-}
 
-@media (max-width: 1024px) {
-  .positionsHeader,
-  .positionRow {
-    grid-template-columns: 110px 75px 65px 85px 85px 95px 95px 100px 100px 65px;
-  }
-
-  .headerCell,
-  .positionCell {
-    padding: 10px 6px;
-  }
-
-  .cellValue {
-    font-size: 11px;
-  }
-
-  .directionBadge {
-    font-size: 14px;
-    padding: 3px 6px;
-  }
-}
 
 @media (max-width: 768px) {
   .positionsTable {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use } from "react";
+import React from "react";
 import { Navbar } from "@/components/Navbar";
 import { TradingChart } from "@/components/TradingChart";
 import { TradingHeader } from "@/components/TradingHeader";
@@ -20,7 +20,7 @@ const Index = () => {
     }))
   );
   const screenWidth: number = window.innerWidth;
-
+  console.log(screenWidth)
 
   return (
     <div className="tradingAppWrapper">
