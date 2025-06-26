@@ -1,16 +1,25 @@
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { CROSS_CHAIN_MANAGER_ABI } from "@/components/ABI/Cross_Chain_manager_ABI";
 import { Abi, parseUnits } from "viem";
 import {
   CROSS_CHAIN_MANAGER_SEPOLIA,
-  USDC_TOKEN_SEPOLIA,
 } from "@/utils/constants";
 import { useEffect, useState } from "react";
+import { useRef } from "react";
+import { sepolia } from "viem/chains";
+interface Props {
+  callBackFunction: () => void;
+}
 
-export const useCreateCrossChainDeposit = () => {
+
+export const useCreateCrossChainDeposit = ({callBackFunction}:Props) => {
   const [query, setQuery] = useState<boolean>(false);
   const { writeContract, data: hash, error, isPending, isError } = useWriteContract();
-
+ 
+  const {
+    address
+  }=useAccount();
+  
   const { isLoading: isConfirming, isSuccess} = useWaitForTransactionReceipt({
     hash,
     query: {
@@ -18,18 +27,35 @@ export const useCreateCrossChainDeposit = () => {
     },
   });
 
+  const callBackFunctionRef = useRef<() => void>(callBackFunction);
+  
   useEffect(() => {
-    if (hash && isConfirming){
-      alert(`Traxn sent successfully with hash:${hash}`);
-      setQuery(false)
-    } else if (error) {
-      alert(`Unable to send the traxn:${error.message}`);
-      setQuery(false)
+    callBackFunctionRef.current = callBackFunction;
+  }, [callBackFunction]);
+
+  useEffect(() => {
+    if (hash) {
+      if (isConfirming) {
+        alert(`Transaction sent successfully with hash: ${hash}`);
+      }
+      
+      if (isSuccess) {
+        alert(`Transaction confirmed successfully!`);
+        setTimeout(() => {
+          setQuery(false);
+          callBackFunctionRef.current();
+        }, 200);
+      }
+    }
+    
+    if (error) {
+      alert(`Unable to send the transaction: ${error.message}`);
+      setQuery(false);
     }
   }, [error, hash, isConfirming, isSuccess, isPending]);
 
   const createCrossChainDeposit = async (depositAmount: string) => {
-    console.log("Calling cross chain Deposit", depositAmount)
+    console.log("Calling cross chain Deposit", depositAmount, CROSS_CHAIN_MANAGER_SEPOLIA)
     try {
       setQuery(true);
       setTimeout(() => {
@@ -38,9 +64,10 @@ export const useCreateCrossChainDeposit = () => {
           address: CROSS_CHAIN_MANAGER_SEPOLIA as `0x${string}`,
           functionName: "depositAndSend",
           args: [
-            USDC_TOKEN_SEPOLIA,
             parseUnits(depositAmount, 6) 
           ],
+          account:address,
+          chain:sepolia
         });
       }, 2000); 
     } catch (err) {

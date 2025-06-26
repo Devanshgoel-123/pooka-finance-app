@@ -5,6 +5,7 @@ import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
 import { Abi, parseEther } from "viem";
 import { useEffect, useState } from "react";
 import { CONTRACT_ADDRESS_AVAX } from "@/utils/constants";
+import { avalancheFuji } from "viem/chains";
 
 export const useClosePosition = () => {
   const [query, setQuery] = useState<boolean>(false);
@@ -38,6 +39,8 @@ export const useClosePosition = () => {
         abi: PERPS_ABI as Abi,
         functionName: "closePosition",
         args: [symbol],
+        account:address,
+        chain:avalancheFuji
       });
     } catch (err) {
       setQuery(false);

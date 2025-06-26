@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { createChart, CandlestickSeries } from "lightweight-charts";
+import { createChart, CandlestickSeries, IChartApi } from "lightweight-charts";
 import "./styles.scss";
 import axios from "axios";
 import { usePerpStore } from "@/store/PerpStore";
@@ -8,9 +8,10 @@ import { useShallow } from "zustand/react/shallow";
 import { TradingChartSkeleton } from "../LoadingComponents/GraphSkeleton";
 import TimeSelector from "./TimeSelector";
 import { OhlcData } from "lightweight-charts";
+
 export const TradingChart = () => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
-  const chartRef = useRef<any>(null);
+  const chartRef = useRef<IChartApi>({} as IChartApi);
   const [ohlcData, setOhlcData] = useState<OhlcData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const {
@@ -50,18 +51,12 @@ export const TradingChart = () => {
 
     chartRef.current.priceScale("right").applyOptions({
       borderColor: "#1e1e1e",
-      autoScale: false,
-      barSpacing: 50,
-      textColor: "#E0E0E0",
+      autoScale:true,
     });
 
     chartRef.current.timeScale().applyOptions({
       borderColor: "#1e1e1e",
-      scaleMargins: {
-        top: 0.1,
-        bottom: 0.2,
-      },
-      textColor: "#E0E0E0",
+      minBarSpacing:8
     });
 
     const candleStickSeries = chartRef.current.addSeries(CandlestickSeries, {
@@ -69,7 +64,6 @@ export const TradingChart = () => {
       downColor: "#ef5350",
       borderVisible: true,
       wickUpColor: "#26a69a",
-      width:"100%",
       wickDownColor: "#ef5350",
     });
     candleStickSeries.setData(ohlcData);

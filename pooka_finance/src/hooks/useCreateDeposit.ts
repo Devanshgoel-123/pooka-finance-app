@@ -1,4 +1,4 @@
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { Abi, parseEther, parseUnits } from "viem";
 import { POOL_MANAGER_ABI } from "@/components/ABI/PoolManagerABI";
 import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
@@ -10,18 +10,20 @@ import {
   USDC_TOKEN_AVAX,
 } from "@/utils/constants";
 import { useEffect, useState } from "react";
+import { avalancheFuji } from "viem/chains";
 
 export const useCreateDeposit = () => {
   const [query, setQuery] = useState<boolean>(false);
   const { writeContract, data: hash, error, isPending, isError } = useWriteContract();
-
   const { isLoading: isConfirming, isSuccess} = useWaitForTransactionReceipt({
     hash,
     query: {
       enabled: query,
     },
   });
-
+  const {
+    address
+  }=useAccount();
   useEffect(() => {
     if (hash && isConfirming) {
       alert(`Traxn sent successfully with hash:${hash}`);
@@ -32,7 +34,7 @@ export const useCreateDeposit = () => {
     }
   }, [error, hash, isConfirming, isPending, isSuccess]);
 
-  const createDeposit = async (depositAmount: string, payToken: string) => {
+  const createDeposit = async (payToken:string, depositAmount:string) => {
     try {
       setQuery(true);
       if (payToken === USDC_TOKEN_AVAX) {
@@ -41,6 +43,8 @@ export const useCreateDeposit = () => {
           address: CONTRACT_ADDRESS_AVAX,
           functionName: "depositUSDC",
           args: [parseUnits(depositAmount, 6)],
+          account:address,
+          chain:avalancheFuji
         });
       } else if(payToken === LINK_TOKEN_AVAX){
         writeContract({
@@ -51,6 +55,8 @@ export const useCreateDeposit = () => {
             LINK_TOKEN_AVAX,
             parseUnits(depositAmount, 6)
           ],
+          account:address,
+          chain:avalancheFuji
         });
       }else {
         writeContract({
@@ -62,6 +68,8 @@ export const useCreateDeposit = () => {
             parseUnits(depositAmount, 18)
           ],
           value: parseEther(depositAmount),
+          account:address,
+          chain:avalancheFuji
         });
       }
     } catch (err) {

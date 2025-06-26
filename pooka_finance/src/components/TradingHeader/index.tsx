@@ -1,10 +1,10 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+
 "use client"
 
 import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import "./styles.scss"
-import { MARKET_SYMBOLS, PERP_MM } from "@/utils/constants"
+import {PERP_MM } from "@/utils/constants"
 import { usePerpStore } from "@/store/PerpStore"
 import Image from "next/image"
 import { useFetchMarketData } from "@/hooks/useFetchMarketData"
@@ -12,22 +12,11 @@ import { useShallow } from "zustand/react/shallow"
 import { markets } from "@/utils/constants"
 import { Market } from "@/store/types/types";
 import { useFetchUserDepositBalance } from "@/hooks/useFetchUserBalance";
-import { useAccount } from "wagmi"
-import { useCreateDeposit } from "@/hooks/useCreateDeposit"
-import { useFetchTokenPriceInUsd } from "@/hooks/useFetchPriceInUsd"
-
 
 export const TradingHeader = ({
   priceChange = -374.74,
   priceChangePercent = -0.36,
 }) => {
-  const {
-    address
-  }=useAccount();
-  const {
-    createDeposit
-  }=useCreateDeposit();
-
 
   const [showDropDown, setShowDropDown] = useState<boolean>(false);
   const [selectedMarket, setSelectedMarket] = useState<Market>(markets[1]);
@@ -44,7 +33,6 @@ export const TradingHeader = ({
 
   const {
     marketData,
-    error,
     isLoading
   }=useFetchMarketData();
 

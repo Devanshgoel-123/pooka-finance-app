@@ -1,3 +1,4 @@
+import { avalancheFuji, sepolia } from "viem/chains";
 import { AVAX_TOKEN, ETH_TOKEN, LINK_TOKEN, LINK_TOKEN_AVAX, NATIVE_TOKEN_AVAX, NATIVE_TOKEN_SEPOLIA, PERP_MM, USDC_TOKEN, USDC_TOKEN_AVAX, USDC_TOKEN_SEPOLIA } from "./constants";
 
 export const NormalizeContractData=(value:bigint)=>{
@@ -50,6 +51,27 @@ export const getChainImage=(chainName:string)=>{
     }
 }
 
+/**
+ * 
+ * @param name name of the token
+ * @param chainId chainId of the token
+ * @returns tokenAddress
+ */
+
+export const getTokenAddressForName=(name:string, chainId:number):string=>{
+    if(name.toLowerCase().includes("us")){
+        if(chainId===sepolia.id){
+            return USDC_TOKEN_SEPOLIA
+        }else{
+            return USDC_TOKEN_AVAX
+        }
+    }else if(name.toLowerCase().includes('link')){
+        return LINK_TOKEN_AVAX
+    }else {
+        return NATIVE_TOKEN_AVAX
+    }
+}
+
 
 export const tokenImageForAddress=(address:string)=>{
     if(address === USDC_TOKEN_SEPOLIA || address===USDC_TOKEN_AVAX){
@@ -72,6 +94,14 @@ export const getTokenImage=(token:string)=>{
     }
 }
 
+
+export const getChainId=(chainName:string)=>{
+    if(chainName.toLowerCase().includes("eth")){
+        return sepolia.id
+    }else{
+        return avalancheFuji.id
+    }
+}
 
 export const getPositionSize=(leverage:string, collateral:string)=>{
    return Number(leverage)*Number(collateral);

@@ -10,9 +10,11 @@ export const metadata:Metadata={
   description:"Cross Chain Perps Exchange"
 }
 
-export const manrope = Manrope({
+const manrope = Manrope({
   subsets: ['latin'],
   variable: '--font-manrope',
+  display:"swap",
+  weight:'500'
 });
 
 

@@ -1,12 +1,17 @@
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
+import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
 import { Abi,parseUnits } from "viem";
 import { CONTRACT_ADDRESS_AVAX } from "@/utils/constants";
 import { useEffect, useState } from "react";
+import { avalancheFuji } from "viem/chains";
 
 export const useOpenPosition = () => {
   const [query, setQuery] = useState<boolean>(false);
   const { writeContract, data: hash, error, isPending, isError } = useWriteContract();
+
+  const {
+    address
+  }=useAccount();
 
   const { isLoading: isConfirming } = useWaitForTransactionReceipt({
     hash,
@@ -36,6 +41,8 @@ export const useOpenPosition = () => {
         address: CONTRACT_ADDRESS_AVAX,
         functionName: "openPosition",
         args: [symbol, parseUnits(collateralAmount,6), BigInt(leverage), isLong],
+        chain:avalancheFuji,
+        account:address
       });
     } catch (err) {
       setQuery(false);

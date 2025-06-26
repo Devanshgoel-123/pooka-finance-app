@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import type React from "react";
@@ -25,6 +24,7 @@ import { handleCheckNativeToken } from "@/utils/helperFunction";
 import { useCreateCrossChainDeposit } from "@/hooks/useCreateCrossChainDeposit";
 import { useSendApprovalTraxn } from "@/hooks/useSendApproval";
 import { useWithdrawAmount } from "@/hooks/useWithdrawAmount";
+import { useCreateCrossChainDepositOnAvax } from "@/hooks/useCrossChainDepositAvax";
 export const OrderComponent: React.FC = () => {
   const {
      chainId,
@@ -68,17 +68,14 @@ export const OrderComponent: React.FC = () => {
   
   const handleApprovalCallBack = async () => {
     if (payChain === avalancheFuji.id) {
-      if(handleCheckNativeToken(payToken)){
-        await createDeposit(collateralAmount, payToken);
-      }else{
-        await createDeposit(collateralAmount, payToken);
-      }
+        await createDeposit(payToken, collateralAmount);
     } else if (payChain === sepolia.id) {
       await createCrossChainDeposit(collateralAmount);
     } else {
       console.error('Unsupported chain selected');
     }
   };
+
 
   const {
     data:userNativeBalance
@@ -110,7 +107,8 @@ export const OrderComponent: React.FC = () => {
 
   const {
     sendApprovalTraxn,
-    isError
+    isError,
+    isSuccess
   }=useSendApprovalTraxn({
     callBackFunction:handleApprovalCallBack
   })
@@ -122,10 +120,32 @@ export const OrderComponent: React.FC = () => {
   }=useCreateDeposit();
 
   const {
+   createCrossChainDepositAvax,
+   isCrossChainDepositAvaxError,
+   isCrossChainDepositAvaxLoading
+  }=useCreateCrossChainDepositOnAvax();
+
+
+  const handleCrossChainDepositOnAvax=()=>{
+    if (chainId !== avalancheFuji.id) {
+      switchChain({ chainId: avalancheFuji.id })
+       setTimeout(() => {
+        console.log("calling cross chain deposit 1", payToken, collateralAmount)
+        createCrossChainDepositAvax(payToken, collateralAmount);
+      },1000)
+    } else {
+      console.log("calling cross chain deposit 2", payToken, collateralAmount)
+      createCrossChainDepositAvax(payToken, collateralAmount);
+    }
+  } 
+
+  const {
     createCrossChainDeposit,
     isCrossChainDepositLoading,
     isCrossChainError
-  }=useCreateCrossChainDeposit();
+  }=useCreateCrossChainDeposit({
+    callBackFunction:handleCrossChainDepositOnAvax
+  });
 
   const {
     tokenPriceInUsd
@@ -150,18 +170,43 @@ export const OrderComponent: React.FC = () => {
   },[tokenPriceInUsd, payToken, collateralAmount, payChain])
 
   
- 
-  useEffect(()=>{
-    if(isCrossChainDepositLoading || isDepositLoading || isError || isDepositError || isCrossChainError){
-      setIsLoading(false)
+  useEffect(() => {
+    if (!loading) return; // Don't process if not currently loading
+    
+    // Check if any operation has failed
+    const hasAnyError = isDepositError || isCrossChainError || isCrossChainDepositAvaxError || isError;
+    console.log("The has any error", hasAnyError, isDepositError, isCrossChainError, isCrossChainError, isError);
+    
+    // Check if all operations are completed (not loading)
+    const allOperationsCompleted = isDepositLoading || isCrossChainDepositLoading || isCrossChainDepositAvaxLoading || isSuccess;
+    console.log("The operations is", allOperationsCompleted, isDepositLoading, isCrossChainDepositLoading, isCrossChainDepositAvaxLoading, isSuccess);
+    
+    // Set loading to false if:
+    // 1. Any operation fails (immediate failure) OR
+    // 2. All operations are completed successfully
+    if (hasAnyError || allOperationsCompleted) {
+      setIsLoading(false);
     }
-  },[isCrossChainDepositLoading, isDepositLoading,isError, isDepositError, isCrossChainError])
+  }, [
+    isDepositLoading, 
+    isDepositError, 
+    isCrossChainDepositLoading, 
+    isCrossChainError, 
+    isCrossChainDepositAvaxLoading, 
+    isCrossChainDepositAvaxError, 
+    isError,
+    loading
+  ]);
 
-  useEffect(()=>{
-    if(isWithdrawError || isWithdrawSuccess){
-      setWithdrawLoader(false)
+  // Fixed loading state management for withdraw operations
+  useEffect(() => {
+    // Only set loading to false when withdraw operation is complete (success or error)
+    if (!withdrawLoader) return; // Don't process if not currently loading
+    
+    if (isWithdrawError || isWithdrawSuccess) {
+      setWithdrawLoader(false);
     }
-  },[isWithdrawError, isWithdrawSuccess])
+  }, [isWithdrawError, isWithdrawSuccess, withdrawLoader]);
 
   const handleOpenPosition = () => {
     const isLong = positionType === "Long";
@@ -246,7 +291,7 @@ const renderDepositButton=()=>{
     </div> :
   <button
   className={Number(collateralAmount)===0 ? `insufficientDepositBtn` : `connectWalletButton`}
-  disabled={Number(collateralAmount)===0}
+  disabled={Number(collateralAmount)===0 }
   onClick={async ()=>{
     if(payChain !== chainId){
       switchChain({
@@ -259,12 +304,12 @@ const renderDepositButton=()=>{
     try {
       if (payChain === avalancheFuji.id) {
         if(handleCheckNativeToken(payToken)){
-          await createDeposit(collateralAmount, payToken);
+          await createDeposit(payToken, collateralAmount);
         }else{
-          await sendApprovalTraxn(collateralAmount, payToken,payChain);
+          await sendApprovalTraxn(payToken, payChain, collateralAmount);
         }
       } else if (payChain === sepolia.id) {
-        await sendApprovalTraxn(collateralAmount, payToken, payChain);
+        await sendApprovalTraxn(payToken,payChain,collateralAmount);
       } else {
         console.error('Unsupported chain selected');
       }
@@ -273,7 +318,7 @@ const renderDepositButton=()=>{
     }
   }}
   >
- {Number(collateralAmount)===0 ? `Enter Amount` : payChain === chainId ? `Deposit` : `Switch Chain`}
+ {Number(collateralAmount)===0 ? `Enter Amount` : payChain === chainId ? Number(collateralAmount) > userTokenBalance ? "Insufficient Balance" : `Deposit` : `Switch Chain`}
   </button>
 )
 }
@@ -340,7 +385,10 @@ const renderWithDrawButton=()=>{
           <input
             type="text"
             value={collateralAmount}
-            onChange={(e) => setCollateralAmount(e.target.value)}
+            onChange={(e) => {
+              setCollateralAmount(e.target.value)
+              usePerpStore.getState().setCollateralAmount(e.target.value);
+            }}
             className="orderInput"
             placeholder="0"
           />

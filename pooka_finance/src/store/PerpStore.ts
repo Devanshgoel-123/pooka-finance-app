@@ -12,6 +12,7 @@ interface PerpStore{
     perps_contract_address:string;
     payToken:string;
     payChain:number;
+    collateralAmount:string;
     setMaintenanceMargin: (maintenanceMargin : number) => void;
     setSelectedPerp:(perp:string)=>void;
     setLeverage:(leverage:string)=>void;
@@ -21,6 +22,7 @@ interface PerpStore{
     setPayToken:(address:string)=>void;
     setPerpsContractAddress:(address:string)=>void;
     setPayChain:(chainId:number)=>void;
+    setCollateralAmount:(amount:string)=>void;
 }
 
 
@@ -31,6 +33,7 @@ export const usePerpStore=create<PerpStore>((set) => ({
         value:"day",
         label:"3D"
     },
+    collateralAmount:"0.00",
     payChain:avalancheFuji.id,
     payToken:USDC_TOKEN_AVAX,
     perps_contract_address:CONTRACT_ADDRESS_AVAX,
@@ -80,6 +83,11 @@ export const usePerpStore=create<PerpStore>((set) => ({
     setPayChain:(chainId:number)=>{
         set(()=>({
             payChain:chainId
+        }))
+    },
+    setCollateralAmount:(amount:string)=>{
+        set(()=>({
+            collateralAmount:amount
         }))
     }
 }))

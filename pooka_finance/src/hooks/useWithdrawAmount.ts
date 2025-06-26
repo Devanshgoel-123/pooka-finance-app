@@ -1,16 +1,17 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { useAccount } from "wagmi";
+
+import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
 import { Abi, parseUnits } from "viem";
 import { useEffect, useState } from "react";
 import { CONTRACT_ADDRESS_AVAX } from "@/utils/constants";
+import { avalancheFuji } from "viem/chains";
 
 export const useWithdrawAmount = () => {
   const [query, setQuery] = useState<boolean>(false);
-  const { address } = useAccount();
-  const { writeContract, data: hash, error, isPending, isError } = useWriteContract();
-
+  const { writeContract, data: hash, error,isError } = useWriteContract();
+  const {
+    address
+  }=useAccount();
   const { isLoading: isConfirming, isSuccess:success } = useWaitForTransactionReceipt({
     hash,
     query: {
@@ -42,6 +43,8 @@ export const useWithdrawAmount = () => {
         args: [
             parseUnits(withdrawAmount, 6)
         ],
+        account:address,
+        chain:avalancheFuji
       });
     } catch (err) {
       setQuery(false);
