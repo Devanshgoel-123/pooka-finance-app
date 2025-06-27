@@ -1,4 +1,4 @@
-import {useReadContract } from "wagmi"
+import { useReadContract } from "wagmi";
 import { useAccount } from "wagmi";
 import {PERPS_ABI} from "@/components/ABI/PookaFinanceABI";
 import { Abi} from "viem";
@@ -25,5 +25,3 @@ export const useFetchUserDepositBalance = () =>{
    return {
     userDepositbalance
    }   
-
-}
