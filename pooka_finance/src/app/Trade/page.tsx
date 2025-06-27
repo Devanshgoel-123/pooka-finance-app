@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { TradingChart } from "@/components/TradingChart";
 import { TradingHeader } from "@/components/TradingHeader";
@@ -19,14 +19,19 @@ const Index = () => {
       mobileOption: state.mobileOption,
     }))
   );
-  const screenWidth: number = window.innerWidth;
+  const [screenWidth, setScreenWidth]=useState<number>(1025);
+
+  useEffect(()=>{
+    if(window.innerWidth === undefined) return;
+    setScreenWidth(window.innerWidth)
+  },[])
 
   return (
     <div className="tradingAppWrapper">
       <Navbar />
       <div className="tradingLayoutWrapper">
-        {screenWidth > 768 ? <TradingHeader /> : <TradingHeaderMobile />}
-        {screenWidth > 768 ? (
+        {screenWidth > 1024 ? <TradingHeader /> : <TradingHeaderMobile />}
+        {screenWidth > 1024 ? (
           <div className="MidComponentWrapper">
             <TradingChart />
             <div className="OrderPlacingColumn">

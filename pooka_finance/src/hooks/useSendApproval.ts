@@ -2,8 +2,10 @@
 import { useAccount, useReadContract, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { Abi, parseUnits } from "viem";
 import {
+  CONTRACT_ADDRESS_AVAX,
     CONTRACT_ADDRESS_POOL_MANAGER,
   CROSS_CHAIN_MANAGER_SEPOLIA,
+  USDC_TOKEN_AVAX,
 } from "@/utils/constants";
 import { useEffect, useState } from "react";
 import { ERC20_ABI } from "@/components/ABI/ERC20ABI";
@@ -75,22 +77,26 @@ export const useSendApprovalTraxn = ({callBackFunction}:Props) => {
   }, [error, hash, isConfirming, isSuccess]);
 
   const sendApprovalTraxn = async (payToken:string, payChain:number, depositAmount:string) => {
-    console.log("Calling approval transaction", depositAmount);
+  
     
     let contractAddress: string;
     if (payChain === sepolia.id) {
       contractAddress = CROSS_CHAIN_MANAGER_SEPOLIA;
-    } else {
-      contractAddress = CONTRACT_ADDRESS_POOL_MANAGER;
+    } else{
+       if(payToken===USDC_TOKEN_AVAX){
+        contractAddress= CONTRACT_ADDRESS_AVAX
+       }else{
+        contractAddress = CONTRACT_ADDRESS_POOL_MANAGER;
+       }     
     }
-
+    console.log("Calling approval transaction", depositAmount, data, contractAddress);
     try {
       setQuery(true);
       const amount = parseUnits(depositAmount, 8);
       console.log(`Approving ${amount} tokens for ${contractAddress}`);
       const chain=payChain===avalancheFuji.id ? avalancheFuji : sepolia;
 
-      if( data as bigint < parseUnits(depositAmount, 6)){
+      if( data===undefined || data as bigint < parseUnits(depositAmount, 6)){
         writeContract({
         abi: ERC20_ABI,
         address: payToken as `0x${string}`,

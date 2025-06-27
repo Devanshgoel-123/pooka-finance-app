@@ -27,7 +27,10 @@ export const useCreateDeposit = () => {
   useEffect(() => {
     if (hash && isConfirming) {
       alert(`Traxn sent successfully with hash:${hash}`);
-      setQuery(false)
+      if(isSuccess){
+        alert(`Traxn completed successfully, your amount has been deposited`);
+        setQuery(false);
+      }
     } else if (error) {
       alert(`Unable to send the traxn:${error.message}`);
       setQuery(false)

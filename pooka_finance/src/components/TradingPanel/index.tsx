@@ -195,7 +195,8 @@ export const OrderComponent: React.FC = () => {
     isCrossChainDepositAvaxLoading, 
     isCrossChainDepositAvaxError, 
     isError,
-    loading
+    loading,
+    isSuccess
   ]);
 
   // Fixed loading state management for withdraw operations

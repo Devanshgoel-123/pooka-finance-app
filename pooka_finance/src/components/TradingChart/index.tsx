@@ -14,15 +14,12 @@ export const TradingChart = () => {
   const chartRef = useRef<IChartApi>({} as IChartApi);
   const [ohlcData, setOhlcData] = useState<OhlcData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const {
-     selectedPerp,
-    timeFrame } = usePerpStore(
+  const { selectedPerp, timeFrame } = usePerpStore(
     useShallow((state) => ({
       selectedPerp: state.selectedPerp,
       timeFrame: state.timeframe,
     }))
   );
-
 
   const myPriceFormatter = Intl.NumberFormat("US", {
     style: "currency",
@@ -42,7 +39,7 @@ export const TradingChart = () => {
         horzLines: { color: "#1A1A1A" },
       },
       height: 400,
-      autoSize:true,
+      autoSize: true,
       localization: {
         priceFormatter: myPriceFormatter,
         // timeFormatter: myTimeFormatter,
@@ -51,12 +48,12 @@ export const TradingChart = () => {
 
     chartRef.current.priceScale("right").applyOptions({
       borderColor: "#1e1e1e",
-      autoScale:true,
+      autoScale: true,
     });
 
     chartRef.current.timeScale().applyOptions({
       borderColor: "#1e1e1e",
-      minBarSpacing:8
+      minBarSpacing: 8,
     });
 
     const candleStickSeries = chartRef.current.addSeries(CandlestickSeries, {
@@ -67,7 +64,9 @@ export const TradingChart = () => {
       wickDownColor: "#ef5350",
     });
     candleStickSeries.setData(ohlcData);
-    chartRef.current.timeScale().fitContent();
+    if(timeFrame.value.includes("week") || timeFrame.value.includes("month") || timeFrame.value.includes("quarter")){
+      chartRef.current.timeScale().fitContent()
+    }
 
     return () => {
       if (chartRef.current) {
@@ -97,7 +96,10 @@ export const TradingChart = () => {
   }, [selectedPerp, timeFrame]);
 
   return loading ? (
-    <TradingChartSkeleton />
+    <div className="candlestickChartWrapper">
+ <TradingChartSkeleton />
+    </div>
+   
   ) : (
     <div className="candlestickChartWrapper">
       <TimeSelector />
