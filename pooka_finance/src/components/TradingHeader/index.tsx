@@ -100,7 +100,7 @@ export const TradingHeader = ({
               className="mt-2"
             />
           </div>
-          <div className="symbolInfo" onClick={toggleDropdown}>
+          <div className="symbolInfoDesktop" onClick={toggleDropdown}>
             <span className="symbolText">{selectedMarket.symbol}</span>
             <div className={`symbolDropdown ${showDropDown ? "open" : ""}`}>
               ▼
