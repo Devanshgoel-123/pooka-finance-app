@@ -1,17 +1,17 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { useWaitForTransactionReceipt, useWriteContract } from "wagmi";
-import { useAccount } from "wagmi";
+
+import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
-import { Abi, parseEther } from "viem";
+import { Abi, parseUnits } from "viem";
 import { useEffect, useState } from "react";
 import { CONTRACT_ADDRESS_AVAX } from "@/utils/constants";
 import { avalancheFuji } from "viem/chains";
 
-export const useClosePosition = () => {
+export const useWithdrawAmount = () => {
   const [query, setQuery] = useState<boolean>(false);
-  const { address } = useAccount();
-  const { writeContract, data: hash, error, isPending } = useWriteContract();
-
+  const { writeContract, data: hash, error,isError } = useWriteContract();
+  const {
+    address
+  }=useAccount();
   const { isLoading: isConfirming, isSuccess:success } = useWaitForTransactionReceipt({
     hash,
     query: {
@@ -22,23 +22,27 @@ export const useClosePosition = () => {
   useEffect(() => {
     if (hash && isConfirming) {
       alert(
-        `Traxn sent successfully with hash:${hash} for closing user's Position`
+        `Traxn sent successfully with hash:${hash} for withdrawing user's Position`
       );
+      setQuery(false)
     } else if (error) {
       alert(
-        `Unable to send the traxn to close User's Position:${error.message}`
+        `Unable to send the traxn to withdraw User's Position:${error.message}`
       );
+      setQuery(false)
     }
   }, [error, hash, isConfirming]);
 
-  const closeUserPosition = async (symbol: string) => {
+  const withdrawUserAmount = async (withdrawAmount: string) => {
     try {
       setQuery(true);
       writeContract({
         address: CONTRACT_ADDRESS_AVAX,
         abi: PERPS_ABI as Abi,
-        functionName: "closePosition",
-        args: [symbol],
+        functionName: "withdrawUSDC",
+        args: [
+            parseUnits(withdrawAmount, 6)
+        ],
         account:address,
         chain:avalancheFuji
       });
@@ -49,8 +53,8 @@ export const useClosePosition = () => {
   };
 
   return {
-    closeUserPosition,
-    isConfirming, 
-    success
+    withdrawUserAmount,
+    isWithdrawError:isError, 
+    isWithdrawSuccess:success
   };
 };

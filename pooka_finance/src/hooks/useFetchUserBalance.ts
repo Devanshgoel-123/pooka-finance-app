@@ -1,28 +1,29 @@
 import {useReadContract } from "wagmi"
 import { useAccount } from "wagmi";
-import { POOKA_ABI } from "@/components/ABI/PookaFinanceABI";
+import {PERPS_ABI} from "@/components/ABI/PookaFinanceABI";
 import { Abi} from "viem";
 import { CONTRACT_ADDRESS_AVAX} from "@/utils/constants";
 
-export const useFetchUserBalance = () =>{
+export const useFetchUserDepositBalance = () =>{
   const {address, isConnected}=useAccount();
 
-  const userDepositBalance = useReadContract({
-    abi: POOKA_ABI as Abi,
+  const {
+    data,
+  } = useReadContract({
+    abi: PERPS_ABI as Abi,
     address: CONTRACT_ADDRESS_AVAX as `0x${string}`,
     functionName: 'balances',
     args: [
-        address,
+        address
     ],
     query:{
       enabled:isConnected
     }
   });
-
-  console.log("The balance of user is", userDepositBalance);
-
+   const userDepositbalance=Number(data)/10**6 || 0;
+   console.log(userDepositbalance)
    return {
-    userDepositBalance 
+    userDepositbalance
    }   
 
 }

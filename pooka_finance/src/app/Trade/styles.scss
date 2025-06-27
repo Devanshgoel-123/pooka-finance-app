@@ -14,6 +14,10 @@
     max-height: 86%;
     overflow: auto;
     background-color: black;
+    padding-inline: 30px;
+    padding-top: 20px;
+    gap: 15px;
+
     @include xl{
       padding-inline: 60px;
       padding-block: 16px;
@@ -23,16 +27,18 @@
     .MidComponentWrapper{
       display: flex;
       flex-direction: row;
-      justify-content: flex-start;
+      justify-content: space-between;
       gap: 10px;
       width: 100%;
       margin-bottom: 20px;
 
+      @include md{
+        justify-content: center;
+      }
+
       @include xxl{
         width: 100%;
-      }
-      .OrderBookColumn{
-        width: 50%;
+        gap: 60px
       }
   
       .OrderPlacingColumn{
@@ -42,6 +48,18 @@
         width: 50%;
         height: 100%;
         gap: 10px;
+
+        @include lg{
+          width: 45%;
+        }
+
+        @include xl{
+          width: 35%;
+        }
+        @include xxl{
+          justify-content: flex-end;
+          width: 25%;
+        }
       }
     }
   }

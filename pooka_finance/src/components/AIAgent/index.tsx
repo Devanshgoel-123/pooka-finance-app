@@ -49,7 +49,6 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
 
   useEffect(() => {
     scrollToBottom();
-    console.log("The messages are", messages);
   }, [messages]);
 
   const handleSendMessage = async () => {
@@ -74,10 +73,18 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
 
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/message`, {
-        text: "I want to deposit 100 usdc on ethereum chain",
+        text: tempMessage,
         agentId: "Sigma",
       });
     } catch (err) {
+      const errorMessage: Message = {
+        id: Date.now().toString(),
+        type: "agent",
+        content: "Sorry We are facing some issues here. Can you please try again later?",
+        timestamp: new Date(),
+        action: "response",
+      };
+      setMessages((prev) => [...prev, errorMessage]);
       console.error("Error sending message:", err);
     } finally {
       setIsTyping(false);
