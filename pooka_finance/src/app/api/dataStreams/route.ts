@@ -115,9 +115,9 @@ async function get24hHighLow(
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
-  const symbol = searchParams.get("symbol");
+  const requestedSymbol = searchParams.get("symbol");
 
-  if (!symbol || !(symbol in FEED_IDS)) {
+  if (!requestedSymbol || !(requestedSymbol in FEED_IDS)) {
     return NextResponse.json({ error: "Invalid symbol" }, { status: 400 });
   }
 
@@ -132,58 +132,76 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const feedId = FEED_IDS[symbol as keyof typeof FEED_IDS];
+    // ISOLATE FEED ID - Create immutable reference
+    const selectedFeedId = FEED_IDS[requestedSymbol as keyof typeof FEED_IDS];
+    const immutableFeedId = String(selectedFeedId); // Force new string instance
 
-    // Get current price
-    const currentPath = `/api/v1/reports/latest?feedID=${feedId}`;
-    const currentHeaders = generateAuthHeaders(
-      "GET",
-      currentPath,
+    // Build API path with isolated variables
+    const apiPath = `/api/v1/reports/latest?feedID=${immutableFeedId}`;
+    const fullApiUrl = `${BASE_URL}${apiPath}`;
+
+    // Generate headers with isolated feed ID
+    const authHeaders = generateAuthHeaders("GET", apiPath, apiKey, apiSecret);
+
+    // Make API call
+    const apiResponse = await fetch(fullApiUrl, {
+      method: "GET",
+      headers: authHeaders,
+    });
+
+    if (!apiResponse.ok) {
+      console.error("API Error:", apiResponse.status, apiResponse.statusText);
+      throw new Error(`API responded with status: ${apiResponse.status}`);
+    }
+
+    const apiData: StreamsResponse = await apiResponse.json();
+
+    // Extract price with fresh variables
+    const extractedPrice = extractPrice(apiData.report.fullReport);
+
+    // Try to get 24h data with same isolated feed ID
+    const historicalData = await get24hHighLow(
+      immutableFeedId,
       apiKey,
       apiSecret
     );
-
-    const currentResponse = await fetch(`${BASE_URL}${currentPath}`, {
-      method: "GET",
-      headers: currentHeaders,
-    });
-
-    if (!currentResponse.ok) {
-      throw new Error(`API responded with status: ${currentResponse.status}`);
-    }
-
-    const currentData: StreamsResponse = await currentResponse.json();
-    const currentPrice = extractPrice(currentData.report.fullReport);
-
-    // Try to get real 24h high/low
-    const historical = await get24hHighLow(feedId, apiKey, apiSecret);
 
     let high24h: number;
     let low24h: number;
     let dataSource: string;
 
-    if (historical && historical.dataPoints > 5) {
-      // Use real data if we have enough points
-      high24h = historical.high24h;
-      low24h = historical.low24h;
-      dataSource = `real_${historical.dataPoints}_points`;
+    if (historicalData && historicalData.dataPoints > 5) {
+      high24h = historicalData.high24h;
+      low24h = historicalData.low24h;
+      dataSource = `real_${historicalData.dataPoints}_points`;
     } else {
-      // Fallback to realistic simulation
-      high24h = currentPrice * 1.02; // +2%
-      low24h = currentPrice * 0.98; // -2%
+      high24h = extractedPrice * 1.02;
+      low24h = extractedPrice * 0.98;
       dataSource = "simulated";
     }
 
-    return NextResponse.json({
-      symbol,
-      price: currentPrice,
-      timestamp: currentData.report.observationsTimestamp,
+    const finalResponse = {
+      symbol: requestedSymbol,
+      price: extractedPrice,
+      timestamp: apiData.report.observationsTimestamp,
       high24h,
       low24h,
       dataSource,
-    });
+      debug: {
+        originalSymbol: requestedSymbol,
+        selectedFeedId: selectedFeedId,
+        immutableFeedId: immutableFeedId,
+        requestedFeedId: immutableFeedId,
+        returnedFeedId: apiData.report.feedID,
+        feedIdMatch: apiData.report.feedID === immutableFeedId,
+        reportPrefix: apiData.report.fullReport.substring(0, 100),
+        allMappings: FEED_IDS,
+      },
+    };
+
+    return NextResponse.json(finalResponse);
   } catch (error) {
-    console.error("Error fetching data streams:", error);
+    console.error("Error in isolated request:", error);
     return NextResponse.json(
       { error: "Failed to fetch price data" },
       { status: 500 }
