@@ -25,6 +25,12 @@ const FEED_IDS = {
 
 const BASE_URL = "https://api.testnet-dataengine.chain.link";
 
+// Expected price ranges for corruption detection
+const EXPECTED_RANGES = {
+  "ETH/USD": { min: 1500, max: 8000 }, // Reasonable ETH range
+  "BTC/USD": { min: 30000, max: 150000 }, // Reasonable BTC range
+} as const;
+
 function generateAuthHeaders(
   method: string,
   path: string,
@@ -55,7 +61,6 @@ function extractPrice(fullReport: string): number {
     if (buffer.length >= priceEnd) {
       const priceHex = buffer.slice(priceStart, priceEnd).toString("hex");
       const priceWei = BigInt("0x" + priceHex);
-
       return Number(priceWei) / 1e2;
     }
 
@@ -64,6 +69,24 @@ function extractPrice(fullReport: string): number {
     console.error("Error extracting price:", error);
     return 0;
   }
+}
+
+// Detect if price data is corrupted based on expected ranges
+function isDataCorrupted(symbol: string, price: number): boolean {
+  if (price <= 0) return true;
+
+  const range = EXPECTED_RANGES[symbol as keyof typeof EXPECTED_RANGES];
+  if (!range) return false;
+
+  const isOutOfRange = price < range.min || price > range.max;
+
+  if (isOutOfRange) {
+    console.warn(
+      `🚨 Price corruption detected for ${symbol}: ${price} (expected: ${range.min}-${range.max})`
+    );
+  }
+
+  return isOutOfRange;
 }
 
 async function get24hHighLow(
@@ -132,18 +155,12 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // ISOLATE FEED ID - Create immutable reference
     const selectedFeedId = FEED_IDS[requestedSymbol as keyof typeof FEED_IDS];
-    const immutableFeedId = String(selectedFeedId); // Force new string instance
-
-    // Build API path with isolated variables
-    const apiPath = `/api/v1/reports/latest?feedID=${immutableFeedId}`;
+    const apiPath = `/api/v1/reports/latest?feedID=${selectedFeedId}`;
     const fullApiUrl = `${BASE_URL}${apiPath}`;
 
-    // Generate headers with isolated feed ID
     const authHeaders = generateAuthHeaders("GET", apiPath, apiKey, apiSecret);
 
-    // Make API call
     const apiResponse = await fetch(fullApiUrl, {
       method: "GET",
       headers: authHeaders,
@@ -155,13 +172,29 @@ export async function GET(request: NextRequest) {
     }
 
     const apiData: StreamsResponse = await apiResponse.json();
-
-    // Extract price with fresh variables
     const extractedPrice = extractPrice(apiData.report.fullReport);
 
-    // Try to get 24h data with same isolated feed ID
+    // CORRUPTION DETECTION
+    if (isDataCorrupted(requestedSymbol, extractedPrice)) {
+      return NextResponse.json(
+        {
+          error: "Data corruption detected",
+          details: {
+            symbol: requestedSymbol,
+            corruptedPrice: extractedPrice,
+            expectedRange:
+              EXPECTED_RANGES[requestedSymbol as keyof typeof EXPECTED_RANGES],
+            feedId: selectedFeedId,
+            reportPrefix: apiData.report.fullReport.substring(0, 100),
+          },
+        },
+        { status: 422 } // Unprocessable Entity - data is returned but invalid
+      );
+    }
+
+    // Get 24h data
     const historicalData = await get24hHighLow(
-      immutableFeedId,
+      selectedFeedId,
       apiKey,
       apiSecret
     );
@@ -187,23 +220,25 @@ export async function GET(request: NextRequest) {
       high24h,
       low24h,
       dataSource,
+      quality: "validated", // Indicates data passed corruption checks
       debug: {
-        originalSymbol: requestedSymbol,
-        selectedFeedId: selectedFeedId,
-        immutableFeedId: immutableFeedId,
-        requestedFeedId: immutableFeedId,
+        feedId: selectedFeedId,
         returnedFeedId: apiData.report.feedID,
-        feedIdMatch: apiData.report.feedID === immutableFeedId,
+        feedIdMatch: apiData.report.feedID === selectedFeedId,
         reportPrefix: apiData.report.fullReport.substring(0, 100),
-        allMappings: FEED_IDS,
+        priceRange:
+          EXPECTED_RANGES[requestedSymbol as keyof typeof EXPECTED_RANGES],
       },
     };
 
     return NextResponse.json(finalResponse);
   } catch (error) {
-    console.error("Error in isolated request:", error);
+    console.error("Error in DataStreams request:", error);
     return NextResponse.json(
-      { error: "Failed to fetch price data" },
+      {
+        error: "Failed to fetch price data",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 }
     );
   }

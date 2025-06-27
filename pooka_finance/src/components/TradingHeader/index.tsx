@@ -4,10 +4,10 @@
 import type React from "react";
 import { useState, useRef, useEffect } from "react";
 import "./styles.scss";
-import {PERP_MM } from "@/utils/constants";
+import { PERP_MM } from "@/utils/constants";
 import { usePerpStore } from "@/store/PerpStore";
 import Image from "next/image";
-import { useDataStreams } from "@/hooks/useDataStreams";
+import { useUnifiedPriceFeeds } from "@/hooks/useUnifiedPriceFeeds";
 import { useShallow } from "zustand/react/shallow";
 import { markets } from "@/utils/constants";
 import { Market } from "@/store/types/types";
@@ -17,22 +17,19 @@ export const TradingHeader = ({
   priceChange = -374.74,
   priceChangePercent = -0.36,
 }) => {
-
   const [showDropDown, setShowDropDown] = useState<boolean>(false);
   const [selectedMarket, setSelectedMarket] = useState<Market>(markets[1]);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const {
-    userDepositbalance
-  }=useFetchUserDepositBalance();
-  const {
-    maintenanceMargin
-  }=usePerpStore(useShallow((state)=>({
-    maintenanceMargin:state.maintenanceMargin
-  })))
+  const { userDepositbalance } = useFetchUserDepositBalance();
+  const { maintenanceMargin } = usePerpStore(
+    useShallow((state) => ({
+      maintenanceMargin: state.maintenanceMargin,
+    }))
+  );
   const isPositive = priceChange >= 0;
 
-  // Use DataStreams instead of useFetchMarketData
-  const { ethData, btcData, isLoading, error } = useDataStreams();
+  // Use Unified Price Feeds with 3-tier fallback system
+  const { ethData, btcData, isLoading, error } = useUnifiedPriceFeeds();
 
   // Get current market data based on selection
   const getCurrentMarketData = () => {
@@ -79,12 +76,12 @@ export const TradingHeader = ({
     setShowDropDown(!showDropDown);
   };
 
-  // Show error state if DataStreams fails
-  if (error) {
+  // Show error state only if all sources fail
+  if (error && error.includes("unavailable")) {
     return (
       <div className="tradingHeader">
         <div className="error-message">
-          Error loading Chainlink data: {error}
+          All price feed sources unavailable. Please try again later.
         </div>
       </div>
     );
@@ -154,46 +151,55 @@ export const TradingHeader = ({
 
       <div className="statsSectionTradingDesktop">
         <div className="statsData">
-        <div className="statItem">
-          <span className="statLabel">24H High</span>
-          <span className="statValue">
-            $
-            {marketData.price24hHigh > 0
-              ? marketData.price24hHigh.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })
-              : isLoading
-              ? "Loading..."
-              : "0.00"}
-          </span>
-        </div>
-        <div className="statItem">
-          <span className="statLabel">24H Low</span>
-          <span className="statValue">
-            $
-            {marketData.price24hLow > 0
-              ? marketData.price24hLow.toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })
-              : isLoading
-              ? "Loading..."
-              : "0.00"}
-          </span>
-        </div>
-        <div className="statItem">
-          <span className="statLabel">Req. Maintenance</span>
-          <span className="statValue">
-            {isLoading ? "Loading..." : maintenanceMargin.toFixed(1)}%
-          </span>
-        </div>
+          <div className="statItem">
+            <span className="statLabel">24H High</span>
+            <span className="statValue">
+              $
+              {marketData.price24hHigh > 0
+                ? marketData.price24hHigh.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })
+                : isLoading
+                ? "Loading..."
+                : "0.00"}
+            </span>
+          </div>
+          <div className="statItem">
+            <span className="statLabel">24H Low</span>
+            <span className="statValue">
+              $
+              {marketData.price24hLow > 0
+                ? marketData.price24hLow.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })
+                : isLoading
+                ? "Loading..."
+                : "0.00"}
+            </span>
+          </div>
+          <div className="statItem">
+            <span className="statLabel">Req. Maintenance</span>
+            <span className="statValue">{maintenanceMargin.toFixed(1)}%</span>
+          </div>
         </div>
         <div className="depositWrapper">
           <span className="depositHeader">YOUR DEPOSIT :</span>
           <div className="depositBalance">
-            <Image src={"/assets/usdc.svg"} alt="" height={22} width={22} className="usdcLogo"/>
-          <span>${userDepositbalance===0 ? userDepositbalance.toFixed(2) : userDepositbalance.toFixed(3)}</span>
+            <Image
+              src={"/assets/usdc.svg"}
+              alt=""
+              height={22}
+              width={22}
+              className="usdcLogo"
+            />
+            <span>
+              $
+              {userDepositbalance === 0
+                ? userDepositbalance.toFixed(2)
+                : userDepositbalance.toFixed(3)}
+            </span>
           </div>
         </div>
       </div>
