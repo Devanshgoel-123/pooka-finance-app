@@ -13,7 +13,7 @@ import { CTASection } from "@/components/CTASection"
 import "./styles.scss"
 import { useRouter } from "next/navigation"
 
-export const LandingPage= () => {
+const LandingPage= () => {
   const [currentVolume, setCurrentVolume] = useState<number>(15000000)
   const [currentUsers, setCurrentUsers] = useState<number>(7200)
 

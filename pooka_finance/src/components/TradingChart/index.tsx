@@ -1,20 +1,19 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import { createChart, CandlestickSeries } from "lightweight-charts";
+import { createChart, CandlestickSeries, IChartApi } from "lightweight-charts";
 import "./styles.scss";
 import axios from "axios";
-import { OHLC_DATA } from "@/store/types/types";
 import { usePerpStore } from "@/store/PerpStore";
 import { useShallow } from "zustand/react/shallow";
 import { TradingChartSkeleton } from "../LoadingComponents/GraphSkeleton";
 import TimeSelector from "./TimeSelector";
+import { OhlcData } from "lightweight-charts";
 
 export const TradingChart = () => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
-  const chartRef = useRef<any>(null);
-  const [ohlcData, setOhlcData] = useState<OHLC_DATA[]>([]);
+  const chartRef = useRef<IChartApi>({} as IChartApi);
+  const [ohlcData, setOhlcData] = useState<OhlcData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
   const { selectedPerp, timeFrame } = usePerpStore(
     useShallow((state) => ({
       selectedPerp: state.selectedPerp,
@@ -40,25 +39,21 @@ export const TradingChart = () => {
         horzLines: { color: "#1A1A1A" },
       },
       height: 400,
+      autoSize: true,
       localization: {
         priceFormatter: myPriceFormatter,
+        // timeFormatter: myTimeFormatter,
       },
     });
 
     chartRef.current.priceScale("right").applyOptions({
       borderColor: "#1e1e1e",
-      autoScale: false,
-      barSpacing: 50,
-      textColor: "#E0E0E0",
+      autoScale: true,
     });
 
     chartRef.current.timeScale().applyOptions({
       borderColor: "#1e1e1e",
-      scaleMargins: {
-        top: 0.1,
-        bottom: 0.2,
-      },
-      textColor: "#E0E0E0",
+      minBarSpacing: 8,
     });
 
     const candleStickSeries = chartRef.current.addSeries(CandlestickSeries, {
@@ -69,7 +64,9 @@ export const TradingChart = () => {
       wickDownColor: "#ef5350",
     });
     candleStickSeries.setData(ohlcData);
-    chartRef.current.timeScale().fitContent();
+    if(timeFrame.value.includes("week") || timeFrame.value.includes("month") || timeFrame.value.includes("quarter")){
+      chartRef.current.timeScale().fitContent()
+    }
 
     return () => {
       if (chartRef.current) {
@@ -99,7 +96,10 @@ export const TradingChart = () => {
   }, [selectedPerp, timeFrame]);
 
   return loading ? (
-    <TradingChartSkeleton />
+    <div className="candlestickChartWrapper">
+ <TradingChartSkeleton />
+    </div>
+   
   ) : (
     <div className="candlestickChartWrapper">
       <TimeSelector />

@@ -4,28 +4,31 @@
 import type React from "react";
 import { useState, useRef, useEffect } from "react";
 import "./styles.scss";
-import { MARKET_SYMBOLS, PERP_MM } from "@/utils/constants";
+import {PERP_MM } from "@/utils/constants";
 import { usePerpStore } from "@/store/PerpStore";
 import Image from "next/image";
 import { useDataStreams } from "@/hooks/useDataStreams";
 import { useShallow } from "zustand/react/shallow";
 import { markets } from "@/utils/constants";
 import { Market } from "@/store/types/types";
+import { useFetchUserDepositBalance } from "@/hooks/useFetchUserBalance";
 
 export const TradingHeader = ({
   priceChange = -374.74,
   priceChangePercent = -0.36,
 }) => {
+
   const [showDropDown, setShowDropDown] = useState<boolean>(false);
   const [selectedMarket, setSelectedMarket] = useState<Market>(markets[1]);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const { maintenanceMargin } = usePerpStore(
-    useShallow((state) => ({
-      maintenanceMargin: state.maintenanceMargin,
-    }))
-  );
-
+  const {
+    userDepositbalance
+  }=useFetchUserDepositBalance();
+  const {
+    maintenanceMargin
+  }=usePerpStore(useShallow((state)=>({
+    maintenanceMargin:state.maintenanceMargin
+  })))
   const isPositive = priceChange >= 0;
 
   // Use DataStreams instead of useFetchMarketData
@@ -90,7 +93,7 @@ export const TradingHeader = ({
   return (
     <div className="tradingHeader">
       <div className="priceSection">
-        <div className="symbolContainer" ref={dropdownRef}>
+        <div className="symbolContainerDesktop" ref={dropdownRef}>
           <div className="symbolIcon">
             <Image
               height={30}
@@ -108,7 +111,7 @@ export const TradingHeader = ({
           </div>
 
           {showDropDown && (
-            <div className="dropdownMenu">
+            <div className="dropdownMenuDesktop">
               {markets.map((market) => (
                 <div
                   key={market.symbol}
@@ -125,7 +128,7 @@ export const TradingHeader = ({
           )}
         </div>
 
-        <div className="priceInfo">
+        <div className="priceInfoDesktop">
           <div className="currentPrice">
             $
             {marketData.currentPrice > 0
@@ -149,7 +152,8 @@ export const TradingHeader = ({
         </div>
       </div>
 
-      <div className="statsSectionTrading">
+      <div className="statsSectionTradingDesktop">
+        <div className="statsData">
         <div className="statItem">
           <span className="statLabel">24H High</span>
           <span className="statValue">
@@ -183,6 +187,14 @@ export const TradingHeader = ({
           <span className="statValue">
             {isLoading ? "Loading..." : maintenanceMargin.toFixed(1)}%
           </span>
+        </div>
+        </div>
+        <div className="depositWrapper">
+          <span className="depositHeader">YOUR DEPOSIT :</span>
+          <div className="depositBalance">
+            <Image src={"/assets/usdc.svg"} alt="" height={22} width={22} className="usdcLogo"/>
+          <span>${userDepositbalance===0 ? userDepositbalance.toFixed(2) : userDepositbalance.toFixed(3)}</span>
+          </div>
         </div>
       </div>
     </div>

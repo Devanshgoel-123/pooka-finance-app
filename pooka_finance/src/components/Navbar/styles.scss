@@ -1,3 +1,5 @@
+@import "../../app/mixin.scss";
+
 .navbar {
   top: 0;
   left: 0;
@@ -5,10 +7,17 @@
   background: #0a0a0a;
   backdrop-filter: blur(12px);
   border-bottom: 1px solid #2a2a2a;
-  padding-inline: 60px;
+  padding-inline: 30px;
   padding-block: 8px;
   font-family: var(--font-manrope), sans-serif;
   font-weight:bolder;
+
+  @include md{
+
+  }
+  @include xl{
+    padding-inline: 60px;
+  }
 }
 
 .navbar-content {
@@ -23,6 +32,21 @@
 .navbar-brand {
   display: flex;
   align-items: center;
+}
+
+.connectedWallet {
+  display: flex;
+  flex-direction: row;
+  padding: 12px 30px;
+  font-weight: 500;
+  font-family: "Manrope";
+  color: #e5e7eb;
+  background-color: #111111;
+  line-height: 150%;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  border: 1px solid #1e1e1e;
 }
 
 .logo {
