@@ -35,12 +35,13 @@ export const PositionCard: React.FC<PositionCardProps> = ({ params, isLoading = 
  
   const {
     openPosition,
-    isPositionLoading
+    isPositionLoading,
+    success
   }=useOpenPosition();
 
   useEffect(()=>{
   if(params.collateral === null || params.perpName===null || !params.positionType === null){
-    return 
+    return
   }
   },[params.collateral, params.perpName, params.positionType])
 
@@ -78,6 +79,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ params, isLoading = 
       })
 
   }
+ 
 
   return (
     <div
@@ -132,7 +134,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ params, isLoading = 
 
       <div className="cardFooter">
         <button
-         disabled={userDepositbalance < Number(params.collateral) && chainId === avalancheFuji.id}
+         disabled={params.collateral === undefined || userDepositbalance < Number(params.collateral) && chainId === avalancheFuji.id}
           className={`openPositionBtn ${isLoading ? "loading" : ""}`}
           onClick={()=>{
 
@@ -144,7 +146,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ params, isLoading = 
            
           }}
         >
-          {isPositionLoading? (
+          {isPositionLoading ? (
             <>
               <LoadingSpinner/>
             </>

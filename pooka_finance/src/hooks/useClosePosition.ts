@@ -51,6 +51,7 @@ export const useClosePosition = () => {
   return {
     closeUserPosition,
     isConfirming, 
+    isPending,
     success
   };
 };

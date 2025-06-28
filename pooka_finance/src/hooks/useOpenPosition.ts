@@ -7,13 +7,13 @@ import { avalancheFuji } from "viem/chains";
 
 export const useOpenPosition = () => {
   const [query, setQuery] = useState<boolean>(false);
-  const { writeContract, data: hash, error, isPending, isError } = useWriteContract();
+  const { writeContract, data: hash, error, isPending } = useWriteContract();
 
   const {
     address
   }=useAccount();
 
-  const { isLoading: isConfirming } = useWaitForTransactionReceipt({
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
     hash,
     query: {
       enabled: query,
@@ -21,8 +21,14 @@ export const useOpenPosition = () => {
   });
 
   useEffect(() => {
-    if (hash && isConfirming) {
-      alert(`Position opened successfully with hash:${hash}`);
+    if (hash) {
+      if (isConfirming) {
+        alert(`Transaction sent successfully with hash: ${hash}`);
+      }
+      
+      if (isSuccess) {
+        alert(`Transaction confirmed successfully!`);
+      }
     } else if (error) {
       alert(`Unable to open position:${error.message}`);
     }
@@ -52,6 +58,7 @@ export const useOpenPosition = () => {
 
   return {
     openPosition,
-    isPositionLoading: isPending || isConfirming || isError,
+    isPositionLoading: isPending || isConfirming,
+    success:isSuccess
   };
 };

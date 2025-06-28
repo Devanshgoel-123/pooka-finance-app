@@ -10,6 +10,9 @@ import { getTokenImage } from "@/utils/helperFunction";
 import { WithdrawPositionParams } from "@/store/types/types";
 import { useFetchUserDepositBalance } from "@/hooks/useFetchUserBalance";
 import { LoadingText } from "@/common/LoadingText";
+import { useChainId, useSwitchChain } from "wagmi";
+import { avalancheFuji } from "viem/chains";
+
 
 interface Props{
   params : WithdrawPositionParams;
@@ -18,6 +21,16 @@ interface Props{
 
 export const WithdrawAmountCard= ({ params }:Props) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const chainId=useChainId();
+  const {
+    switchChain
+  }=useSwitchChain();
+
+  const handleSwitchChain=()=>{
+    switchChain({
+      chainId:avalancheFuji.id
+    })
+}
   const {
     userDepositbalance,
     isLoading:isDepositLoading
@@ -68,7 +81,7 @@ export const WithdrawAmountCard= ({ params }:Props) => {
       <div className="cardFooter">
         <button
           className={`closeBtn ${isLoading ? "loading" : ""}`}
-          onClick={handleWithdrawal}
+          onClick={chainId=== avalancheFuji.id ? handleWithdrawal : handleSwitchChain}
           disabled={params.withdrawAmount === undefined || isLoading || Number(params.withdrawAmount) > userDepositbalance}
         >
           {isLoading && !isWithdrawSuccess && !isWithdrawError ? (
