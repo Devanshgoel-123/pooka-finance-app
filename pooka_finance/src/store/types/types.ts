@@ -42,7 +42,7 @@ export interface ClosePositionParams{
 }
 
 export interface WithdrawPositionParams{
-  amount:string | undefined;
+  withdrawAmount:string | undefined;
 }
 
 export interface Message {

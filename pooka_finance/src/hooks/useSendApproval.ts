@@ -78,7 +78,6 @@ export const useSendApprovalTraxn = ({callBackFunction}:Props) => {
 
   const sendApprovalTraxn = async (payToken:string, payChain:number, depositAmount:string) => {
   
-    
     let contractAddress: string;
     if (payChain === sepolia.id) {
       contractAddress = CROSS_CHAIN_MANAGER_SEPOLIA;

@@ -52,7 +52,6 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
 
   useEffect(() => {
     scrollToBottom();
-    console.log(element)
   }, [messages]);
 
   const handleSendMessage = async () => {
@@ -105,7 +104,6 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
   };
 
   const renderAgentResponse = (message: Message) => {
-    console.log("The agent msg is", message.action)
     if (message.action === "trade" && message.params !== undefined) {
       return (
         <div className="messageContent">
@@ -180,7 +178,7 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
       setMessages((prev) => [...prev, newMessage]);
     } else if (
       element === "withdraw" &&
-      withdrawParams.current.amount !== undefined
+      withdrawParams.current.withdrawAmount !== undefined
     ){
       console.log("debugging ",element, withdrawParams.current)
       const newMessage: Message = {
@@ -288,7 +286,10 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
             <div className="messageAvatar">
               <div className="avatarIcon">🤖</div>
             </div>
-            <div className="messageContent">
+            <div className="messageContent" style={{
+              width:"100px",
+              overflow:"hidden"
+            }}>
               <div className="typingIndicator">
                 <span></span>
                 <span></span>

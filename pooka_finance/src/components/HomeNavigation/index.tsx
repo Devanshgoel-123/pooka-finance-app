@@ -22,14 +22,11 @@ export const Navigation: React.FC<NavigationProps> = ({ onLaunchApp }) => {
         </div>
 
         <div className="navLinks">
-          <a href="#docs" className="navLink">
+          <a href="https://pookafinance.gitbook.io/pookafinance-docs/" className="navLink">
             Docs
           </a>
-          <a href="#blog" className="navLink">
-            Blog
-          </a>
-          <a href="#products" className="navLink">
-            Products
+          <a href="/Trade" className="navLink">
+            Trade
           </a>
           <a href="/Agent" className="navLink">
             Agent

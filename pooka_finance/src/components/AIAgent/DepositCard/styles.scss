@@ -99,6 +99,7 @@
   display: flex;
   flex-direction: row;
   gap: 12px;
+  justify-content: space-between;
   background-color: transparent;
 
   .parameter {
@@ -107,15 +108,11 @@
     min-width: 125px;
     gap: 12px;
     padding: 12px;
-    // background: linear-gradient(
-    //   135deg,
-    //   rgba(255, 255, 255, 0.02) 0%,
-    //   rgba(255, 255, 255, 0.01) 100%
-    // );
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     transition: all 0.3s ease;
     animation: parameterFade 0.6s ease-out both;
+    width: 20%;
   
     &.mainParameter {
       padding: 12px;
@@ -126,6 +123,7 @@
         rgba(123, 241, 121, 0.01) 100%
       );
       animation-delay: 0.1s;
+      width: 60%;
     }
   
     &:nth-child(2) {

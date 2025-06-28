@@ -21,7 +21,7 @@ export const useSocketConnection = () => {
   });
 
   const withdrawParams=useRef<WithdrawPositionParams>({
-    amount:undefined
+    withdrawAmount:undefined
   });
 
   const closePositionParams=useRef<ClosePositionParams>({
@@ -61,7 +61,7 @@ export const useSocketConnection = () => {
     })
 
     socket_connections.on("withdraw_amount", (data) => {
-      console.log("The received data", data);
+      console.log("The received data withdrawal amount", data);
      withdrawParams.current=data.position;
       setElement("withdraw")
     });

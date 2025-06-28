@@ -14,9 +14,9 @@ import { useCreateCrossChainDeposit } from "@/hooks/useCreateCrossChainDeposit";
 import { useSendApprovalTraxn } from "@/hooks/useSendApproval";
 import { useCreateCrossChainDepositOnAvax } from "@/hooks/useCrossChainDepositAvax";
 import { avalancheFuji, sepolia } from "viem/chains"
-import { usePerpStore } from "@/store/PerpStore"
-import { useShallow } from "zustand/react/shallow"
-
+import { getChainName } from "@/utils/helperFunction"
+import { useChainId, useSwitchChain } from "wagmi"
+import { switchChain } from "viem/actions"
 interface DepositCardProps {
   params: DepositParams
   isLoading?: boolean
@@ -24,6 +24,10 @@ interface DepositCardProps {
 
 export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = false }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const chainId =useChainId();
+  const {
+    switchChain
+  }=useSwitchChain()
   const formatCurrency = (amount: number | undefined) => {
     if (!amount) return "0"
     return new Intl.NumberFormat("en-US", {
@@ -68,8 +72,11 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
     if(params.chainName === undefined || params.collateral===undefined || params.payToken===undefined) return;
     if (getChainId(params.chainName) === avalancheFuji.id) {
       const tokenAddress=getTokenAddressForName(params.payToken, avalancheFuji.id);
+    
       await createDeposit(tokenAddress, params.collateral.toString());
     } else if (getChainId(params.chainName) === sepolia.id) {
+    
+      
       await createCrossChainDeposit(params.collateral.toString());
     } else {
       console.error('Unsupported chain selected');
@@ -89,9 +96,19 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
    if(params.collateral===undefined || params.payToken===undefined || params.chainName === undefined) return;
    const chainId=getChainId(params.chainName);
    const tokenAddress=getTokenAddressForName(params.payToken, chainId);
+   console.log(chainId, tokenAddress, params.collateral)
    sendApprovalTraxn(tokenAddress, chainId, params.collateral.toString())
   }
 
+  const handleSwitchChain=(chainName:string | undefined)=>{
+    if(chainName === undefined) return;
+    const targetChain=getChainId(chainName)
+    if(chainId !== targetChain){
+      switchChain({
+        chainId:targetChain
+      })
+    } 
+  }
   return (
     <div
       className={`depositCard ${isHovered ? "hovered" : ""}`}
@@ -108,7 +125,7 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
             height={20}
             className="chainIcon"
           />
-          <span className="chainName">{params?.chainName?.toUpperCase()}</span>
+          <span className="chainName">{getChainName(params?.chainName?.toUpperCase() || "eth") }</span>
         </div>
       </div>
 
@@ -160,7 +177,7 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
                 height={24}
                 className="networkIcon"
               />
-              <span className="networkName">{params?.chainName?.toUpperCase()}</span>
+              <span className="networkName">{getChainName(params?.chainName?.toUpperCase() || "eth")}</span>
             </div>
           </div>
       </div>
@@ -168,7 +185,13 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
       <div className="cardFooter">
         <button
           className={`depositBtn ${isLoading ? "loading" : ""}`}
-          onClick={handleDeposit}
+          onClick={()=>{
+            if( chainId !== getChainId(params.chainName as string)){
+              handleSwitchChain(params.chainName)
+            }else{
+              handleDeposit()
+            }
+          }}
           disabled={isLoading || !params.collateral || params.collateral <= 0}
         >
           {isDepositLoading ? (
@@ -176,7 +199,7 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
               <LoadingSpinner/>
             </>
           ) : (
-           "Confirm Deposit"
+           chainId === getChainId(params.chainName as string) ? "Confirm Deposit" : "Switch Chain"
           )}
         </button>
       </div>
