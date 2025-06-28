@@ -133,8 +133,9 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
   useEffect(() => {
     if (
       element === "trade" &&
-      positionParams.current.payToken !== undefined &&
-      positionParams.current.positionType !== undefined
+      positionParams.current.collateral !== undefined &&
+      positionParams.current.positionType !== undefined &&
+      positionParams.current.perpName !== undefined
     ) {
       const newMessage: Message = {
         id: Date.now().toString(),
@@ -148,7 +149,8 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
     } else if (
       element === "deposit" &&
       depositParams.current.payToken !== undefined &&
-      depositParams.current.collateral !== undefined
+      depositParams.current.collateral !== undefined &&
+      depositParams.current.chainName !== undefined
     ) {
       const newMessage: Message = {
         id: Date.now().toString(),

@@ -6,13 +6,11 @@ import { DepositParams, PositionParams } from "@/store/types/types";
 dotenv.config();
 export const useSocketConnection = () => {
   const [renderElement, setRenderElement]=useState<string | undefined>(undefined);
-  const [element, setElement]=useState<"deposit" | "liquidate" | "trade" | null>(null);
+  const [element, setElement]=useState<"deposit" | "close" | "trade" | "withdraw" | null>(null);
   const positionParams = useRef<PositionParams>({
-    chainName:undefined, 
     perpName: undefined,
     leverage: undefined,
     collateral: undefined,
-    payToken: undefined,
     positionType: undefined,
   });
   const depositParams=useRef<DepositParams>({
