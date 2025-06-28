@@ -9,6 +9,7 @@ export const useFetchUserDepositBalance = () =>{
 
   const {
     data,
+    isLoading
   } = useReadContract({
     abi: PERPS_ABI as Abi,
     address: CONTRACT_ADDRESS_AVAX as `0x${string}`,
@@ -23,5 +24,7 @@ export const useFetchUserDepositBalance = () =>{
    const userDepositbalance=Number(data)/10**6 || 0;
    console.log(userDepositbalance)
    return {
-    userDepositbalance
+    userDepositbalance,
+    isLoading
    }   
+  }

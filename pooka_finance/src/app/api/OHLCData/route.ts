@@ -29,7 +29,7 @@ export async function GET(request:NextRequest) {
         { status: 400 }
       );
      }
-     const DATE_NOW=returnFormattedDate(new Date(new Date().setDate(new Date().getDate()-2))) || "2024-08-09";
+     const DATE_NOW=returnFormattedDate(new Date()) || "2024-08-09";
    
      const BASE_URL="https://api.polygon.io/v2/aggs/ticker";
      const DATE_TO= getPastDate() || "2025-06-05";
@@ -46,10 +46,7 @@ export async function GET(request:NextRequest) {
         low: item.l, 
         close: item.c, 
       }));
-     
-    // const cleanedData = ohlcData.filter((d: ApiResponse, i: number, arr: ApiResponse[]) => i === 0 || d.time !== arr[i - 1].time).sort((a:ApiResponse, b:ApiResponse)=>Number(a.time) - Number(b.time));
-     console.log(ohlcData)
-     return NextResponse.json(
+   return NextResponse.json(
         { data: ohlcData },
         { status: 200 }
       );

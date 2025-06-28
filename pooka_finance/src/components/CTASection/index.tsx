@@ -2,7 +2,6 @@
 
 import type React from "react"
 import "./styles.scss"
-import Image from "next/image"
 
 interface CTASectionProps {
   onLaunchApp?: () => void
@@ -17,7 +16,6 @@ export const CTASection: React.FC<CTASectionProps> = ({ onLaunchApp }) => {
 
         
         <div className="ctaImagePlaceholder">
-        {/* //  <Image src={"/assets/tradingPanel.svg"} height={45} width={45} className="homePageTradingView" alt=""/> */}
         </div>
 
         <button className="ctaButton" onClick={onLaunchApp}>

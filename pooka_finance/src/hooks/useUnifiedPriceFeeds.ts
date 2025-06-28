@@ -1,212 +1,95 @@
-/* eslint-disable react-hooks/rules-of-hooks */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { dataStreamsService } from "@/services/dataStreams";
 import { useFetchMarketData } from "./useFetchMarketData";
 import { usePerpStore } from "@/store/PerpStore";
 import { useShallow } from "zustand/react/shallow";
-
-interface PriceData {
-  symbol: string;
-  price: number;
-  timestamp: string | number;
-  high24h: number;
-  low24h: number;
-  dataSource:
-    | "datastreams"
-    | "avalanche_contract"
-    | "ohlc_polygon"
-    | "last_known"
-    | "none"
-    | "fallback_hardcoded";
-  error?: string;
-}
-
-interface UseUnifiedPriceFeedsReturn {
-  ethPrice: number;
-  btcPrice: number;
-  ethData: PriceData | null;
-  btcData: PriceData | null;
-  isLoading: boolean;
-  error: string | null;
-  dataSource: string;
-  refetch: () => Promise<void>;
-}
-
-// OHLC Service for Polygon API fallback
+import { FALLBACK_VALUES } from "@/utils/constants";
+import axios from "axios";
+import { PerpPriceInfo, PriceData } from "@/store/types/types";
+import { isDataCorrupted } from "@/utils/helperFunction";
 class OHLCService {
-  private static async fetchOHLCData(symbol: string): Promise<any[]> {
-    const response = await fetch(`/api/OHLCData?perp=${symbol}&timeFrame=day`);
-    if (!response.ok) throw new Error("OHLC API failed");
-    const data = await response.json();
-    return data.data || [];
-  }
-
-  static async getPrice(symbol: string): Promise<PriceData> {
-    try {
-      const ohlcData = await this.fetchOHLCData(symbol);
-
-      if (!ohlcData || ohlcData.length === 0) {
-        throw new Error("No OHLC data available");
-      }
-
-      // Get latest data point
-      const latest = ohlcData[ohlcData.length - 1];
-      const price = latest.close;
-
-      // Calculate 24h high/low from recent data
-      const recent24h = ohlcData.slice(-24); // Last 24 data points
-      const high24h = Math.max(...recent24h.map((d: any) => d.high));
-      const low24h = Math.min(...recent24h.map((d: any) => d.low));
-
-      return {
-        symbol,
-        price,
-        timestamp: latest.time,
-        high24h,
-        low24h,
-        dataSource: "ohlc_polygon",
-      };
-    } catch (error) {
-      throw new Error(`OHLC fetch failed: ${error}`);
-    }
+  static async fetchOHLCData(symbol: string): Promise<PriceData | null> {
+    const response = await axios.get(
+      `/api/OHLCData?perp=${symbol}&timeFrame=day`
+    );
+    if (!response.data) throw new Error("OHLC API failed");
+    console.log("Data from polygon api",response.data.data[-1])
+    return response.data.data[-1] || null;
   }
 }
 
-// Data corruption detection
-const isDataCorrupted = (symbol: string, price: number): boolean => {
-  if (symbol.includes("ETH") && price > 50000) return true; // ETH showing BTC price
-  if (symbol.includes("BTC") && price < 10000) return true; // BTC showing ETH price
-  if (price <= 0) return true; // Invalid price
-  return false;
-};
 
-// Hardcoded fallback values
-const FALLBACK_VALUES = {
-  ETH: {
-    symbol: "ETH/USD",
-    price: 2439,
-    timestamp: Date.now(),
-    high24h: 2490,
-    low24h: 2380,
-    dataSource: "fallback_hardcoded" as const,
-  },
-  BTC: {
-    symbol: "BTC/USD",
-    price: 109012,
-    timestamp: Date.now(),
-    high24h: 111000,
-    low24h: 107000,
-    dataSource: "fallback_hardcoded" as const,
-  },
-};
 
-export function useUnifiedPriceFeeds(): UseUnifiedPriceFeedsReturn {
-  const [ethPrice, setEthPrice] = useState(0);
-  const [btcPrice, setBtcPrice] = useState(0);
-  const [ethData, setEthData] = useState<PriceData | null>(null);
-  const [btcData, setBtcData] = useState<PriceData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [dataSource, setDataSource] = useState<string>("none");
-
-  // Store last known good values
-  const [lastKnownEthData, setLastKnownEthData] = useState<PriceData | null>(
-    null
-  );
-  const [lastKnownBtcData, setLastKnownBtcData] = useState<PriceData | null>(
-    null
-  );
+export function useUnifiedPriceFeeds(){
+  const [ethPrice, setEthPrice]=useState<number>(FALLBACK_VALUES.ETH.price);
+  const [btcPrice, setBtcPrice]=useState<number>(FALLBACK_VALUES.BTC.price);
   const { selectedPerp } = usePerpStore(
     useShallow((state) => ({
       selectedPerp: state.selectedPerp,
     }))
   );
 
-  // Get Avalanche contract data as fallback
   const {
     marketData: avaxMarketData,
     isLoading: avaxLoading,
     isError: avaxError,
   } = useFetchMarketData();
-  // Helper function to update data and store as last known good values
-  const updatePriceData = (
-    ethResult: PriceData,
-    btcResult: PriceData,
-    source: string
-  ) => {
-    setEthData(ethResult);
-    setBtcData(btcResult);
-    setEthPrice(ethResult.price);
-    setBtcPrice(btcResult.price);
-    setDataSource(source);
 
-    // Store as last known good values
-    setLastKnownEthData(ethResult);
-    setLastKnownBtcData(btcResult);
-
-    setIsLoading(false);
-    setError(null);
+  const updatePriceData = (perpData: PriceData) => {
+    const ohlcData:PerpPriceInfo={
+      time:perpData.timestamp,
+      low:perpData.low24h,
+      high:perpData.high24h,
+      price:perpData.price
+    }
+    if(selectedPerp.toLowerCase().includes("eth")){
+      setEthPrice(ohlcData.price)
+    }
+    if(selectedPerp.toLowerCase().includes("btc")){
+      setBtcPrice(ohlcData.price)
+    }
+    usePerpStore.getState().setCurrentPerpOhlcData(ohlcData)
+    usePerpStore.getState().setCurrentPerpPrice(perpData.price)
   };
 
   // Helper function to use fallback values
-  const useFallbackValues = () => {
-    // Try last known values first
-    if (lastKnownEthData && lastKnownBtcData) {
-      console.log("📦 Using last known values");
-      setEthData({ ...lastKnownEthData, dataSource: "last_known" });
-      setBtcData({ ...lastKnownBtcData, dataSource: "last_known" });
-      setEthPrice(lastKnownEthData.price);
-      setBtcPrice(lastKnownBtcData.price);
-      setDataSource("Last Known Values");
-    } else {
-      // Use hardcoded fallback values
-      console.log("🔧 Using hardcoded fallback values");
-      setEthData(FALLBACK_VALUES.ETH);
-      setBtcData(FALLBACK_VALUES.BTC);
-      setEthPrice(FALLBACK_VALUES.ETH.price);
-      setBtcPrice(FALLBACK_VALUES.BTC.price);
-      setDataSource("Hardcoded Fallback");
+  const callFallbackValues = () => {
+    console.log("🔧 Using hardcoded fallback values");
+    const fallBackValue = selectedPerp.toLowerCase().includes("eth") ? FALLBACK_VALUES.ETH : FALLBACK_VALUES.BTC;
+
+    const ohlcData:PerpPriceInfo={
+      time:fallBackValue.timestamp,
+      low:fallBackValue.low24h,
+      high:fallBackValue.high24h,
+      price:fallBackValue.price
     }
-    setIsLoading(false);
-    setError(null);
+    usePerpStore.getState().setCurrentPerpOhlcData(ohlcData)
+    usePerpStore.getState().setCurrentPerpPrice(fallBackValue.price)
   };
 
   // Fetch from DataStreams (Tier 1)
-  const fetchDataStreams = async (): Promise<{
-    eth: PriceData | null;
-    btc: PriceData | null;
-  }> => {
+  const fetchDataStreams = async (): Promise<PriceData> => {
     try {
-      const { eth, btc } = await dataStreamsService.getAllPrices();
+      const data: PriceData = await dataStreamsService.getLatestPrice(
+        selectedPerp
+      );
+      console.log("The data received in streams",data);
+      const corruptedData = isDataCorrupted(selectedPerp, data.price);
 
-      // Check for corruption
-      const ethCorrupted = isDataCorrupted("ETH/USD", eth.price);
-      const btcCorrupted = isDataCorrupted("BTC/USD", btc.price);
-
-      if (ethCorrupted || btcCorrupted) {
-        console.warn("🚨 DataStreams corruption detected:", {
-          ethPrice: eth.price,
-          btcPrice: btc.price,
-          ethCorrupted,
-          btcCorrupted,
+      if (corruptedData) {
+        console.warn("🚨 DataStreams corruption detected: for ", {
+          data,
         });
         throw new Error("DataStreams data corruption detected");
       }
 
-      return {
-        eth: { ...eth, dataSource: "datastreams" as const },
-        btc: { ...btc, dataSource: "datastreams" as const },
-      };
+      return data;
     } catch (error) {
       console.warn("DataStreams failed:", error);
       throw error;
     }
   };
 
-  // Convert Avalanche contract data to our format (Tier 2)
   const getAvaxContractData = useCallback(
     (symbol: string): PriceData | null => {
       if (avaxLoading || avaxError || !avaxMarketData) return null;
@@ -217,7 +100,7 @@ export function useUnifiedPriceFeeds(): UseUnifiedPriceFeedsReturn {
       // Check for zero/invalid prices
       if (price <= 0) {
         console.warn(
-          `🚨 Avalanche contract returned invalid price: ${price} for ${symbol}`
+          `Avalanche contract returned invalid price: ${price} for ${symbol}`
         );
         return null;
       }
@@ -225,7 +108,7 @@ export function useUnifiedPriceFeeds(): UseUnifiedPriceFeedsReturn {
       // Check if data is corrupted (same validation as DataStreams)
       if (isDataCorrupted(symbol, price)) {
         console.warn(
-          `🚨 Avalanche contract corruption detected for ${symbol}: ${price}`
+          `Avalanche contract corruption detected for ${symbol}: ${price}`
         );
         return null;
       }
@@ -242,67 +125,51 @@ export function useUnifiedPriceFeeds(): UseUnifiedPriceFeedsReturn {
         timestamp: Date.now(),
         high24h: avaxMarketData.price24hHigh,
         low24h: avaxMarketData.price24hLow,
-        dataSource: "avalanche_contract",
       };
     },
     [avaxMarketData, avaxLoading, avaxError]
   );
 
   // Fetch from OHLC API (Tier 3)
-  const fetchOHLCData = async (): Promise<{
-    eth: PriceData | null;
-    btc: PriceData | null;
-  }> => {
+  const fetchOHLCData = async (): Promise<PriceData | null> => {
     try {
-      const [eth, btc] = await Promise.all([
-        OHLCService.getPrice("ETH/USD"),
-        OHLCService.getPrice("BTC/USD"),
-      ]);
+      const perpData = await OHLCService.fetchOHLCData(selectedPerp);
 
-      return { eth, btc };
+      if (perpData !== null) return perpData;
+      return null;
     } catch (error) {
       console.warn("OHLC API failed:", error);
       throw error;
     }
   };
 
-  // Main fetch logic with cascading fallbacks
   const fetchPrices = async () => {
-    if (ethPrice === 0 && btcPrice === 0) {
-      setIsLoading(true);
-    }
-    setError(null);
 
     try {
       // TIER 1: Try DataStreams first
       console.log("🚀 Attempting DataStreams...");
       const datastreamResult = await fetchDataStreams();
 
-      if (datastreamResult.eth && datastreamResult.btc) {
+      if (datastreamResult.price) {
         console.log("✅ DataStreams success");
-        updatePriceData(
-          datastreamResult.eth,
-          datastreamResult.btc,
-          "DataStreams (Chainlink)"
-        );
+        updatePriceData(datastreamResult);
         return;
       }
     } catch (error) {
-      console.log("❌ DataStreams failed, trying Avalanche contract...");
+      console.log("DataStreams failed, trying Avalanche contract...", error);
     }
 
     try {
       // TIER 2: Try Avalanche Contract
-      const ethContractData = getAvaxContractData("ETH/USD");
-      const btcContractData = getAvaxContractData("BTC/USD");
+      const contractOracleData = getAvaxContractData(selectedPerp);
 
-      if (ethContractData && btcContractData) {
+      if (contractOracleData) {
         console.log("✅ Avalanche contract success");
-        updatePriceData(ethContractData, btcContractData, "Avalanche Contract");
+        updatePriceData(contractOracleData);
         return;
       }
     } catch (error) {
-      console.log("❌ Avalanche contract failed, trying OHLC...");
+      console.log("Avalanche contract failed, trying OHLC...", error);
     }
 
     try {
@@ -310,36 +177,27 @@ export function useUnifiedPriceFeeds(): UseUnifiedPriceFeedsReturn {
       console.log("🔄 Attempting OHLC API fallback...");
       const ohlcResult = await fetchOHLCData();
 
-      if (ohlcResult.eth && ohlcResult.btc) {
+      if (ohlcResult !== null) {
         console.log("✅ OHLC API success");
-        updatePriceData(ohlcResult.eth, ohlcResult.btc, "OHLC (Polygon.io)");
+        updatePriceData(ohlcResult);
         return;
       }
     } catch (error) {
-      console.error("❌ All price feed sources failed");
+      console.error("❌ All price feed sources failed", error);
     }
-
-    // All sources failed - use fallback values
+    callFallbackValues()
     console.log("🔄 All sources failed, using fallback values");
-    useFallbackValues();
   };
 
   useEffect(() => {
     fetchPrices();
-
-    // Update every 30 seconds
-    const interval = setInterval(fetchPrices, 30 * 1000);
+    const interval = setInterval(fetchPrices, 45 * 1000);
     return () => clearInterval(interval);
-  }, [selectedPerp]); // Re-fetch when selected perp changes
+  }, [selectedPerp]);
 
   return {
-    ethPrice,
-    btcPrice,
-    ethData,
-    btcData,
-    isLoading,
-    error,
-    dataSource,
     refetch: fetchPrices,
+    ethPrice,
+    btcPrice
   };
 }

@@ -163,6 +163,7 @@
   .currentPrice {
     font-size: 24px;
     font-weight: 700;
+    display: flex;
     color: #ffffff;
 
     @include xxl{
@@ -203,8 +204,12 @@
 
   @include xl{
     gap: 25px;
-    width: 55%;
+    width: 60%;
     justify-content: space-between;
+  }
+
+  @include xxl{
+    width: 55%;
   }
 
   .statsData{
@@ -212,6 +217,9 @@
     flex-direction: row;
     gap: 10px;
 
+    @include lg{
+      gap: 20px;
+    }
     @include xxl{
       gap: 40px;
     }
@@ -241,6 +249,7 @@
     }
     
     .statValue {
+      display: flex;
       font-size: 14px;
       color: #ffffff;
       font-weight: 600;
@@ -276,6 +285,12 @@
       flex-direction: row;
       gap: 5px;
       align-items: center;
+
+      .balanceText{
+        display: flex;
+        flex-direction: row;
+      }
+
       .usdcLogo{
         background-color: #040404;
         border-radius: 50%;

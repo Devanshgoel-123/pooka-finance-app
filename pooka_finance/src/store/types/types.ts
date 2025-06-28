@@ -34,9 +34,7 @@ export type PositionParams = {
   perpName?: string;
   leverage?: number;
   collateral?: number;
-  payToken?: "USDC" | "ETH";
   positionType?: "long" | "short";
-  chainName?: string;
 };
 
 export interface Message {
@@ -59,4 +57,21 @@ export interface Market {
   symbol: string;
   name: string;
   logo: string;
+}
+
+
+export interface PriceData {
+  symbol: string;
+  price: number;
+  timestamp: string | number;
+  high24h: number;
+  low24h: number;
+}
+
+
+export interface PerpPriceInfo{
+  price: number ;
+  time: string | number;
+  high:number;
+  low:number;
 }
