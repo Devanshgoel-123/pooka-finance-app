@@ -137,13 +137,11 @@ export const PositionCard: React.FC<PositionCardProps> = ({ params, isLoading = 
          disabled={params.collateral === undefined || userDepositbalance < Number(params.collateral) && chainId === avalancheFuji.id}
           className={`openPositionBtn ${isLoading ? "loading" : ""}`}
           onClick={()=>{
-
             if(chainId !== avalancheFuji.id){
               handleSwitchChain()
             }else{
               handleOpenPosition()
             }
-           
           }}
         >
           {isPositionLoading ? (
