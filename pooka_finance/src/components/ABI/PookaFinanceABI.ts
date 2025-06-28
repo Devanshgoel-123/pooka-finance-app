@@ -1,4 +1,4 @@
-export const PERPS_ABI =  [
+export const PERPS_ABI = [
   {
     "inputs": [
       {
@@ -19,6 +19,11 @@ export const PERPS_ABI =  [
       {
         "internalType": "address",
         "name": "_usdcToken",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_vrfRandomizer",
         "type": "address"
       }
     ],
@@ -286,6 +291,35 @@ export const PERPS_ABI =  [
     "name": "depositUSDCForUser",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "deposits",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "depositTime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "depositAmount",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -813,11 +847,56 @@ export const PERPS_ABI =  [
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_vrfRandomizer",
+        "type": "address"
+      }
+    ],
+    "name": "updateVRFRandomizer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "usdcToken",
     "outputs": [
       {
         "internalType": "contract IERC20",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "userDepositCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "vrfRandomizer",
+    "outputs": [
+      {
+        "internalType": "contract VRFRandomizer",
         "name": "",
         "type": "address"
       }

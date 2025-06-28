@@ -96,7 +96,6 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
    if(params.collateral===undefined || params.payToken===undefined || params.chainName === undefined) return;
    const chainId=getChainId(params.chainName);
    const tokenAddress=getTokenAddressForName(params.payToken, chainId);
-   console.log(chainId, tokenAddress, params.collateral)
    sendApprovalTraxn(tokenAddress, chainId, params.collateral.toString())
   }
 

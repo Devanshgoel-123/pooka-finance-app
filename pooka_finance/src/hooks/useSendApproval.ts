@@ -92,7 +92,6 @@ export const useSendApprovalTraxn = ({callBackFunction}:Props) => {
     try {
       setQuery(true);
       const amount = parseUnits(depositAmount, 8);
-      console.log(`Approving ${amount} tokens for ${contractAddress}`);
       const chain=payChain===avalancheFuji.id ? avalancheFuji : sepolia;
 
       if( data===undefined || data as bigint < parseUnits(depositAmount, 6)){

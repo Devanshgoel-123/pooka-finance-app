@@ -26,6 +26,8 @@ export const enum PRICE_MM_TOKEN{
     LINK_TOKEN_AVAX='LINK/USD'
 }
 
+export const DOCS_LINK="https://pookafinance.gitbook.io/pookafinance-docs/";
+
 export const BNB_TOKEN="/assets/bnb.svg";
 export const BTC_TOKEN="/assets/btc.svg";
 export const ETH_TOKEN="/assets/eth.svg";
@@ -34,6 +36,7 @@ export const DOGE_TOKEN="/assets/doge.svg";
 export const USDC_TOKEN="/assets/usdc.svg";
 export const AVAX_TOKEN="/assets/avax.svg";
 export const LINK_TOKEN="/assets/link.svg";
+export const POOKA_LOGO="/assets/pookaLogo.svg";
 
 export const markets = [
     { symbol: 'ETH/USD', name: 'Ethereum Perpetual', logo:"/assets/eth.svg"},

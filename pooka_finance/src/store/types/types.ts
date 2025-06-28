@@ -83,3 +83,9 @@ export interface PerpPriceInfo{
   high:number;
   low:number;
 }
+
+
+export interface UserDeposit{
+  amount:number;
+  time:number;
+}

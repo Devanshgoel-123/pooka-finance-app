@@ -35,7 +35,6 @@ export const WithdrawAmountCard= ({ params }:Props) => {
     userDepositbalance,
     isLoading:isDepositLoading
   }=useFetchUserDepositBalance()
-  console.log("I am being rendered")
 
   const {
     withdrawUserAmount,

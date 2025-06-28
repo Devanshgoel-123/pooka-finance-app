@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { ClosePositionCard } from "./ClosePositionCard";
 import { WithdrawAmountCard } from "./WithdrawAmount";
 import { WithdrawParameters } from "viem/zksync";
+import { POOKA_LOGO } from "@/utils/constants";
 
 export const AgentChat: React.FC<AgentChatProps> = () => {
   const router = useRouter();
@@ -123,7 +124,6 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
         </div>
       )
     } else if(message.action === "withdraw" && message.params !== undefined ){
-      console.log("hello there")
       return (
         <div className="messageContent">
           <WithdrawAmountCard params={message.params as WithdrawPositionParams} isLoading={false} />
@@ -180,7 +180,6 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
       element === "withdraw" &&
       withdrawParams.current.withdrawAmount !== undefined
     ){
-      console.log("debugging ",element, withdrawParams.current)
       const newMessage: Message = {
         id: Date.now().toString(),
         type: "agent",
@@ -194,7 +193,6 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
       element === "close" &&
       closePositionParams.current.perpName !== undefined
     ){
-      console.log("debugging ",element, closePositionParams.current)
       const newMessage: Message = {
         id: Date.now().toString(),
         type: "agent",
@@ -224,7 +222,7 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
           <div className="agentAvatar">
             <Image
               className="avatarIcon"
-              src={"/assets/logo.svg"}
+              src={POOKA_LOGO}
               height={45}
               width={45}
               alt=""
@@ -284,7 +282,9 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
         {isTyping && (
           <div className="message agent">
             <div className="messageAvatar">
-              <div className="avatarIcon">🤖</div>
+              <div className="avatarIcon">
+                <Image src={POOKA_LOGO} width={32} height={32} alt="" className=""/>
+              </div>
             </div>
             <div className="messageContent" style={{
               width:"100px",

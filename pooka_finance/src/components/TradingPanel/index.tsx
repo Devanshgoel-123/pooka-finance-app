@@ -130,11 +130,9 @@ export const OrderComponent: React.FC = () => {
     if (chainId !== avalancheFuji.id) {
       switchChain({ chainId: avalancheFuji.id })
        setTimeout(() => {
-        console.log("calling cross chain deposit 1", payToken, collateralAmount)
         createCrossChainDepositAvax(payToken, collateralAmount);
       },1000)
     } else {
-      console.log("calling cross chain deposit 2", payToken, collateralAmount)
       createCrossChainDepositAvax(payToken, collateralAmount);
     }
   } 
@@ -175,11 +173,9 @@ export const OrderComponent: React.FC = () => {
     
     // Check if any operation has failed
     const hasAnyError = isDepositError || isCrossChainError || isCrossChainDepositAvaxError || isError;
-    console.log("The has any error", hasAnyError, isDepositError, isCrossChainError, isCrossChainError, isError);
-    
+   
     // Check if all operations are completed (not loading)
     const allOperationsCompleted = isDepositLoading || isCrossChainDepositLoading || isCrossChainDepositAvaxLoading || isSuccess;
-    console.log("The operations is", allOperationsCompleted, isDepositLoading, isCrossChainDepositLoading, isCrossChainDepositAvaxLoading, isSuccess);
     
     // Set loading to false if:
     // 1. Any operation fails (immediate failure) OR
