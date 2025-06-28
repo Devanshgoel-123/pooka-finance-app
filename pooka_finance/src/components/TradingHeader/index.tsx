@@ -15,7 +15,7 @@ import { useFetchUserDepositBalance } from "@/hooks/useFetchUserBalance";
 import { LoadingText } from "@/common/LoadingText";
 
 export const TradingHeader = ({
-  priceChange = -374.74,
+  priceChange = -1.074,
   priceChangePercent = -0.36,
 }) => {
   const [showDropDown, setShowDropDown] = useState<boolean>(false);
@@ -35,7 +35,6 @@ export const TradingHeader = ({
   );
   const isPositive = priceChange >= 0;
 
-  console.log("the perp info is",perpInfo)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -110,7 +109,7 @@ export const TradingHeader = ({
         <div className="priceInfoDesktop">
           <div className="currentPrice">
             $
-            {perpInfo.price !==0 ? perpInfo.price : <LoadingText text="0.00" size={22}/>}
+            {perpInfo.price !==0 ? `${perpInfo.price.toString().slice(0,3)},${perpInfo.price.toFixed(2).toString().slice(3)}` : <LoadingText text="0.00" size={24}/>}
           </div>
           <div
             className={`priceChange ${isPositive ? "positive" : "negative"}`}
@@ -127,14 +126,13 @@ export const TradingHeader = ({
           <div className="statItem">
             <span className="statLabel">24H High</span>
             <span className="statValue">
-              ${perpInfo.high !== 0 ? perpInfo.low : <LoadingText text="0.00" size={14}/>}
+              {perpInfo.high !== 0 ? `${perpInfo.high.toString().slice(0,3)},${perpInfo.high.toFixed(2).toString().slice(3)}` : <LoadingText text="0.00" size={14}/>}
             </span>
           </div>
           <div className="statItem">
             <span className="statLabel">24H Low</span>
             <span className="statValue">
-              $
-              {perpInfo.low !==0 ? perpInfo.low : <LoadingText text="0.00" size={14}/>} 
+              {perpInfo.low !==0 ? `${perpInfo.low.toString().slice(0,3)},${perpInfo.low.toFixed(2).toString().slice(3)}` : <LoadingText text="0.00" size={14}/>} 
             </span>
           </div>
           <div className="statItem">
@@ -153,7 +151,7 @@ export const TradingHeader = ({
               className="usdcLogo"
             />
             <span className="balanceText">
-              $
+              
               {isDepositLoading ? <LoadingText text="0.00" size={22}/> :userDepositbalance === 0 
                 ? userDepositbalance.toFixed(2)
                 : userDepositbalance.toFixed(3)}

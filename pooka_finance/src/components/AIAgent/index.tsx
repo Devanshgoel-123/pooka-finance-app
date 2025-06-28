@@ -8,7 +8,7 @@ import axios from "axios";
 import { useSocketConnection } from "@/hooks/useSockerConnection";
 import { PositionCard, PositionParams } from "./PositionCard";
 import Image from "next/image";
-import { DepositParams } from "@/store/types/types";
+import { ClosePositionParams, DepositParams, WithdrawPositionParams } from "@/store/types/types";
 import { RxCross1 } from "react-icons/rx";
 import { DepositCard } from "./DepositCard";
 import { useAccount } from "wagmi";
@@ -18,6 +18,9 @@ import { AgentChatProps } from "@/store/types/types";
 import { Message } from "@/store/types/types";
 import { useDisconnect } from "wagmi";
 import { useRouter } from "next/navigation";
+import { ClosePositionCard } from "./ClosePositionCard";
+import { WithdrawAmountCard } from "./WithdrawAmount";
+import { WithdrawParameters } from "viem/zksync";
 
 export const AgentChat: React.FC<AgentChatProps> = () => {
   const router = useRouter();
@@ -26,7 +29,7 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
 
   const { disconnect } = useDisconnect();
 
-  const { depositParams, positionParams, element } = useSocketConnection();
+  const { depositParams, positionParams, element, withdrawParams, closePositionParams } = useSocketConnection();
   const [sendEnable, setSend] = useState<boolean>(true);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -49,6 +52,7 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
 
   useEffect(() => {
     scrollToBottom();
+    console.log(element)
   }, [messages]);
 
   const handleSendMessage = async () => {
@@ -101,19 +105,33 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
   };
 
   const renderAgentResponse = (message: Message) => {
+    console.log("The agent msg is", message.action)
     if (message.action === "trade" && message.params !== undefined) {
       return (
         <div className="messageContent">
-          <PositionCard params={message.params} isLoading={false} />
+          <PositionCard params={message.params as PositionParams} isLoading={false} />
         </div>
       );
     } else if (message.action === "deposit" && message.params !== undefined) {
       return (
         <div className="messageContent">
-          <DepositCard params={message.params} isLoading={false} />
+          <DepositCard params={message.params as DepositParams} isLoading={false} />
         </div>
       );
-    } else {
+    }else if(message.action === "close" && message.params !== undefined ){
+      return (
+        <div className="messageContent">
+          <ClosePositionCard params={message.params as ClosePositionParams} isLoading={false} />
+        </div>
+      )
+    } else if(message.action === "withdraw" && message.params !== undefined ){
+      console.log("hello there")
+      return (
+        <div className="messageContent">
+          <WithdrawAmountCard params={message.params as WithdrawPositionParams} isLoading={false} />
+        </div>
+      )
+    }else {
       return (
         <div className="messageContent">
           <div className="messageText">{message.content}</div>
@@ -121,7 +139,6 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
       );
     }
   };
-
   const renderUserQuery = (message: Message) => {
     return (
       <div className="messageContent">
@@ -161,10 +178,38 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
         params: depositParams.current,
       };
       setMessages((prev) => [...prev, newMessage]);
+    } else if (
+      element === "withdraw" &&
+      withdrawParams.current.amount !== undefined
+    ){
+      console.log("debugging ",element, withdrawParams.current)
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        type: "agent",
+        content: "",
+        timestamp: new Date(),
+        action: element,
+        params: withdrawParams.current,
+      };
+      setMessages((prev) => [...prev, newMessage]);
+    }else if(
+      element === "close" &&
+      closePositionParams.current.perpName !== undefined
+    ){
+      console.log("debugging ",element, closePositionParams.current)
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        type: "agent",
+        content: "",
+        timestamp: new Date(),
+        action: element,
+        params: closePositionParams.current,
+      };
+      setMessages((prev) => [...prev, newMessage]);
     }
     setIsTyping(false);
     setSend(true);
-  }, [element, depositParams, positionParams]);
+  }, [element, depositParams, positionParams, closePositionParams, withdrawParams]);
 
   return (
     <div className="agentChatWrapper">

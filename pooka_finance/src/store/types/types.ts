@@ -37,13 +37,21 @@ export type PositionParams = {
   positionType?: "long" | "short";
 };
 
+export interface ClosePositionParams{
+    perpName:string | undefined;
+}
+
+export interface WithdrawPositionParams{
+  amount:string | undefined;
+}
+
 export interface Message {
   id: string;
   type: "user" | "agent";
   content: string;
   timestamp: Date;
-  action:"query" | "response" | "trade" | "deposit";
-  params?: DepositParams | PositionParams;
+  action:"query" | "response" | "trade" | "deposit" | "close" | "withdraw";
+  params?: DepositParams | PositionParams | WithdrawPositionParams | ClosePositionParams;
 }
 
 export interface AgentChatProps {

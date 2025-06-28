@@ -13,7 +13,7 @@ import { markets } from "@/utils/constants"
 import { Market } from "@/store/types/types";
 import { useFetchUserDepositBalance } from "@/hooks/useFetchUserBalance";
 import { useAccount } from "wagmi"
-
+import { LoadingText } from "@/common/LoadingText"
 
 const button_array=[
   {
@@ -25,7 +25,7 @@ const button_array=[
 ]
 
 export const TradingHeaderMobile = ({
-  priceChange = -374.74,
+  priceChange = -1.074,
   priceChangePercent = -0.36,
 }) => {
   const {
@@ -36,20 +36,23 @@ export const TradingHeaderMobile = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab]=useState<string>("chart");
   const {
-    userDepositbalance
+    userDepositbalance,
+    isLoading:isDepositLoading
   }=useFetchUserDepositBalance();
   const {
-    maintenanceMargin
-  }=usePerpStore(useShallow((state)=>({
-    maintenanceMargin:state.maintenanceMargin
-  })))
+    maintenanceMargin,
+    perpInfo,
+    tokenPrice
+   } = usePerpStore(
+    useShallow((state) => ({
+      maintenanceMargin: state.maintenanceMargin,
+      perpInfo:state.currentPerpOhlcData,
+      tokenPrice:state.currentPerpPrice
+    }))
+  );
+
   const isPositive = priceChange >= 0;
 
-  const {
-    marketData,
-    error,
-    isLoading
-  }=useFetchMarketData();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -108,7 +111,10 @@ export const TradingHeaderMobile = ({
         </div>
 
         <div className="priceInfo">
-          <div className="currentPrice">${isLoading ? "0.00" : marketData.currentPrice.toLocaleString()}</div>
+        <div className="currentPrice">
+            $
+            {perpInfo.price !==0 ? `${perpInfo.price.toString().slice(0,3)},${perpInfo.price.toFixed(2).toString().slice(3)}` : <LoadingText text="0.00" size={24}/>}
+          </div>
           <div className={`priceChange ${isPositive ? "positive" : "negative"}`}>
             {isPositive ? "+" : ""}
             {priceChangePercent}%
@@ -118,15 +124,19 @@ export const TradingHeaderMobile = ({
         <div className="statsData">
         <div className="statItem">
           <span className="statLabel">24H High</span>
-          <span className="statValue">${isLoading ? "0.00" : marketData.price24hHigh.toLocaleString()}</span>
+          <span className="statValue">
+          {perpInfo.high !== 0 ? `${perpInfo.high.toString().slice(0,3)},${perpInfo.high.toFixed(2).toString().slice(3)}` : <LoadingText text="0.00" size={14}/>}
+          </span>
         </div>
         <div className="statItem">
           <span className="statLabel">24H Low</span>
-          <span className="statValue">${isLoading ? "0.00" : marketData.price24hLow.toLocaleString()}</span>
+          <span className="statValue"> 
+          {perpInfo.low !==0 ? `${perpInfo.low.toString().slice(0,3)},${perpInfo.low.toFixed(2).toString().slice(3)}` : <LoadingText text="0.00" size={14}/>}
+          </span>
         </div>
         <div className="statItem">
           <span className="statLabel">Req. Maintenance</span>
-          <span className="statValue">{isLoading ? "0.00" : maintenanceMargin.toFixed(1)}%</span>
+          <span className="statValue">{maintenanceMargin.toFixed(1)}%</span>
         </div>
         </div>
       </div>
@@ -147,7 +157,12 @@ export const TradingHeaderMobile = ({
         <span className="depositHeader">YOUR DEPOSIT :</span>
           <div className="depositBalance">
             <Image src={"/assets/usdc.svg"} alt="" height={22} width={22} className="usdcLogo"/>
-          <span>${userDepositbalance===0 ? userDepositbalance.toFixed(2) : userDepositbalance.toFixed(3)}</span>
+          <span>
+          $
+              {isDepositLoading ? <LoadingText text="0.00" size={22}/> :userDepositbalance === 0 
+                ? userDepositbalance.toFixed(2)
+                : userDepositbalance.toFixed(3)}
+          </span>
          { address && <button className="depositCollateralBtn ">
             Deposit
           </button>}

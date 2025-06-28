@@ -66,13 +66,62 @@
   }
 }
 
+// .tabContent {
+//   flex: 1;
+//   padding: 20px;
+//   min-height: 120px;
+//   animation: fadeIn 0.2s ease-in-out;
+//   width: 100%;
+
+//   .positionsTable{
+//     min-width: 120%;
+//     @include xl{
+//       width: 100%;
+//     }
+//   }
+//   @include lg{
+  
+//     overflow-x:auto;
+//   }
+//   @include xl{
+//     overflow: hidden;
+//   }
+// }
+
 .tabContent {
   flex: 1;
   padding: 20px;
   min-height: 120px;
   animation: fadeIn 0.2s ease-in-out;
+  width: 100%;
+  overflow-x: auto; 
+  .positionsTable {
+    min-width: 120%;
+    @include md{
+      min-width: 150%;
+    }
+    @include lg {
+      min-width: 110%;
+      width: 100%;
+    }
+
+    @include xl{
+      min-width: 0;
+    }
+  }
+
+  @include lg {
+    overflow-x: auto; 
+  }
+
+  @include xl {
+    overflow: hidden; 
+  }
 }
 
+.tabContent::-webkit-scrollbar {
+  display: none; 
+}
 .loadingState {
   display: flex;
   flex-direction: column;
