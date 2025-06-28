@@ -6,7 +6,6 @@ import { Navigation } from "@/components/HomeNavigation"
 import { CryptoTicker } from "@/components/CryptoTicker"
 import { HeroSection } from "@/components/HeroSection"
 import { StatsSection } from "@/components/StatsSection"
-import { SuperAppSection } from "@/components/SuperAppSection"
 import { BuiltForSection } from "@/components/BuiltForSection"
 import { Footer } from "@/components/HomeFooter"
 import { CTASection } from "@/components/CTASection"
@@ -43,7 +42,6 @@ const LandingPage= () => {
       <Navigation onLaunchApp={handleTradeNow} />
       <HeroSection onTradeNow={handleTradeNow} />
       <StatsSection volume={currentVolume} users={currentUsers} />
-      <SuperAppSection />
       <CryptoTicker />
       <BuiltForSection />
       <CTASection onLaunchApp={handleTradeNow} />

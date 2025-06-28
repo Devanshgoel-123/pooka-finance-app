@@ -1,25 +1,15 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
 import "./styles.scss"
 
 export const BuiltForSection: React.FC = () => {
-  const [isExpert, setIsExpert] = useState(false)
 
   return (
     <section className="builtForSection">
       <h2 className="builtForTitle">
         Built for <span className="highlightText">You</span>
       </h2>
-
-      <div className="experienceToggle">
-        <span className={`toggleLabel ${!isExpert ? "active" : ""}`}>Beginners</span>
-        <div className="toggleSwitch" onClick={() => setIsExpert(!isExpert)}>
-          <div className={`toggleSlider ${isExpert ? "expert" : "beginner"}`}></div>
-        </div>
-        <span className={`toggleLabel ${isExpert ? "active" : ""}`}>Experts</span>
-      </div>
 
       <div className="featuresGrid">
         <div className="featureCard">
@@ -32,17 +22,17 @@ export const BuiltForSection: React.FC = () => {
 
         <div className="featureCard">
           <div className="featureImagePlaceholder">
-            <span className="imagePlaceholderText">Lightning Icon</span>
+            <span className="imagePlaceholderText">AI Powered</span>
           </div>
-          <h3 className="featureTitle">Lightning Fast</h3>
+          <h3 className="featureTitle">AI Powered</h3>
           <p className="featureDesc">Execute Trades Instantly With Our Advanced Infrastructure</p>
         </div>
 
         <div className="featureCard">
           <div className="featureImagePlaceholder">
-            <span className="imagePlaceholderText">Advanced Orders Icon</span>
+            <span className="imagePlaceholderText">Cross Chain Deposits</span>
           </div>
-          <h3 className="featureTitle">Advanced Order Types</h3>
+          <h3 className="featureTitle">Cross Chain Deposits</h3>
           <p className="featureDesc">Create Advanced Orders Like TP and SL to Manage Your Risk Efficiently</p>
         </div>
       </div>

@@ -8,7 +8,7 @@ import {
 import { http } from 'wagmi';
 import { createConfig, WagmiProvider } from 'wagmi';
 import { ReactNode } from 'react';
-import { metaMaskWallet, rabbyWallet, bybitWallet} from '@rainbow-me/rainbowkit/wallets';
+import { metaMaskWallet, rabbyWallet, bybitWallet, coreWallet} from '@rainbow-me/rainbowkit/wallets';
 import {
   avalancheFuji,
   sepolia
@@ -28,7 +28,7 @@ const connectors=connectorsForWallets(
   [
     {
       groupName: 'Recommended',
-      wallets: [metaMaskWallet, rabbyWallet, bybitWallet],
+      wallets: [metaMaskWallet, rabbyWallet, bybitWallet, coreWallet],
     },
   ],
   {
