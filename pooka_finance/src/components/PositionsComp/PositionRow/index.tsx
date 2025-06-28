@@ -1,10 +1,11 @@
 import { useFetchTokenPriceInUsd } from "@/hooks/useFetchPriceInUsd"
 import { PositionData } from "@/store/types/types"
-import { USDC_TOKEN } from "@/utils/constants"
+import { FALLBACK_VALUES, USDC_TOKEN } from "@/utils/constants"
 import Image from "next/image"
 import { useEffect, useState } from "react"
 import "./styles.scss"
 import { useClosePosition } from "@/hooks/useClosePosition"
+import { useUnifiedPriceFeeds } from "@/hooks/useUnifiedPriceFeeds"
 
 interface Props{
     position:PositionData,
@@ -20,16 +21,23 @@ export const formatPrice = (price: bigint, decimals = 8): string => {
   }
 
 
+
 export const PositionRow=({
     position,
     index
 }:Props)=>{
 
     const [pnl,setPnl]=useState<number>(0.00);
+    const [tokenPrice, setTokenPrice]=useState<number>(position.perpName.toLowerCase().includes("eth") ? FALLBACK_VALUES.ETH.price : FALLBACK_VALUES.BTC.price);
     const {
-        tokenPriceInUsd
+      ethPrice,
+      btcPrice
+    }=useUnifiedPriceFeeds();
+
+    const {
+        tokenPriceInUsd,
     }=useFetchTokenPriceInUsd({
-        token:position.perpName
+        token:position.perpName,
     })
 
 
@@ -38,23 +46,32 @@ export const PositionRow=({
       isConfirming,
       success
     }=useClosePosition();
-    useEffect(()=>{
-        const fetchPnl=()=>{
-            if (!tokenPriceInUsd) return 0;
-        
-            const formattedEntryPrice: number = Number(position.entryPrice) / 10**8;
-        
-            const formattedPositionInUSDC: number = Number(position.size) / 10**6;
 
-            const formattedPositionInPerpToken: number = formattedPositionInUSDC / formattedEntryPrice;
-        
-            
-            const currentPnl: number = (tokenPriceInUsd - formattedEntryPrice) * formattedPositionInPerpToken;
-            setPnl(currentPnl)
-            return currentPnl;
+    useEffect(()=>{
+
+        const fetchPnl=()=>{
+          let tokenPrice:number;
+          if(position.perpName.toLowerCase().includes("eth")){
+            tokenPrice=ethPrice
+            setTokenPrice(ethPrice)
+          }
+          if(position.perpName.toLowerCase().includes("btc")){
+            tokenPrice=btcPrice
+            setTokenPrice(btcPrice)
+          }
+          else{
+            tokenPrice=0;
+          }
+          const formattedEntryPrice: number = Number(position.entryPrice) / 10**8;
+          const formattedPositionInUSDC: number = Number(position.size) / 10**6;
+          const formattedPositionInPerpToken: number = formattedPositionInUSDC / formattedEntryPrice;
+          const currentPnl: number =tokenPrice ? (tokenPrice - formattedEntryPrice) * formattedPositionInPerpToken : 0;
+          console.log(currentPnl)
+          setPnl(currentPnl)
+          return currentPnl;
         }
         fetchPnl()
-    },[tokenPriceInUsd, position.perpName])
+    },[tokenPriceInUsd, position.perpName, ethPrice, btcPrice, position.entryPrice, position.size])
 
   
     return (
@@ -101,7 +118,7 @@ export const PositionRow=({
       </div>
 
       <div className="positionCell">
-        <div className="cellValue">{tokenPriceInUsd ? `$${(tokenPriceInUsd.toFixed(3))}` : "$0.000"}</div>
+        <div className="cellValue">{tokenPrice ? `$${(tokenPrice.toFixed(3))}` : "$0.000"}</div>
       </div>
 
 

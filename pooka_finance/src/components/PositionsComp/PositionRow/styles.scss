@@ -126,6 +126,7 @@
     &.short {
       background: rgba(255, 107, 107, 0.15);
       color: #ff6b6b;
+      
     }
   }
   
@@ -193,85 +194,7 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
-  
-  
-  
-  @media (max-width: 768px) {
-    .positionsTable {
-      overflow-x: auto;
-    }
-  
-    .positionsHeader,
-    .positionRow {
-      grid-template-columns: 100px 70px 60px 80px 80px 90px 90px 95px 95px 60px;
-      min-width: 820px;
-    }
-  
-    .headerCell,
-    .positionCell {
-      padding: 8px 4px;
-    }
-  
-    .cellValue {
-      font-size: 10px;
-    }
-  
-    .directionBadge {
-      font-size: 8px;
-      padding: 2px 4px;
-    }
-  
-    .liquidationWarning {
-      font-size: 8px;
-      padding: 2px 4px;
-    }
-  
-    .positionStatus {
-      font-size: 9px;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .positionsHeader,
-    .positionRow {
-      grid-template-columns: 90px 65px 55px 75px 75px 85px 85px 90px 90px 55px;
-      min-width: 770px;
-    }
-  
-    .headerCell,
-    .positionCell {
-      padding: 6px 3px;
-    }
-  
-    .cellValue {
-      font-size: 9px;
-    }
-  
-    .directionContainer {
-      gap: 6px;
-    }
-  }
-  
-  
-  @media (max-width: 480px) {
-    .tabButton {
-      padding: 12px 14px;
-      font-size: 12px;
-    }
-  
-    .tabContent {
-      padding: 12px;
-      min-height: 80px;
-    }
-  
-    .emptyStateText {
-      font-size: 13px;
-    }
-  
-    .emptyStateSubtext {
-      font-size: 11px;
-    }
-  }
+ 
   
   // Hover effects
   .positionsComponent:hover {

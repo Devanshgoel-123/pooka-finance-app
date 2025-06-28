@@ -2,24 +2,32 @@
 import { io, Socket } from "socket.io-client";
 import dotenv from "dotenv";
 import { useEffect, useRef, useState } from "react";
-import { DepositParams, PositionParams } from "@/store/types/types";
+import { ClosePositionParams, DepositParams, PositionParams, WithdrawPositionParams } from "@/store/types/types";
 dotenv.config();
 export const useSocketConnection = () => {
   const [renderElement, setRenderElement]=useState<string | undefined>(undefined);
-  const [element, setElement]=useState<"deposit" | "liquidate" | "trade" | null>(null);
+  const [element, setElement]=useState<"deposit" | "close" | "trade" | "withdraw" | null>(null);
   const positionParams = useRef<PositionParams>({
-    chainName:undefined, 
     perpName: undefined,
     leverage: undefined,
     collateral: undefined,
-    payToken: undefined,
     positionType: undefined,
   });
+
   const depositParams=useRef<DepositParams>({
     chainName:undefined,
     collateral:undefined,
     payToken:undefined
   });
+
+  const withdrawParams=useRef<WithdrawPositionParams>({
+    amount:undefined
+  });
+
+  const closePositionParams=useRef<ClosePositionParams>({
+    perpName:undefined
+  })
+
   
   const socketURL = process.env.NEXT_PUBLIC_SERVER_URL;
   useEffect(() => {
@@ -35,6 +43,7 @@ export const useSocketConnection = () => {
     );
     if (!socket_connections) {
     }
+
     socket_connections.on("connect", () => {
         console.log("port connected")
     });
@@ -43,6 +52,18 @@ export const useSocketConnection = () => {
       console.log("The received data", data);
       positionParams.current=data.position;
       setElement("trade")
+    });
+
+    socket_connections.on("close_position", (data) => {
+      console.log("The received data", data);
+      closePositionParams.current=data.position;
+      setElement("close")
+    })
+
+    socket_connections.on("withdraw_amount", (data) => {
+      console.log("The received data", data);
+     withdrawParams.current=data.position;
+      setElement("withdraw")
     });
 
     socket_connections.on("deposit_collateral", (data) => {
@@ -67,6 +88,8 @@ export const useSocketConnection = () => {
   return {
     positionParams,
     depositParams,
+    withdrawParams,
+    closePositionParams,
     element
   }
 };

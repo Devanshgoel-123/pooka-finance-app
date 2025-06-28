@@ -34,18 +34,24 @@ export type PositionParams = {
   perpName?: string;
   leverage?: number;
   collateral?: number;
-  payToken?: "USDC" | "ETH";
   positionType?: "long" | "short";
-  chainName?: string;
 };
+
+export interface ClosePositionParams{
+    perpName:string | undefined;
+}
+
+export interface WithdrawPositionParams{
+  amount:string | undefined;
+}
 
 export interface Message {
   id: string;
   type: "user" | "agent";
   content: string;
   timestamp: Date;
-  action:"query" | "response" | "trade" | "deposit";
-  params?: DepositParams | PositionParams;
+  action:"query" | "response" | "trade" | "deposit" | "close" | "withdraw";
+  params?: DepositParams | PositionParams | WithdrawPositionParams | ClosePositionParams;
 }
 
 export interface AgentChatProps {
@@ -59,4 +65,21 @@ export interface Market {
   symbol: string;
   name: string;
   logo: string;
+}
+
+
+export interface PriceData {
+  symbol: string;
+  price: number;
+  timestamp: string | number;
+  high24h: number;
+  low24h: number;
+}
+
+
+export interface PerpPriceInfo{
+  price: number ;
+  time: string | number;
+  high:number;
+  low:number;
 }

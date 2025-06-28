@@ -128,4 +128,11 @@ export const handleCheckNativeToken=(tokenAddress:string)=>{
       return false
     }
     return true
-   }
+}
+ // Data corruption detection
+export const isDataCorrupted = (symbol: string, price: number): boolean => {
+  if (symbol.includes("ETH") && price > 50000) return true; 
+  if (symbol.includes("BTC") && price < 10000) return true; 
+  if (price <= 0) return true; // Invalid price
+  return false;
+};

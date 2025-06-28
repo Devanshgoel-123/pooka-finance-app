@@ -1,6 +1,6 @@
-import {CONTRACT_ADDRESS_AVAX, PERP_MM, USDC_TOKEN_AVAX } from "@/utils/constants";
+import {CONTRACT_ADDRESS_AVAX, FALLBACK_VALUES, PERP_MM, USDC_TOKEN_AVAX } from "@/utils/constants";
 import {create} from "zustand";
-import { TimeFrame } from "./types/types";
+import { PerpPriceInfo, TimeFrame } from "./types/types";
 import { avalancheFuji } from "viem/chains";
 interface PerpStore{
     selectedPerp:string;
@@ -12,7 +12,9 @@ interface PerpStore{
     perps_contract_address:string;
     payToken:string;
     payChain:number;
+    currentPerpPrice:number;
     collateralAmount:string;
+    currentPerpOhlcData:PerpPriceInfo;
     setMaintenanceMargin: (maintenanceMargin : number) => void;
     setSelectedPerp:(perp:string)=>void;
     setLeverage:(leverage:string)=>void;
@@ -23,6 +25,8 @@ interface PerpStore{
     setPerpsContractAddress:(address:string)=>void;
     setPayChain:(chainId:number)=>void;
     setCollateralAmount:(amount:string)=>void;
+    setCurrentPerpPrice:(amount:number)=>void;
+    setCurrentPerpOhlcData:(data:PerpPriceInfo)=>void;
 }
 
 
@@ -32,6 +36,13 @@ export const usePerpStore=create<PerpStore>((set) => ({
     timeframe:{
         value:"day",
         label:"3D"
+    },
+    currentPerpPrice:FALLBACK_VALUES.BTC.price,
+    currentPerpOhlcData: {
+        high: 0,
+        low: 0,
+        time: 0,
+        price:0
     },
     collateralAmount:"0.00",
     payChain:avalancheFuji.id,
@@ -88,6 +99,16 @@ export const usePerpStore=create<PerpStore>((set) => ({
     setCollateralAmount:(amount:string)=>{
         set(()=>({
             collateralAmount:amount
+        }))
+    },
+    setCurrentPerpPrice:(amount:number)=>{
+        set(()=>({
+            currentPerpPrice:amount
+        }))
+    },
+    setCurrentPerpOhlcData:(data:PerpPriceInfo)=>{
+        set(()=>({
+          currentPerpOhlcData:data
         }))
     }
 }))

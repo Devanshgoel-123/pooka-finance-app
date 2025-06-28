@@ -12,8 +12,10 @@ import { PositionsComponent } from "@/components/PositionsComp";
 import { TradingHeaderMobile } from "@/components/TradingHeaderMobile";
 import { usePerpStore } from "@/store/PerpStore";
 import { useShallow } from "zustand/react/shallow";
+import { useUnifiedPriceFeeds } from "@/hooks/useUnifiedPriceFeeds";
 
 const Index = () => {
+  useUnifiedPriceFeeds();
   const { mobileOption } = usePerpStore(
     useShallow((state) => ({
       mobileOption: state.mobileOption,
