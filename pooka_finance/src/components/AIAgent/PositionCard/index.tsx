@@ -134,7 +134,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ params, isLoading = 
 
       <div className="cardFooter">
         <button
-         disabled={params.collateral === undefined || userDepositbalance < Number(params.collateral) && chainId === avalancheFuji.id}
+         disabled={params.collateral === null || (userDepositbalance < Number(params.collateral) && chainId === avalancheFuji.id)}
           className={`openPositionBtn ${isLoading ? "loading" : ""}`}
           onClick={()=>{
             if(chainId !== avalancheFuji.id){
