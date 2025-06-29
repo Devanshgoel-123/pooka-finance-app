@@ -220,7 +220,7 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
           }}
           disabled={isLoading || !params.collateral || params.collateral <= 0}
         >
-          {isDepositLoading ? (
+          {loading ? (
             <>
               <LoadingSpinner/>
             </>
