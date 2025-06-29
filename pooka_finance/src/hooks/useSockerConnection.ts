@@ -2,11 +2,11 @@
 import { io, Socket } from "socket.io-client";
 import dotenv from "dotenv";
 import { useEffect, useRef, useState } from "react";
-import { ClosePositionParams, DepositParams, PositionParams, WithdrawPositionParams } from "@/store/types/types";
+import { ClosePositionParams, DepositParams, generalQueryProps, PositionParams, WithdrawPositionParams } from "@/store/types/types";
 dotenv.config();
 export const useSocketConnection = () => {
   const [renderElement, setRenderElement]=useState<string | undefined>(undefined);
-  const [element, setElement]=useState<"deposit" | "close" | "trade" | "withdraw" | null>(null);
+  const [element, setElement]=useState<"deposit" | "close" | "trade" | "withdraw" | "response" | null>(null);
   const positionParams = useRef<PositionParams>({
     perpName: undefined,
     leverage: undefined,
@@ -14,6 +14,9 @@ export const useSocketConnection = () => {
     positionType: undefined,
   });
 
+  const generalQuery = useRef<generalQueryProps>({
+    message:undefined
+  })
   const depositParams=useRef<DepositParams>({
     chainName:undefined,
     collateral:undefined,
@@ -47,6 +50,12 @@ export const useSocketConnection = () => {
     socket_connections.on("connect", () => {
         console.log("port connected")
     });
+
+    socket_connections.on("general_query", (data)=>{
+      console.log("The received data", data);
+      generalQuery.current.message=data.position;
+      setElement('response')
+    })
 
     socket_connections.on("open_position", (data) => {
       console.log("The received data", data);
@@ -90,6 +99,7 @@ export const useSocketConnection = () => {
     depositParams,
     withdrawParams,
     closePositionParams,
-    element
+    element,
+    generalQuery
   }
 };

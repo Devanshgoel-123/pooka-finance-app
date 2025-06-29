@@ -30,7 +30,7 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
 
   const { disconnect } = useDisconnect();
 
-  const { depositParams, positionParams, element, withdrawParams, closePositionParams } = useSocketConnection();
+  const { depositParams, positionParams, element, withdrawParams, closePositionParams, generalQuery } = useSocketConnection();
   const [sendEnable, setSend] = useState<boolean>(true);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -137,6 +137,7 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
       );
     }
   };
+
   const renderUserQuery = (message: Message) => {
     return (
       <div className="messageContent">
@@ -202,10 +203,23 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
         params: closePositionParams.current,
       };
       setMessages((prev) => [...prev, newMessage]);
+    }else if(
+      element === "response" &&
+     (generalQuery.current !== undefined || generalQuery.current != "")
+    ){
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        type: "agent",
+        content: generalQuery.current.message || "Facing some issues please try again later",
+        timestamp: new Date(),
+        action:"response",
+        params: generalQuery.current,
+      };
+      setMessages((prev) => [...prev, newMessage]);
     }
     setIsTyping(false);
     setSend(true);
-  }, [element, depositParams, positionParams, closePositionParams, withdrawParams]);
+  }, [element, depositParams, positionParams, closePositionParams, withdrawParams, generalQuery]);
 
   return (
     <div className="agentChatWrapper">

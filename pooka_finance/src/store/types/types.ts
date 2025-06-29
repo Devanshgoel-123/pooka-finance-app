@@ -51,7 +51,11 @@ export interface Message {
   content: string;
   timestamp: Date;
   action:"query" | "response" | "trade" | "deposit" | "close" | "withdraw";
-  params?: DepositParams | PositionParams | WithdrawPositionParams | ClosePositionParams;
+  params?: DepositParams | PositionParams | WithdrawPositionParams | ClosePositionParams | generalQueryProps;
+}
+
+export interface generalQueryProps{
+  message:string | undefined;
 }
 
 export interface AgentChatProps {

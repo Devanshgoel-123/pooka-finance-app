@@ -37,6 +37,7 @@ export const USDC_TOKEN="/assets/usdc.svg";
 export const AVAX_TOKEN="/assets/avax.svg";
 export const LINK_TOKEN="/assets/link.svg";
 export const POOKA_LOGO="/assets/pookaLogo.svg";
+export const ONE_CLICK='/assets/oneClick.svg';
 
 export const markets = [
     { symbol: 'ETH/USD', name: 'Ethereum Perpetual', logo:"/assets/eth.svg"},
