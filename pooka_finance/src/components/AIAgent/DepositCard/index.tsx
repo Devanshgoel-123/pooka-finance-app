@@ -49,7 +49,7 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
 
   const {
     createDeposit,
-    isDepositLoading,
+    isDepositSuccess,
     isDepositError
   }=useCreateDeposit();
 
@@ -62,7 +62,7 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
   const {
     createCrossChainDepositAvax,
     isCrossChainDepositAvaxError,
-    isCrossChainDepositAvaxLoading
+    isCrossChainDepositAvaxSuccess
    }=useCreateCrossChainDepositOnAvax();
 
    const {
@@ -121,16 +121,16 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
     const hasAnyError = isDepositError || isCrossChainError || isCrossChainDepositAvaxError || isError;
    
     // Check if all operations are completed (not loading)
-    const allOperationsCompleted = isDepositLoading || isCrossChainDepositLoading || isCrossChainDepositAvaxLoading || isSuccess;
+    const allOperationsCompleted = isDepositError || isCrossChainDepositLoading || isCrossChainDepositAvaxSuccess || isSuccess;
     if (hasAnyError || allOperationsCompleted) {
       setIsLoading(false);
     }
   }, [
-    isDepositLoading, 
+    isDepositSuccess, 
     isDepositError, 
     isCrossChainDepositLoading, 
     isCrossChainError, 
-    isCrossChainDepositAvaxLoading, 
+    isCrossChainDepositAvaxSuccess, 
     isCrossChainDepositAvaxError, 
     isError,
     isSuccess,
@@ -138,10 +138,10 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
   ]);
 
   useEffect(()=>{
-    if(isCrossChainDepositAvaxLoading){
+    if(isCrossChainDepositAvaxSuccess){
       setForceDisable(true)
     }
-  },[isCrossChainDepositAvaxLoading])
+  },[isCrossChainDepositAvaxSuccess])
   
   return (
     <div
