@@ -1,7 +1,3 @@
-Here’s an improved version of your `README.md` for **PookaFinance** that presents the project in a more polished, informative, and developer-friendly format:
-
----
-
 # 🦊 PookaFinance
 
 **PookaFinance** is a modern Web3 **Perpetual Trading Platform** that enables users to trade crypto assets across chains with ease. Built with **Next.js** and **Sass**, it features wallet integration, seamless UI, and powerful state management to offer a smooth user experience.
@@ -182,5 +178,3 @@ Distributed under the [MIT License](./LICENSE).
 Feel free to use and modify with attribution.
 
 ---
-
-Let me know if you want badges, feature GIFs, or visuals added!
