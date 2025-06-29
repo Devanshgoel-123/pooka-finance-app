@@ -2,16 +2,15 @@
 
 import type React from "react"
 import "./styles.scss"
-import Link from "next/link";
 import Image from "next/image";
 import { POOKA_LOGO } from "@/utils/constants";
 import { DOCS_LINK } from "@/utils/constants";
+import Link from "next/link";
 interface NavigationProps {
   onLaunchApp?: () => void
 }
 
-export const Navigation: React.FC<NavigationProps> = ({ onLaunchApp }) => {
- 
+export const Navigation: React.FC<NavigationProps> = () => {
   return (
     <nav className="navigation">
       <div className="navContainer">
@@ -33,8 +32,8 @@ export const Navigation: React.FC<NavigationProps> = ({ onLaunchApp }) => {
             Agent
           </a>
         </div>
+        <Link className="launchButton" href="/Trade">Launch App</Link>
 
-        <Link className="launchButton" onClick={onLaunchApp} href="/">Launch App</Link>
       </div>
     </nav>
   )

@@ -66,7 +66,7 @@ export const OrderComponent: React.FC = () => {
   });
 
   const handleApprovalCallBack = async () => {
-    console.log("The loading is", loading);
+   
     if (payChain === avalancheFuji.id) {
       await createDeposit(payToken, collateralAmount);
     } else if (payChain === sepolia.id) {
@@ -82,7 +82,6 @@ export const OrderComponent: React.FC = () => {
       enabled: !!address,
     },
   });
-  console.log("The balance is",data)
   const { userDepositbalance } = useFetchUserDepositBalance();
 
   const { openPosition, isPositionLoading } = useOpenPosition();
@@ -101,13 +100,10 @@ export const OrderComponent: React.FC = () => {
   } = useCreateCrossChainDepositOnAvax();
 
   const handleCrossChainDepositOnAvax = async () => {
-    console.log("The loading is", loading);
-    console.log("Calling handle cross chain deposit on avax");
     if (chainId !== avalancheFuji.id) {
      await switchChainAsync({
       chainId:avalancheFuji.id
      })
-     console.log("switched chains")
       setTimeout(() => {
         createCrossChainDepositAvax(payToken, collateralAmount);
       }, 1000);
@@ -151,7 +147,6 @@ export const OrderComponent: React.FC = () => {
       
 
     const allOperationsCompleted = isCrossChainDepositAvaxSuccess;
-    console.log("The errors are",isError, allOperationsCompleted)
     if (hasAnyError || allOperationsCompleted) {
       setCollateralAmount("");
       setIsLoading(false);
@@ -339,7 +334,6 @@ export const OrderComponent: React.FC = () => {
         }
         disabled={(payChain===chainId && Number(collateralAmount) === 0)|| loading}
         onClick={async () => {
-          console.log("The loading is", loading);
           if (loading) {
             return;
           }
@@ -355,7 +349,6 @@ export const OrderComponent: React.FC = () => {
               if (handleCheckNativeToken(payToken)) {
                 await createDeposit(payToken, collateralAmount);
               } else {
-                console.log("The loading is", loading);
                 await sendApprovalTraxn(payToken, payChain, collateralAmount);
               }
             } else if (payChain === sepolia.id) {

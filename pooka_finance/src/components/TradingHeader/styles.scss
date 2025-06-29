@@ -204,7 +204,7 @@
 
   @include xl{
     gap: 25px;
-    width: 60%;
+    width: 62%;
     justify-content: space-between;
   }
 
@@ -253,6 +253,8 @@
       font-size: 14px;
       color: #ffffff;
       font-weight: 600;
+      justify-content: center;
+      text-align: center;
     }
     
     .statValue.funding {

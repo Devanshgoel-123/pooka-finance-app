@@ -14,7 +14,7 @@ export const Navbar=() => {
   const [activeNav, setActiveNav] = useState("Dashboard");
   const {address, isConnected}=useAccount();
   const { disconnect } = useDisconnect();
-  const navItems = ["Dashboard", "Agent", "Home"];
+  const navItems = [ "Home", "Dashboard", "Agent"];
   const router=useRouter();
   useEffect(() => {
     useWalletStore.getState().setUserWalletAddress(

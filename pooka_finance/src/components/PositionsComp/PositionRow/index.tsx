@@ -112,7 +112,7 @@ export const PositionRow=({
             color:pnl >= 0 ? `#7bf179`:`#ff6b6b`
         }}>
             <Image height={22} width={22} src={USDC_TOKEN} alt=""/>
-            <span>{pnl >= 0 ? `+`:`-`}  {pnl.toFixed(4)}</span>
+            <span>{pnl >= 0 ? `+`:``}  {pnl.toFixed(4)}</span>
             </div>
       </div>
 

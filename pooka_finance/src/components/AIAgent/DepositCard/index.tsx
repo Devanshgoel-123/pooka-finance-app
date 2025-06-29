@@ -28,7 +28,7 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
   const [loading, setIsLoading]=useState<boolean>(false);
   const [forceDisable, setForceDisable]=useState<boolean>(false);
   const {
-    switchChain
+    switchChainAsync
   }=useSwitchChain()
   const formatCurrency = (amount: number | undefined) => {
     if (!amount) return "0"
@@ -108,7 +108,7 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
     if(chainName === undefined) return;
     const targetChain=getChainId(chainName)
     if(chainId !== targetChain){
-      switchChain({
+      switchChainAsync({
         chainId:targetChain
       })
     } 
