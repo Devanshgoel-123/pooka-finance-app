@@ -498,6 +498,37 @@
   }
 }
 
+.navbar-nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-link {
+  position: relative;
+  cursor: pointer;
+  background-color: transparent;
+  text-align: center;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  border: 0;
+  line-height: 175%;
+  letter-spacing: 0.6px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  transition: 0.2s linear;
+  height: 100%;
+  padding: 15px 0px;
+  color: #787878;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: #7bf179;
+  text-decoration: none;
+}
+
 // Dark mode enhancements
 @media (prefers-color-scheme: dark) {
   .agentChatWrapper {

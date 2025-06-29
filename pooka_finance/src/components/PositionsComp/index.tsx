@@ -10,7 +10,7 @@ import { PositionRow } from "./PositionRow";
 import { useFetchUserDepositCount } from "@/hooks/useFetchUserDepositCount";
 import { LoadingSpinner } from "@/common/LoadingSpinner";
 import { LoadingText } from "@/common/LoadingText";
-import { DepositRow } from "./DepositRow";
+// import { DepositRow } from "./DepositRow";
 export const PositionsComponent = () => {
   const [activeTab, setActiveTab] = useState<"Positions" | "Funding History">(
     "Positions"
@@ -119,14 +119,14 @@ export const PositionsComponent = () => {
 
     return (
       <div className="positionsTable">
-        <div className="positionsHeader">
+        <div className="depositHeader">
           <div className="headerCell">Size</div>
           <div className="headerCell">Time</div>
         </div>
         <div className="positionsBody">
-          {Array.from({ length: userDepositCount }, (_, index) => (
+          {/* {Array.from({ length: userDepositCount }, (_, index) => (
             <DepositRow index={index} key={index}/>
-          ))}
+          ))} */}
         </div>
       </div>
     );

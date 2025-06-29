@@ -19,7 +19,8 @@ export const useFetchParticularUserDeposit=({
   const {
     data,
     error,
-    isError
+    isError,
+    isFetching
   } = useReadContract({
     abi: PERPS_ABI as Abi,
     address:CONTRACT_ADDRESS_AVAX as `0x${string}`,
@@ -32,13 +33,15 @@ export const useFetchParticularUserDeposit=({
         enabled: address!==undefined,
     },
   });
+  console.log(data);
   if(isError){
     console.log("Error fetching the deposit count for user",error)
   }
    console.log("The user deposit is", data)
    const userDeposit=data as UserDeposit;
    return {
-    userDeposit
+    userDeposit,
+    isFetching
    }   
 
 }

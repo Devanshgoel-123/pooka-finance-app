@@ -220,7 +220,7 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
     setIsTyping(false);
     setSend(true);
   }, [element, depositParams, positionParams, closePositionParams, withdrawParams, generalQuery]);
-
+  const navItems = ["Dashboard", "Home"];
   return (
     <div className="agentChatWrapper">
       <div className="chatHeader">
@@ -251,6 +251,19 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
               {isConnected ? "Online" : "Offline"}
             </span>
           </div>
+        </div>
+        <div className="navbar-nav">
+          {navItems.map((item) => (
+            <button
+              key={item}
+              className={`nav-link`}
+              onClick={() => {
+                router.push(item==="Home" ? "/":"/Trade")
+              }}
+            >
+              {item}
+            </button>
+          ))}
         </div>
         <ConnectButton.Custom>
           {({ openConnectModal, account, authenticationStatus, mounted }) => {
