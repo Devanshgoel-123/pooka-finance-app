@@ -1,47 +1,29 @@
+import { useAccount} from "wagmi";
+import { DepositData} from "@/store/types/types";
+import { useState, useEffect } from "react";
 
-import { Abi } from "viem";
-import { CONTRACT_ADDRESS_AVAX} from "@/utils/constants";
-import { useAccount, useReadContract } from "wagmi";
-import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
-import { UserDeposit } from "@/store/types/types";
+export const useFetchUserDeposits = () => {
+  const { address } = useAccount();
+  const [userDeposits, setUserDeposits] = useState<DepositData[]>([]);
+  const [isFetching, setIsFetching] = useState(true);
 
-interface Props{
-    index:number;
-}
+  useEffect(() => {
+    if (!address) return;
 
-export const useFetchParticularUserDeposit=({
-    index
-}:Props)=>{
-    const {
-        address
-    }=useAccount()
-  
-  const {
-    data,
-    error,
-    isError,
-    isFetching
-  } = useReadContract({
-    abi: PERPS_ABI as Abi,
-    address:CONTRACT_ADDRESS_AVAX as `0x${string}`,
-    functionName: 'deposits',
-    args: [
-        address,
-        index
-    ],
-    query:{
-        enabled: address!==undefined,
-    },
-  });
-  console.log(data);
-  if(isError){
-    console.log("Error fetching the deposit count for user",error)
-  }
-   console.log("The user deposit is", data)
-   const userDeposit=data as UserDeposit;
-   return {
-    userDeposit,
-    isFetching
-   }   
+    try {
+      const storedDeposits: DepositData[] = JSON.parse(localStorage.getItem('deposits') || '[]');
+      const filtered = storedDeposits.filter((deposit) => deposit.address === address);
+      setUserDeposits(filtered);
+    } catch (e) {
+      console.error('Failed to parse deposits from localStorage:', e);
+      setUserDeposits([]);
+    } finally {
+      setIsFetching(false);
+    }
+  }, [address]);
 
-}
+  return {
+    userDeposits,
+    isFetching,
+  };
+};

@@ -296,7 +296,6 @@ const renderDepositButton=()=>{
       })
       return 
     }
-    console.log(payChain, payToken, chainId)
     setIsLoading(true);
     try {
       if (payChain === avalancheFuji.id) {

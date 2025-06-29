@@ -57,6 +57,11 @@ export const useSocketConnection = () => {
       setElement('response')
     })
 
+    socket_connections.on("model_response", (data)=>{
+      console.log("The received data from model is", data);
+      generalQuery.current.message=data.position[0];
+      setElement('response')
+    })
     socket_connections.on("open_position", (data) => {
       console.log("The received data", data);
       positionParams.current=data.position;

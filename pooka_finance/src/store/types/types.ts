@@ -16,6 +16,15 @@ export type DepositParams = {
   chainName?: string;
 };
 
+export interface DepositData{
+  hash:string;
+  time:number;
+  amount:number;
+  chain:number;
+  token:string;
+  address:string;
+}
+
 export interface PositionData {
   perpName:string;
   size: bigint;

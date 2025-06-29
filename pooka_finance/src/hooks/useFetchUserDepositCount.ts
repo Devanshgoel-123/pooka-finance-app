@@ -30,7 +30,6 @@ export const useFetchUserDepositCount=()=>{
   if(isError){
     console.log("Error fetching the deposit count for user",error)
   }
-  console.log("userDeposit Count",data)
    const userDepositCount=Number(data) as number;
    return {
     userDepositCount,

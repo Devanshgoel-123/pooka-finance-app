@@ -4,13 +4,14 @@ import { useWalletStore } from "@/store/walletStore";
 import { useShallow } from "zustand/react/shallow";
 import { useFetchUserPosition } from "@/hooks/useFetchUserPosition";
 import "./styles.scss";
-import { PositionData } from "@/store/types/types";
+import { DepositData, PositionData } from "@/store/types/types";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { PositionRow } from "./PositionRow";
 import { useFetchUserDepositCount } from "@/hooks/useFetchUserDepositCount";
 import { LoadingSpinner } from "@/common/LoadingSpinner";
 import { LoadingText } from "@/common/LoadingText";
-// import { DepositRow } from "./DepositRow";
+import { useFetchUserDeposits } from "@/hooks/useFetchUserDeposit";
+import { DepositRow } from "./DepositRow";
 export const PositionsComponent = () => {
   const [activeTab, setActiveTab] = useState<"Positions" | "Funding History">(
     "Positions"
@@ -29,10 +30,14 @@ export const PositionsComponent = () => {
   ] as const;
 
   const {
-    userDepositCount,
+    // userDepositCount,
     isLoading: isFetchingDepositCount,
     isError: countError,
   } = useFetchUserDepositCount();
+
+  const {
+    userDeposits
+  }=useFetchUserDeposits();
 
   const renderPositionRow = (position: PositionData, index: number) => {
     return <PositionRow position={position} index={index} key={index} />;
@@ -106,7 +111,7 @@ export const PositionsComponent = () => {
       );
     }
 
-    if (userDepositCount === 0) {
+    if (userDeposits.length === 0) {
       return (
         <div className="emptyState">
           <span className="emptyStateText">No deposit History</span>
@@ -120,13 +125,19 @@ export const PositionsComponent = () => {
     return (
       <div className="positionsTable">
         <div className="depositHeader">
-          <div className="headerCell">Size</div>
-          <div className="headerCell">Time</div>
+          <div className="headerCellDeposit">Size</div>
+          <div className="headerCellDeposit">Chain</div>
+          <div className="headerCellDeposit">Token</div>
+          <div className="headerCellDeposit">Traxn Hash</div>
+          <div className="headerCellDeposit">Time</div>
+          
         </div>
         <div className="positionsBody">
-          {/* {Array.from({ length: userDepositCount }, (_, index) => (
-            <DepositRow index={index} key={index}/>
-          ))} */}
+          {
+            userDeposits.map((item:DepositData)=>{
+              return <DepositRow key={item.hash} userDeposit={item}/>
+            }) 
+          }
         </div>
       </div>
     );

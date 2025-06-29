@@ -88,7 +88,6 @@ export const useSendApprovalTraxn = ({callBackFunction}:Props) => {
         contractAddress = CONTRACT_ADDRESS_POOL_MANAGER;
        }     
     }
-    console.log("Calling approval transaction", depositAmount, data, contractAddress);
     try {
       setQuery(true);
       const amount = parseUnits(depositAmount, 8);
