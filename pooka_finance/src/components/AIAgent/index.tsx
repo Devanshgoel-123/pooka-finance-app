@@ -220,7 +220,7 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
     setIsTyping(false);
     setSend(true);
   }, [element, depositParams, positionParams, closePositionParams, withdrawParams, generalQuery]);
-  const navItems = ["Dashboard", "Home"];
+  const navItems = ["Home","Dashboard"];
   return (
     <div className="agentChatWrapper">
       <div className="chatHeader">

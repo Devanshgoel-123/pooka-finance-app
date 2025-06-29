@@ -26,6 +26,7 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const chainId =useChainId();
   const [loading, setIsLoading]=useState<boolean>(false);
+  const [forceDisable, setForceDisable]=useState<boolean>(false);
   const {
     switchChain
   }=useSwitchChain()
@@ -135,6 +136,13 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
     isSuccess,
     loading,
   ]);
+
+  useEffect(()=>{
+    if(isCrossChainDepositAvaxLoading){
+      setForceDisable(true)
+    }
+  },[isCrossChainDepositAvaxLoading])
+  
   return (
     <div
       className={`depositCard ${isHovered ? "hovered" : ""}`}
@@ -215,10 +223,11 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
             if( chainId !== getChainId(params.chainName as string)){
               handleSwitchChain(params.chainName)
             }else{
+              setIsLoading(true)
               handleDeposit()
             }
           }}
-          disabled={isLoading || !params.collateral || params.collateral <= 0}
+          disabled={loading || !params.collateral || params.collateral <= 0}
         >
           {loading ? (
             <>

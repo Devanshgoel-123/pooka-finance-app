@@ -10,6 +10,7 @@ import { getPerpImage } from "@/utils/helperFunction";
 import { ClosePositionParams } from "@/store/types/types";
 import { useChainId, useSwitchChain } from "wagmi";
 import { avalancheFuji } from "viem/chains";
+import { useEffect } from "react";
 
 interface Props{
   params:ClosePositionParams;
@@ -18,6 +19,7 @@ interface Props{
 
 export const ClosePositionCard= ({params}:Props) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [forceDisable, setForceDisable]=useState<boolean>(false);
   const {switchChain}=useSwitchChain();
   const chainId=useChainId();
   const {
@@ -26,6 +28,12 @@ export const ClosePositionCard= ({params}:Props) => {
     success,
     isPending
   }=useClosePosition();
+
+  useEffect(()=>{
+    if(success){
+      setForceDisable(true)
+    }
+  },[success])
 
   
 
@@ -41,6 +49,8 @@ export const ClosePositionCard= ({params}:Props) => {
   }
 
   if(params.perpName === undefined) return;
+
+  const isLoading = isPending || isConfirming
   return (
     <div
       className={`ClosePositionCard ${isHovered ? "hovered" : ""}`}
@@ -63,9 +73,9 @@ export const ClosePositionCard= ({params}:Props) => {
         <button
           className={`closeBtn ${isConfirming ? "loading" : ""}`}
           onClick={chainId === avalancheFuji.id ? handleClosePosition : handleSwitchChain}
-          disabled={params.perpName === undefined || (isConfirming || isPending)}
+          disabled={forceDisable || params.perpName === undefined || (isConfirming || isPending)}
         >
-          {(isPending || isConfirming) && !success ? (
+          {(isLoading) && !success ? (
             <>
               <LoadingSpinner/>
             </>

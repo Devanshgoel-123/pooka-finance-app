@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import "./styles.scss"
 import { LoadingSpinner } from "@/common/LoadingSpinner";
 import Image from "next/image";
@@ -21,6 +21,7 @@ interface Props{
 
 export const WithdrawAmountCard= ({ params }:Props) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [forceDisable, setForceDisable]=useState<boolean>(false);
   const chainId=useChainId();
   const {
     switchChain
@@ -38,10 +39,15 @@ export const WithdrawAmountCard= ({ params }:Props) => {
 
   const {
     withdrawUserAmount,
-    isWithdrawError,
     isWithdrawSuccess,
     isLoading
   }=useWithdrawAmount();
+
+  useEffect(()=>{
+    if(isWithdrawSuccess){
+      setForceDisable(true)
+    }
+  },[isWithdrawSuccess])
   
 
   if(params.withdrawAmount === undefined) return;
@@ -81,9 +87,9 @@ export const WithdrawAmountCard= ({ params }:Props) => {
         <button
           className={`closeBtn ${isLoading ? "loading" : ""}`}
           onClick={chainId=== avalancheFuji.id ? handleWithdrawal : handleSwitchChain}
-          disabled={params.withdrawAmount === undefined || isLoading || Number(params.withdrawAmount) > userDepositbalance}
+          disabled={forceDisable || params.withdrawAmount === undefined || isLoading || Number(params.withdrawAmount) > userDepositbalance}
         >
-          {isLoading && !isWithdrawSuccess && !isWithdrawError ? (
+          {isLoading && !isWithdrawSuccess ? (
             <>
               <LoadingSpinner/>
             </>

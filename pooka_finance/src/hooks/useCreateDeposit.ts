@@ -31,7 +31,7 @@ export const useCreateDeposit = () => {
     if (hash) {
       alert(`Traxn sent successfully with hash:${hash}`);
       if(isSuccess){
-        alert(`Traxn completed successfully, fucker your amount has been deposited`);
+        alert(`Traxn completed successfully, your amount has been deposited`);
         const existingDeposits: DepositData[] = JSON.parse(localStorage.getItem("deposits") || "[]");
         const traxnDeposit:DepositData={
           hash:hash,

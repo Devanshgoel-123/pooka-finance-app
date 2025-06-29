@@ -27,7 +27,7 @@ interface PositionCardProps {
 
 export const PositionCard: React.FC<PositionCardProps> = ({ params, isLoading = false }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
-
+  const [forceDisable, setForceDisable]=useState<boolean>(false);
   const chainId= useChainId();
   const {
     switchChain
@@ -40,11 +40,18 @@ export const PositionCard: React.FC<PositionCardProps> = ({ params, isLoading = 
   }=useOpenPosition();
 
   useEffect(()=>{
+    if(success){
+      setForceDisable(true)
+    }
+  },[success])
+
+  useEffect(()=>{
   if(params.collateral === null || params.perpName===null || !params.positionType === null){
     return
   }
   },[params.collateral, params.perpName, params.positionType])
 
+  
 
   const formatCurrency = (amount: number | undefined) => {
     if (!amount) return "0"
@@ -134,7 +141,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ params, isLoading = 
 
       <div className="cardFooter">
         <button
-         disabled={params.collateral === null || (userDepositbalance < Number(params.collateral) && chainId === avalancheFuji.id)}
+         disabled={forceDisable || params.collateral === null || (userDepositbalance < Number(params.collateral) && chainId === avalancheFuji.id)}
           className={`openPositionBtn ${isLoading ? "loading" : ""}`}
           onClick={()=>{
             if(chainId !== avalancheFuji.id){
@@ -144,7 +151,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({ params, isLoading = 
             }
           }}
         >
-          {isPositionLoading ? (
+          {isPositionLoading && !success ? (
             <>
               <LoadingSpinner/>
             </>
