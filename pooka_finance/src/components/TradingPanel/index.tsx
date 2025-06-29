@@ -76,20 +76,13 @@ export const OrderComponent: React.FC = () => {
     }
   };
 
-  const { data: userNativeBalance } = useBalance({
-    address: payToken as `0x${string}`,
-    chainId: payChain,
-    query: {
-      enabled: handleCheckNativeToken(payToken),
-    },
-  });
   const { data, isLoading: isBalanceLoading } = useBalance({
     address: address as `0x${string}`,
     query: {
       enabled: !!address,
     },
   });
-
+  console.log("The balance is",data)
   const { userDepositbalance } = useFetchUserDepositBalance();
 
   const { openPosition, isPositionLoading } = useOpenPosition();
@@ -241,7 +234,7 @@ export const OrderComponent: React.FC = () => {
         />
         <span>
           {handleCheckNativeToken(payToken)
-            ? userNativeBalance?.value
+            ? (Number(data.value)/1e18).toFixed(4)
             : userTokenBalance.toFixed(4)}
         </span>
       </div>
@@ -285,6 +278,52 @@ export const OrderComponent: React.FC = () => {
     }
   };
 
+  const getButtonText = () => {
+    if (payChain !== chainId) {
+      return "Switch Chain";
+    }
+
+    if (Number(collateralAmount) === 0) {
+      return "Enter Amount";
+    }
+    
+    
+    if (handleCheckNativeToken(payToken)) {
+      const nativeBalance = Number(data?.value) / 10**18;
+      if (Number(collateralAmount) > nativeBalance) {
+        return "Insufficient Balance";
+      }
+    } else {
+     
+      if (Number(collateralAmount) > userTokenBalance) {
+        return "Insufficient Balance";
+      }
+    }
+    
+    return "Deposit";
+  };
+
+  const getButtonClassName = () => {
+    if (payChain !== chainId) {
+      return "connectWalletButton";
+    }
+    
+    if (Number(collateralAmount) === 0) {
+      return "insufficientDepositBtn";
+    }
+    
+    if (handleCheckNativeToken(payToken)) {
+      if (Number(collateralAmount) > Number(data?.value) / 10**18) {
+        return "insufficientDepositBtn";
+      }
+    } else {
+      if (Number(collateralAmount) > Number(userTokenBalance)) {
+        return "insufficientDepositBtn";
+      }
+    }
+    return "connectWalletButton";
+  };
+
   const renderDepositButton = () => {
     return loading ? (
       <div className="bg-[#7bf179] p-[12px] w-[100%] flex flex-row justify-center rounded-[12px]">
@@ -293,11 +332,9 @@ export const OrderComponent: React.FC = () => {
     ) : (
       <button
         className={
-          Number(collateralAmount) === 0
-            ? `insufficientDepositBtn`
-            : `connectWalletButton`
+         getButtonClassName()
         }
-        disabled={Number(collateralAmount) === 0 || loading}
+        disabled={(payChain===chainId && Number(collateralAmount) === 0)|| loading}
         onClick={async () => {
           console.log("The loading is", loading);
           if (loading) {
@@ -328,13 +365,7 @@ export const OrderComponent: React.FC = () => {
           }
         }}
       >
-        {Number(collateralAmount) === 0
-          ? `Enter Amount`
-          : payChain === chainId
-          ? Number(collateralAmount) > userTokenBalance
-            ? "Insufficient Balance"
-            : `Deposit`
-          : `Switch Chain`}
+        {getButtonText()}
       </button>
     );
   };

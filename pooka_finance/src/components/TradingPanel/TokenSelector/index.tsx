@@ -88,7 +88,12 @@ export const TokenSelector = () => {
   const selectedTokenData = currentTokens.find(token => token.name === selectedToken);
 
   return (
-    <div className="tokenSelector" ref={dropdownRef}>
+    <div className="tokenSelectorFinal" ref={dropdownRef}>
+      <span style={{
+        fontSize:"10px",
+        marginTop:"-6px",
+        opacity:"0.6"
+      }}>Token Name:</span>
       <div className="customSelect" onClick={toggleDropdown}>
         <div className="selectTrigger">
           {selectedTokenData ? (

@@ -11,10 +11,16 @@ import { LoadingSpinner } from "@/common/LoadingSpinner";
 import { LoadingText } from "@/common/LoadingText";
 import { useFetchUserDeposits } from "@/hooks/useFetchUserDeposit";
 import { DepositRow } from "./DepositRow";
+import { useChainId, useSwitchChain } from "wagmi";
+import { avalancheFuji } from "viem/chains";
 export const PositionsComponent = () => {
   const [activeTab, setActiveTab] = useState<"Positions" | "Funding History">(
     "Positions"
   );
+  const chainId=useChainId();
+  const {
+    switchChain
+  }=useSwitchChain()
   const { error, isError, isLoading, userPositions } = useFetchUserPosition();
   const { address } = useWalletStore(
     useShallow((state) => ({
@@ -39,6 +45,21 @@ export const PositionsComponent = () => {
   };
 
   const renderPositionsContent = () => {
+
+    if(chainId!== avalancheFuji.id){
+      return (
+        <div className="loadingState" onClick={()=>{
+          switchChain({
+            chainId:avalancheFuji.id
+          })
+        }}>
+          <span className="connectWalletButton" style={{
+            minWidth:"0"
+          }}>Switch Network</span>
+        </div>
+      );
+    } 
+
     if (isLoading) {
       return (
         <div className="loadingState">
@@ -129,9 +150,13 @@ export const PositionsComponent = () => {
         </div>
         <div className="positionsBody">
           {
-            userDeposits.map((item:DepositData)=>{
-              return <DepositRow key={item.hash} userDeposit={item}/>
-            }) 
+            userDeposits
+            .filter((item: DepositData, index: number, arr: DepositData[]) => 
+              arr.findIndex(deposit => deposit.hash === item.hash) === index
+            )
+            .map((item: DepositData) => {
+              return <DepositRow key={item.hash} userDeposit={item} />
+            })
           }
         </div>
       </div>

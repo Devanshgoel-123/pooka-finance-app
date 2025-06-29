@@ -22,7 +22,17 @@ export const returnFormattedDate=(now:Date):string=>{
     return `${yyyy}-${mm}-${dd}`;
 }
 
-
+export const returnFormattedPrice = (price: string): string => {
+    const cleanPrice = price.replace(/[^\d.]/g, '');
+    const numPrice = parseFloat(cleanPrice);
+    if (isNaN(numPrice)) {
+      return price; 
+    }
+    return numPrice.toLocaleString('en-US', {
+      minimumFractionDigits: 3,
+      maximumFractionDigits: 3
+    });
+  };
 export const getPerpName=(name:string)=>{
     if(name.toLowerCase().includes("eth")){
         return "ETH/USD"
