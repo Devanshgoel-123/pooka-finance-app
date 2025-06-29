@@ -74,6 +74,11 @@ export const ChainSelector = () => {
 
   return (
     <div className="tokenSelector" ref={dropdownRef}>
+      <span style={{
+        fontSize:"10px",
+        marginTop:"-6px",
+        opacity:"0.6"
+      }}>Chain Name:</span>
       <div className="customSelect" onClick={toggleDropdown}>
         <div className="selectTrigger">
           {selectedChain ? (

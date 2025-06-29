@@ -91,7 +91,8 @@
     }
 
     .aiPowered{
-      background-image: url("/assets/aiLogo.svg");
+      background-image: url("/assets/ai.svg");
+
     }
 
     .crossChainDeposits{
@@ -103,7 +104,12 @@
   .featureCard:hover {
     border-color: #7bf179;
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(123, 241, 121, 0.1);
+    box-shadow: 0 10px 30px rgba(44, 108, 43, 0.1);
+
+   div{
+    transform: scale(1.03);
+    transition: ease-in-out 0.5s all;
+   }
   }
   
   .featureImagePlaceholder {

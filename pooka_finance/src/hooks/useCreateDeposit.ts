@@ -11,9 +11,12 @@ import {
 } from "@/utils/constants";
 import { useEffect, useState } from "react";
 import { avalancheFuji } from "viem/chains";
+import { DepositData } from "@/store/types/types";
 
 export const useCreateDeposit = () => {
   const [query, setQuery] = useState<boolean>(false);
+  const [amount, setAmount]=useState<number>(0);
+  const [token, setToken]=useState<string>('');
   const { writeContract, data: hash, error, isPending, isError } = useWriteContract();
   const { isLoading: isConfirming, isSuccess} = useWaitForTransactionReceipt({
     hash,
@@ -25,10 +28,21 @@ export const useCreateDeposit = () => {
     address
   }=useAccount();
   useEffect(() => {
-    if (hash && isConfirming) {
+    if (hash) {
       alert(`Traxn sent successfully with hash:${hash}`);
       if(isSuccess){
         alert(`Traxn completed successfully, your amount has been deposited`);
+        const existingDeposits: DepositData[] = JSON.parse(localStorage.getItem("deposits") || "[]");
+        const traxnDeposit:DepositData={
+          hash:hash,
+          time:Math.floor(new Date().getTime()/1000),
+          amount:amount,
+          chain:avalancheFuji.id,
+          token:token,
+          address:address as string
+        }
+        existingDeposits.push(traxnDeposit);
+        localStorage.setItem("deposits",JSON.stringify(existingDeposits));
         setQuery(false);
       }
     } else if (error) {
@@ -40,6 +54,8 @@ export const useCreateDeposit = () => {
   const createDeposit = async (payToken:string, depositAmount:string) => {
     try {
       setQuery(true);
+      setAmount(Number(depositAmount));
+      setToken(payToken)
       if (payToken === USDC_TOKEN_AVAX) {
         writeContract({
           abi: PERPS_ABI as Abi,
@@ -56,7 +72,7 @@ export const useCreateDeposit = () => {
           functionName: "depositDirect",
           args: [
             LINK_TOKEN_AVAX,
-            parseUnits(depositAmount, 6)
+            parseUnits(depositAmount, 18)
           ],
           account:address,
           chain:avalancheFuji
@@ -84,7 +100,7 @@ export const useCreateDeposit = () => {
 
   return {
     createDeposit,
-    isDepositLoading: isSuccess,
+    isDepositSuccess: isSuccess,
     isDepositError:isError
   };
 };

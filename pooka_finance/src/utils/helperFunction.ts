@@ -22,7 +22,17 @@ export const returnFormattedDate=(now:Date):string=>{
     return `${yyyy}-${mm}-${dd}`;
 }
 
-
+export const returnFormattedPrice = (price: string): string => {
+    const cleanPrice = price.replace(/[^\d.]/g, '');
+    const numPrice = parseFloat(cleanPrice);
+    if (isNaN(numPrice)) {
+      return price; 
+    }
+    return numPrice.toLocaleString('en-US', {
+      minimumFractionDigits: 3,
+      maximumFractionDigits: 3
+    });
+  };
 export const getPerpName=(name:string)=>{
     if(name.toLowerCase().includes("eth")){
         return "ETH/USD"
@@ -94,6 +104,22 @@ export const tokenImageForAddress=(address:string)=>{
         return USDC_TOKEN
     }
 }
+
+export const tokenNameForAddress=(address:string)=>{
+    if(address === USDC_TOKEN_SEPOLIA || address===USDC_TOKEN_AVAX){
+        return "USDC"
+    }else if(address === NATIVE_TOKEN_AVAX){
+        return "AVAX"
+    }else if(address === NATIVE_TOKEN_SEPOLIA){
+        return "ETH"
+    }else if(address === LINK_TOKEN_AVAX){
+        return "LINK"
+    }else{
+        return "USDC"
+    }
+}
+
+
 export const getTokenImage=(token:string)=>{
     if(token.toLowerCase().includes('u')){
         return '/assets/usdc.svg'

@@ -55,7 +55,6 @@ export const useCreateCrossChainDeposit = ({callBackFunction}:Props) => {
   }, [error, hash, isConfirming, isSuccess, isPending]);
 
   const createCrossChainDeposit = async (depositAmount: string) => {
-    console.log("Calling cross chain Deposit", depositAmount, CROSS_CHAIN_MANAGER_SEPOLIA)
     try {
       setQuery(true);
       setTimeout(() => {

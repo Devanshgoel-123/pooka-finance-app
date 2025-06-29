@@ -4,17 +4,23 @@ import { useWalletStore } from "@/store/walletStore";
 import { useShallow } from "zustand/react/shallow";
 import { useFetchUserPosition } from "@/hooks/useFetchUserPosition";
 import "./styles.scss";
-import { PositionData } from "@/store/types/types";
+import { DepositData, PositionData } from "@/store/types/types";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { PositionRow } from "./PositionRow";
-import { useFetchUserDepositCount } from "@/hooks/useFetchUserDepositCount";
 import { LoadingSpinner } from "@/common/LoadingSpinner";
 import { LoadingText } from "@/common/LoadingText";
-// import { DepositRow } from "./DepositRow";
+import { useFetchUserDeposits } from "@/hooks/useFetchUserDeposit";
+import { DepositRow } from "./DepositRow";
+import { useChainId, useSwitchChain } from "wagmi";
+import { avalancheFuji } from "viem/chains";
 export const PositionsComponent = () => {
   const [activeTab, setActiveTab] = useState<"Positions" | "Funding History">(
     "Positions"
   );
+  const chainId=useChainId();
+  const {
+    switchChain
+  }=useSwitchChain()
   const { error, isError, isLoading, userPositions } = useFetchUserPosition();
   const { address } = useWalletStore(
     useShallow((state) => ({
@@ -28,17 +34,32 @@ export const PositionsComponent = () => {
     { key: "Funding History", label: "Funding History" },
   ] as const;
 
+
   const {
-    userDepositCount,
-    isLoading: isFetchingDepositCount,
-    isError: countError,
-  } = useFetchUserDepositCount();
+    userDeposits,
+    isFetching
+  }=useFetchUserDeposits();
 
   const renderPositionRow = (position: PositionData, index: number) => {
     return <PositionRow position={position} index={index} key={index} />;
   };
 
   const renderPositionsContent = () => {
+
+    if(chainId!== avalancheFuji.id){
+      return (
+        <div className="loadingState" onClick={()=>{
+          switchChain({
+            chainId:avalancheFuji.id
+          })
+        }}>
+          <span className="connectWalletButton" style={{
+            minWidth:"0"
+          }}>Switch Network</span>
+        </div>
+      );
+    } 
+
     if (isLoading) {
       return (
         <div className="loadingState">
@@ -89,7 +110,7 @@ export const PositionsComponent = () => {
   };
 
   const renderDepositHistoryContent = () => {
-    if (isFetchingDepositCount) {
+    if (isFetching) {
       return (
         <div className="loadingState">
           <LoadingSpinner />
@@ -98,7 +119,7 @@ export const PositionsComponent = () => {
       );
     }
 
-    if (countError) {
+    if (userDeposits===undefined) {
       return (
         <div className="errorState">
           <span className="errorText">Failed to load your Deposit History</span>
@@ -106,7 +127,7 @@ export const PositionsComponent = () => {
       );
     }
 
-    if (userDepositCount === 0) {
+    if (userDeposits.length === 0) {
       return (
         <div className="emptyState">
           <span className="emptyStateText">No deposit History</span>
@@ -120,13 +141,23 @@ export const PositionsComponent = () => {
     return (
       <div className="positionsTable">
         <div className="depositHeader">
-          <div className="headerCell">Size</div>
-          <div className="headerCell">Time</div>
+          <div className="headerCellDeposit">Size</div>
+          <div className="headerCellDeposit">Chain</div>
+          <div className="headerCellDeposit">Token</div>
+          <div className="headerCellDeposit">Traxn Hash</div>
+          <div className="headerCellDeposit">Time</div>
+          
         </div>
         <div className="positionsBody">
-          {/* {Array.from({ length: userDepositCount }, (_, index) => (
-            <DepositRow index={index} key={index}/>
-          ))} */}
+          {
+            userDeposits
+            .filter((item: DepositData, index: number, arr: DepositData[]) => 
+              arr.findIndex(deposit => deposit.hash === item.hash) === index
+            )
+            .map((item: DepositData) => {
+              return <DepositRow key={item.hash} userDeposit={item} />
+            })
+          }
         </div>
       </div>
     );

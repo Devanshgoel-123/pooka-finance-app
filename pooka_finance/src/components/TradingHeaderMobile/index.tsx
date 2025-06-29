@@ -14,7 +14,7 @@ import { Market } from "@/store/types/types";
 import { useFetchUserDepositBalance } from "@/hooks/useFetchUserBalance";
 import { useAccount } from "wagmi"
 import { LoadingText } from "@/common/LoadingText"
-
+import { returnFormattedPrice } from "@/utils/helperFunction"
 const button_array=[
   {
     text:"chart"
@@ -113,7 +113,7 @@ export const TradingHeaderMobile = ({
         <div className="priceInfo">
         <div className="currentPrice">
             $
-            {tokenPrice !==0  && tokenPrice!==undefined? `${tokenPrice.toString().slice(0,3)},${tokenPrice.toFixed(2).toString().slice(3)}` : <LoadingText text="0.00" size={24}/>}
+            {tokenPrice !==0  && tokenPrice!==undefined? `${returnFormattedPrice(tokenPrice.toString())}` : <LoadingText text="0.00" size={24}/>}
           </div>
           <div className={`priceChange ${isPositive ? "positive" : "negative"}`}>
             {isPositive ? "+" : ""}
@@ -125,13 +125,13 @@ export const TradingHeaderMobile = ({
         <div className="statItem">
           <span className="statLabel">24H High</span>
           <span className="statValue">
-          {perpInfo.high !== 0 ? `${perpInfo.high.toString().slice(0,3)},${perpInfo.high.toFixed(2).toString().slice(3)}` : <LoadingText text="0.00" size={14}/>}
+          {perpInfo.high !== 0 ? `${returnFormattedPrice(perpInfo.high.toString())}` : <LoadingText text="0.00" size={14}/>}
           </span>
         </div>
         <div className="statItem">
           <span className="statLabel">24H Low</span>
           <span className="statValue"> 
-          {perpInfo.low !==0 ? `${perpInfo.low.toString().slice(0,3)},${perpInfo.low.toFixed(2).toString().slice(3)}` : <LoadingText text="0.00" size={14}/>}
+          {perpInfo.low !==0 ? `${returnFormattedPrice(perpInfo.low.toString())}` : <LoadingText text="0.00" size={14}/>}
           </span>
         </div>
         <div className="statItem">

@@ -188,14 +188,6 @@
   padding: 0;
 }
 
-.depositHeader{
-  justify-content: flex-start;
-  width: 30%;
-  gap: 10px;
-  .headerCell{
-    width: 50%;
-  }
-}
 .headerCell {
   width: 15%;
   padding: 12px 8px;
@@ -213,6 +205,21 @@
     border-right: none;
   }
 }
+
+.headerCellDeposit {
+  width: 20%;
+  padding: 12px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #a6a6a6;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-right: 1px solid #333333;
+}
+
 
 .positionsBody {
   background: #040404;

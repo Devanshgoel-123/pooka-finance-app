@@ -8,7 +8,7 @@ import { avalancheFuji } from "viem/chains";
 
 export const useWithdrawAmount = () => {
   const [query, setQuery] = useState<boolean>(false);
-  const { writeContract, data: hash, error,isError, isPending:isLoading } = useWriteContract();
+  const { writeContract, data: hash, error,isError, isPending } = useWriteContract();
   const {
     address
   }=useAccount();
@@ -55,7 +55,7 @@ export const useWithdrawAmount = () => {
   return {
     withdrawUserAmount,
     isWithdrawError:isError, 
-    isLoading:isLoading,
+    isLoading:isPending || isConfirming,
     isWithdrawSuccess:success
   };
 };

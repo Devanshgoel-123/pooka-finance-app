@@ -16,7 +16,7 @@ import { useCreateCrossChainDepositOnAvax } from "@/hooks/useCrossChainDepositAv
 import { avalancheFuji, sepolia } from "viem/chains"
 import { getChainName } from "@/utils/helperFunction"
 import { useChainId, useSwitchChain } from "wagmi"
-import { switchChain } from "viem/actions"
+import { useEffect } from "react"
 interface DepositCardProps {
   params: DepositParams
   isLoading?: boolean
@@ -25,6 +25,8 @@ interface DepositCardProps {
 export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = false }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const chainId =useChainId();
+  const [loading, setIsLoading]=useState<boolean>(false);
+  const [forceDisable, setForceDisable]=useState<boolean>(false);
   const {
     switchChain
   }=useSwitchChain()
@@ -42,11 +44,12 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
     return `${amount.toLocaleString()} ${token.toUpperCase()}`
   }
 
- 
+
+
 
   const {
     createDeposit,
-    isDepositLoading,
+    isDepositSuccess,
     isDepositError
   }=useCreateDeposit();
 
@@ -57,7 +60,9 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
   } 
 
   const {
-    createCrossChainDepositAvax
+    createCrossChainDepositAvax,
+    isCrossChainDepositAvaxError,
+    isCrossChainDepositAvaxSuccess
    }=useCreateCrossChainDepositOnAvax();
 
    const {
@@ -85,7 +90,7 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
 
   const {
     sendApprovalTraxn,
-    isError
+    isError, isSuccess
   }=useSendApprovalTraxn({
     callBackFunction:handleApprovalCallBack
   })
@@ -108,6 +113,36 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
       })
     } 
   }
+
+  useEffect(() => {
+    if (!loading) return; // Don't process if not currently loading
+    
+    // Check if any operation has failed
+    const hasAnyError = isDepositError || isCrossChainError || isCrossChainDepositAvaxError || isError;
+   
+    // Check if all operations are completed (not loading)
+    const allOperationsCompleted = isDepositError || isCrossChainDepositLoading || isCrossChainDepositAvaxSuccess || isSuccess;
+    if (hasAnyError || allOperationsCompleted) {
+      setIsLoading(false);
+    }
+  }, [
+    isDepositSuccess, 
+    isDepositError, 
+    isCrossChainDepositLoading, 
+    isCrossChainError, 
+    isCrossChainDepositAvaxSuccess, 
+    isCrossChainDepositAvaxError, 
+    isError,
+    isSuccess,
+    loading,
+  ]);
+
+  useEffect(()=>{
+    if(isCrossChainDepositAvaxSuccess){
+      setForceDisable(true)
+    }
+  },[isCrossChainDepositAvaxSuccess])
+  
   return (
     <div
       className={`depositCard ${isHovered ? "hovered" : ""}`}
@@ -188,12 +223,13 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
             if( chainId !== getChainId(params.chainName as string)){
               handleSwitchChain(params.chainName)
             }else{
+              setIsLoading(true)
               handleDeposit()
             }
           }}
-          disabled={isLoading || !params.collateral || params.collateral <= 0}
+          disabled={loading || !params.collateral || params.collateral <= 0}
         >
-          {isDepositLoading ? (
+          {loading ? (
             <>
               <LoadingSpinner/>
             </>

@@ -2,11 +2,15 @@ import {useReadContract } from "wagmi"
 import { useAccount } from "wagmi";
 import { ERC20_ABI } from "@/components/ABI/ERC20ABI";
 import { Abi} from "viem";
+import {USDC_TOKEN_AVAX } from "@/utils/constants";
+import { avalancheFuji } from "viem/chains";
 
 export const useFetchUserTokenBalance = ({
-    tokenAddress
+    tokenAddress,
+    payChain
 }:{
-  tokenAddress:string
+  tokenAddress:string;
+  payChain:number
 }) =>{
   const { address, isConnected }=useAccount();
   const {
@@ -20,9 +24,10 @@ export const useFetchUserTokenBalance = ({
     ],
     query:{
       enabled:isConnected
-    }
+    },
+    chainId:payChain
   });
-   const userTokenBalance=Number(data)/10**6 || 0.00;
+   const userTokenBalance= payChain === avalancheFuji.id ? tokenAddress === USDC_TOKEN_AVAX ?  Number(data)/10**6 : Number(data)/10**18 :Number(data)/10**6 || 0.00;
    return {
     userTokenBalance
    }   
