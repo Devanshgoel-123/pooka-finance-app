@@ -79,21 +79,25 @@ export const useSendApprovalTraxn = ({callBackFunction}:Props) => {
   const sendApprovalTraxn = async (payToken:string, payChain:number, depositAmount:string) => {
   
     let contractAddress: string;
+    let decimalUnits:number;
     if (payChain === sepolia.id) {
       contractAddress = CROSS_CHAIN_MANAGER_SEPOLIA;
+      decimalUnits=7;
     } else{
        if(payToken===USDC_TOKEN_AVAX){
-        contractAddress= CONTRACT_ADDRESS_AVAX
+        contractAddress= CONTRACT_ADDRESS_AVAX;
+        decimalUnits=7;
        }else{
+        decimalUnits=19;
         contractAddress = CONTRACT_ADDRESS_POOL_MANAGER;
        }     
     }
     try {
       setQuery(true);
-      const amount = parseUnits(depositAmount, 8);
+      const amount = parseUnits(depositAmount, decimalUnits);
       const chain=payChain===avalancheFuji.id ? avalancheFuji : sepolia;
 
-      if( data===undefined || data as bigint < parseUnits(depositAmount, 6)){
+      if( data===undefined || data as bigint < parseUnits(depositAmount, 7)){
         writeContract({
         abi: ERC20_ABI,
         address: payToken as `0x${string}`,

@@ -78,7 +78,7 @@ export const useCreateCrossChainDepositOnAvax = () => {
 
   return {
     createCrossChainDepositAvax,
-    isCrossChainDepositAvaxLoading: isSuccess,
+    isCrossChainDepositAvaxSuccess: isSuccess,
     isCrossChainDepositAvaxError: isError,
   };
 };

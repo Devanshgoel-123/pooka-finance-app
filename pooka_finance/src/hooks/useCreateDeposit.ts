@@ -72,7 +72,7 @@ export const useCreateDeposit = () => {
           functionName: "depositDirect",
           args: [
             LINK_TOKEN_AVAX,
-            parseUnits(depositAmount, 6)
+            parseUnits(depositAmount, 18)
           ],
           account:address,
           chain:avalancheFuji
@@ -100,7 +100,7 @@ export const useCreateDeposit = () => {
 
   return {
     createDeposit,
-    isDepositLoading: isSuccess,
+    isDepositSuccess: isSuccess,
     isDepositError:isError
   };
 };
