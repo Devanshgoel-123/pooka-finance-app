@@ -36,7 +36,7 @@ import { useWithdrawAmount } from "@/hooks/useWithdrawAmount";
 import { useCreateCrossChainDepositOnAvax } from "@/hooks/useCrossChainDepositAvax";
 export const OrderComponent: React.FC = () => {
   const { chainId } = useAccount();
-  const { switchChain } = useSwitchChain();
+  const { switchChainAsync } = useSwitchChain();
   const [positionType, setPositionType] = useState<"Long" | "Short">("Long");
   const [leverageIndex, setLeverageIndex] = useState<number>(0);
   const [activeTab, setActiveTab] = useState<number>(0);
@@ -100,11 +100,14 @@ export const OrderComponent: React.FC = () => {
     isCrossChainDepositAvaxSuccess,
   } = useCreateCrossChainDepositOnAvax();
 
-  const handleCrossChainDepositOnAvax = () => {
+  const handleCrossChainDepositOnAvax = async () => {
     console.log("The loading is", loading);
     console.log("Calling handle cross chain deposit on avax");
     if (chainId !== avalancheFuji.id) {
-      switchChain({ chainId: avalancheFuji.id });
+     await switchChainAsync({
+      chainId:avalancheFuji.id
+     })
+     console.log("switched chains")
       setTimeout(() => {
         createCrossChainDepositAvax(payToken, collateralAmount);
       }, 1000);
@@ -341,7 +344,7 @@ export const OrderComponent: React.FC = () => {
             return;
           }
           if (payChain !== chainId) {
-            switchChain({
+            await switchChainAsync({
               chainId: payChain,
             });
             return;
