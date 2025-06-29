@@ -76,9 +76,9 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
     setSend(false);
 
     try {
-      await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL}/message`, {
+      await axios.post(`${process.env.NEXT_PUBLIC_SERVER_URL_AXIOS}/message`, {
         text: tempMessage,
-        agentId: "Sigma",
+        agentId: "Sigma"
       });
     } catch (err) {
       const errorMessage: Message = {

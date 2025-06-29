@@ -16,7 +16,7 @@ import { useCreateCrossChainDepositOnAvax } from "@/hooks/useCrossChainDepositAv
 import { avalancheFuji, sepolia } from "viem/chains"
 import { getChainName } from "@/utils/helperFunction"
 import { useChainId, useSwitchChain } from "wagmi"
-import { switchChain } from "viem/actions"
+import { useEffect } from "react"
 interface DepositCardProps {
   params: DepositParams
   isLoading?: boolean
@@ -25,6 +25,7 @@ interface DepositCardProps {
 export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = false }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const chainId =useChainId();
+  const [loading, setIsLoading]=useState<boolean>(false);
   const {
     switchChain
   }=useSwitchChain()
@@ -42,7 +43,8 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
     return `${amount.toLocaleString()} ${token.toUpperCase()}`
   }
 
- 
+
+
 
   const {
     createDeposit,
@@ -57,7 +59,9 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
   } 
 
   const {
-    createCrossChainDepositAvax
+    createCrossChainDepositAvax,
+    isCrossChainDepositAvaxError,
+    isCrossChainDepositAvaxLoading
    }=useCreateCrossChainDepositOnAvax();
 
    const {
@@ -85,7 +89,7 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
 
   const {
     sendApprovalTraxn,
-    isError
+    isError, isSuccess
   }=useSendApprovalTraxn({
     callBackFunction:handleApprovalCallBack
   })
@@ -108,6 +112,29 @@ export const DepositCard: React.FC<DepositCardProps> = ({ params, isLoading = fa
       })
     } 
   }
+
+  useEffect(() => {
+    if (!loading) return; // Don't process if not currently loading
+    
+    // Check if any operation has failed
+    const hasAnyError = isDepositError || isCrossChainError || isCrossChainDepositAvaxError || isError;
+   
+    // Check if all operations are completed (not loading)
+    const allOperationsCompleted = isDepositLoading || isCrossChainDepositLoading || isCrossChainDepositAvaxLoading || isSuccess;
+    if (hasAnyError || allOperationsCompleted) {
+      setIsLoading(false);
+    }
+  }, [
+    isDepositLoading, 
+    isDepositError, 
+    isCrossChainDepositLoading, 
+    isCrossChainError, 
+    isCrossChainDepositAvaxLoading, 
+    isCrossChainDepositAvaxError, 
+    isError,
+    isSuccess,
+    loading,
+  ]);
   return (
     <div
       className={`depositCard ${isHovered ? "hovered" : ""}`}

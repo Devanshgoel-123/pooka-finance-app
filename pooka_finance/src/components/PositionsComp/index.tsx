@@ -7,7 +7,6 @@ import "./styles.scss";
 import { DepositData, PositionData } from "@/store/types/types";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { PositionRow } from "./PositionRow";
-import { useFetchUserDepositCount } from "@/hooks/useFetchUserDepositCount";
 import { LoadingSpinner } from "@/common/LoadingSpinner";
 import { LoadingText } from "@/common/LoadingText";
 import { useFetchUserDeposits } from "@/hooks/useFetchUserDeposit";
@@ -29,14 +28,10 @@ export const PositionsComponent = () => {
     { key: "Funding History", label: "Funding History" },
   ] as const;
 
-  const {
-    // userDepositCount,
-    isLoading: isFetchingDepositCount,
-    isError: countError,
-  } = useFetchUserDepositCount();
 
   const {
-    userDeposits
+    userDeposits,
+    isFetching
   }=useFetchUserDeposits();
 
   const renderPositionRow = (position: PositionData, index: number) => {
@@ -94,7 +89,7 @@ export const PositionsComponent = () => {
   };
 
   const renderDepositHistoryContent = () => {
-    if (isFetchingDepositCount) {
+    if (isFetching) {
       return (
         <div className="loadingState">
           <LoadingSpinner />
@@ -103,7 +98,7 @@ export const PositionsComponent = () => {
       );
     }
 
-    if (countError) {
+    if (userDeposits===undefined) {
       return (
         <div className="errorState">
           <span className="errorText">Failed to load your Deposit History</span>
