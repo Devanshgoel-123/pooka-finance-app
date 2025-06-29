@@ -41,7 +41,6 @@ export const useCreateCrossChainDepositOnAvax = () => {
   const createCrossChainDepositAvax = async (payToken:string, depositAmount:string) => {
     try {
       setQuery(true);
-      console.log("The creation of deposit on avax ",payToken, depositAmount);
       writeContract({
         abi: POOL_MANAGER_ABI as Abi,
         address: CONTRACT_ADDRESS_POOL_MANAGER,

@@ -1,4 +1,4 @@
-export const CROSS_CHAIN_MANAGER_ABI=[
+export const CROSS_CHAIN_MANAGER_ABI= [
   {
     "inputs": [
       {

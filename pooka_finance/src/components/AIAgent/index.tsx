@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { ClosePositionCard } from "./ClosePositionCard";
 import { WithdrawAmountCard } from "./WithdrawAmount";
 import { WithdrawParameters } from "viem/zksync";
+import { POOKA_LOGO } from "@/utils/constants";
 
 export const AgentChat: React.FC<AgentChatProps> = () => {
   const router = useRouter();
@@ -29,7 +30,7 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
 
   const { disconnect } = useDisconnect();
 
-  const { depositParams, positionParams, element, withdrawParams, closePositionParams } = useSocketConnection();
+  const { depositParams, positionParams, element, withdrawParams, closePositionParams, generalQuery } = useSocketConnection();
   const [sendEnable, setSend] = useState<boolean>(true);
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -52,7 +53,6 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
 
   useEffect(() => {
     scrollToBottom();
-    console.log(element)
   }, [messages]);
 
   const handleSendMessage = async () => {
@@ -105,7 +105,6 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
   };
 
   const renderAgentResponse = (message: Message) => {
-    console.log("The agent msg is", message.action)
     if (message.action === "trade" && message.params !== undefined) {
       return (
         <div className="messageContent">
@@ -125,7 +124,6 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
         </div>
       )
     } else if(message.action === "withdraw" && message.params !== undefined ){
-      console.log("hello there")
       return (
         <div className="messageContent">
           <WithdrawAmountCard params={message.params as WithdrawPositionParams} isLoading={false} />
@@ -139,6 +137,7 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
       );
     }
   };
+
   const renderUserQuery = (message: Message) => {
     return (
       <div className="messageContent">
@@ -180,9 +179,8 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
       setMessages((prev) => [...prev, newMessage]);
     } else if (
       element === "withdraw" &&
-      withdrawParams.current.amount !== undefined
+      withdrawParams.current.withdrawAmount !== undefined
     ){
-      console.log("debugging ",element, withdrawParams.current)
       const newMessage: Message = {
         id: Date.now().toString(),
         type: "agent",
@@ -196,7 +194,6 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
       element === "close" &&
       closePositionParams.current.perpName !== undefined
     ){
-      console.log("debugging ",element, closePositionParams.current)
       const newMessage: Message = {
         id: Date.now().toString(),
         type: "agent",
@@ -206,11 +203,24 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
         params: closePositionParams.current,
       };
       setMessages((prev) => [...prev, newMessage]);
+    }else if(
+      element === "response" &&
+     (generalQuery.current !== undefined || generalQuery.current != "")
+    ){
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        type: "agent",
+        content: generalQuery.current.message || "Facing some issues please try again later",
+        timestamp: new Date(),
+        action:"response",
+        params: generalQuery.current,
+      };
+      setMessages((prev) => [...prev, newMessage]);
     }
     setIsTyping(false);
     setSend(true);
-  }, [element, depositParams, positionParams, closePositionParams, withdrawParams]);
-
+  }, [element, depositParams, positionParams, closePositionParams, withdrawParams, generalQuery]);
+  const navItems = ["Dashboard", "Home"];
   return (
     <div className="agentChatWrapper">
       <div className="chatHeader">
@@ -226,7 +236,7 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
           <div className="agentAvatar">
             <Image
               className="avatarIcon"
-              src={"/assets/logo.svg"}
+              src={POOKA_LOGO}
               height={45}
               width={45}
               alt=""
@@ -241,6 +251,19 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
               {isConnected ? "Online" : "Offline"}
             </span>
           </div>
+        </div>
+        <div className="navbar-nav">
+          {navItems.map((item) => (
+            <button
+              key={item}
+              className={`nav-link`}
+              onClick={() => {
+                router.push(item==="Home" ? "/":"/Trade")
+              }}
+            >
+              {item}
+            </button>
+          ))}
         </div>
         <ConnectButton.Custom>
           {({ openConnectModal, account, authenticationStatus, mounted }) => {
@@ -286,9 +309,14 @@ export const AgentChat: React.FC<AgentChatProps> = () => {
         {isTyping && (
           <div className="message agent">
             <div className="messageAvatar">
-              <div className="avatarIcon">🤖</div>
+              <div className="avatarIcon">
+                <Image src={POOKA_LOGO} width={32} height={32} alt="" className=""/>
+              </div>
             </div>
-            <div className="messageContent">
+            <div className="messageContent" style={{
+              width:"100px",
+              overflow:"hidden"
+            }}>
               <div className="typingIndicator">
                 <span></span>
                 <span></span>

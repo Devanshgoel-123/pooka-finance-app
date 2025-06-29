@@ -22,7 +22,6 @@ export const useFetchUserDepositBalance = () =>{
     }
   });
    const userDepositbalance=Number(data)/10**6 || 0;
-   console.log(userDepositbalance)
    return {
     userDepositbalance,
     isLoading

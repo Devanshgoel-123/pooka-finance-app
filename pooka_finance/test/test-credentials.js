@@ -25,7 +25,6 @@ async function testConnection() {
     const path = `/api/v1/reports/latest?feedID=${FEED_ID}`
     const headers = generateAuthHeaders('GET', path, USERNAME, PASSWORD)
 
-    console.log('Testing connection to Chainlink Data Streams...')
     console.log('Headers:', headers)
 
     const response = await fetch(`${BASE_URL}${path}`, {
@@ -33,11 +32,9 @@ async function testConnection() {
       headers
     })
 
-    console.log('Response status:', response.status)
     
     if (response.ok) {
       const data = await response.json()
-      console.log('✅ SUCCESS! Your credentials work!')
       console.log('BTC/USD Report received:', {
         feedID: data.report.feedID,
         timestamp: data.report.observationsTimestamp,

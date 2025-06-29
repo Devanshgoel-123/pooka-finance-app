@@ -17,7 +17,6 @@ export class DataStreamsService {
     }
 
     const data = await response.json();
-    console.log("The data in service streams",data)
     return data as PriceData;
   }
 

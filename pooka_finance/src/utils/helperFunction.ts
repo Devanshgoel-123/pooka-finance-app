@@ -44,10 +44,18 @@ export const getPerpImage=(name:string)=>{
 }
 
 export const getChainImage=(chainName:string)=>{
-    if(chainName.toLowerCase().includes("eth")){
+    if(chainName.toLowerCase().includes("eth") || chainName.toLowerCase().includes("sep")){
         return '/assets/eth.svg'
     }else{
         return '/assets/avax.svg'
+    }
+}
+
+export const getChainName=(chainName:string)=>{
+    if(chainName.toLowerCase().includes("eth") || chainName.toLowerCase().includes("sep")){
+        return "Ethereum"
+    }else{
+        return "Avax"
     }
 }
 
@@ -96,7 +104,7 @@ export const getTokenImage=(token:string)=>{
 
 
 export const getChainId=(chainName:string)=>{
-    if(chainName.toLowerCase().includes("eth")){
+    if(chainName.toLowerCase().includes("eth") || chainName.toLowerCase().includes("sep")){
         return sepolia.id
     }else{
         return avalancheFuji.id

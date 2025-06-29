@@ -42,7 +42,7 @@ export interface ClosePositionParams{
 }
 
 export interface WithdrawPositionParams{
-  amount:string | undefined;
+  withdrawAmount:string | undefined;
 }
 
 export interface Message {
@@ -51,7 +51,11 @@ export interface Message {
   content: string;
   timestamp: Date;
   action:"query" | "response" | "trade" | "deposit" | "close" | "withdraw";
-  params?: DepositParams | PositionParams | WithdrawPositionParams | ClosePositionParams;
+  params?: DepositParams | PositionParams | WithdrawPositionParams | ClosePositionParams | generalQueryProps;
+}
+
+export interface generalQueryProps{
+  message:string | undefined;
 }
 
 export interface AgentChatProps {
@@ -82,4 +86,10 @@ export interface PerpPriceInfo{
   time: string | number;
   high:number;
   low:number;
+}
+
+
+export interface UserDeposit{
+  amount:number;
+  time:number;
 }

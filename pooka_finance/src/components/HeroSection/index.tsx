@@ -27,7 +27,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onTradeNow }) => {
         </button>
 
         <div className="curveContainer">
-          <svg className="curveSvg" viewBox="0 0 1200 300" fill="none">
+        <svg className="curveSvg" viewBox="0 0 1200 300" fill="none" preserveAspectRatio="none">
             <path
               d="M0 250 Q300 100 600 150 Q900 200 1200 50"
               stroke="#7bf179"

@@ -109,7 +109,7 @@ export const TradingHeader = ({
         <div className="priceInfoDesktop">
           <div className="currentPrice">
             $
-            {perpInfo.price !==0 ? `${perpInfo.price.toString().slice(0,3)},${perpInfo.price.toFixed(2).toString().slice(3)}` : <LoadingText text="0.00" size={24}/>}
+            {tokenPrice !==0 && tokenPrice!==undefined ? `${tokenPrice.toString().slice(0,3)},${tokenPrice.toFixed(2).toString().slice(3)}` : <LoadingText text="0.00" size={24}/>}
           </div>
           <div
             className={`priceChange ${isPositive ? "positive" : "negative"}`}

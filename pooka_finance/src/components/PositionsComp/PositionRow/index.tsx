@@ -65,8 +65,7 @@ export const PositionRow=({
           const formattedEntryPrice: number = Number(position.entryPrice) / 10**8;
           const formattedPositionInUSDC: number = Number(position.size) / 10**6;
           const formattedPositionInPerpToken: number = formattedPositionInUSDC / formattedEntryPrice;
-          const currentPnl: number =tokenPrice ? (tokenPrice - formattedEntryPrice) * formattedPositionInPerpToken : 0;
-          console.log(currentPnl)
+          const currentPnl: number = tokenPrice ? position.isLong ? (tokenPrice - formattedEntryPrice) * formattedPositionInPerpToken : (formattedEntryPrice-tokenPrice) * formattedPositionInPerpToken : 0;
           setPnl(currentPnl)
           return currentPnl;
         }

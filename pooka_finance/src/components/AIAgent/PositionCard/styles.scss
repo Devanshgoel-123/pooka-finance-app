@@ -40,9 +40,28 @@
   }
   
   .positionInfo {
+    width: 100%;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
     gap: 8px;
+
+    .userDepositBalance{
+      display: flex;
+      align-items: center;
+    
+      span{
+        gap: 5px;
+        display: flex;
+      flex-direction: row;
+      font-size: 18px;
+      align-items: center;
+      }
+      
+      .perpIcon{
+        border-radius: 50%;
+      }
+    }
   }
   
   .perpWrapper{

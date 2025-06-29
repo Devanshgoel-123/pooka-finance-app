@@ -66,27 +66,6 @@
   }
 }
 
-// .tabContent {
-//   flex: 1;
-//   padding: 20px;
-//   min-height: 120px;
-//   animation: fadeIn 0.2s ease-in-out;
-//   width: 100%;
-
-//   .positionsTable{
-//     min-width: 120%;
-//     @include xl{
-//       width: 100%;
-//     }
-//   }
-//   @include lg{
-  
-//     overflow-x:auto;
-//   }
-//   @include xl{
-//     overflow: hidden;
-//   }
-// }
 
 .tabContent {
   flex: 1;
@@ -191,4 +170,50 @@
   text-align: center;
 }
 
-// Positions Table
+
+.positionsTable {
+  width: 100%;
+  overflow: hidden;
+  
+}
+
+.positionsHeader, .depositHeader {
+  border: 1px solid #333333;
+  border-radius: 6px;
+  display:flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background: #050505;
+  border-bottom: 1px solid #333333;
+  padding: 0;
+}
+
+.depositHeader{
+  justify-content: flex-start;
+  width: 30%;
+  gap: 10px;
+  .headerCell{
+    width: 50%;
+  }
+}
+.headerCell {
+  width: 15%;
+  padding: 12px 8px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #a6a6a6;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-right: 1px solid #333333;
+  
+  &:last-child {
+    border-right: none;
+  }
+}
+
+.positionsBody {
+  background: #040404;
+}

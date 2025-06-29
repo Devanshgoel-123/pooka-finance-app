@@ -8,6 +8,11 @@ import Image from "next/image";
 import { useWithdrawAmount } from "@/hooks/useWithdrawAmount";
 import { getTokenImage } from "@/utils/helperFunction";
 import { WithdrawPositionParams } from "@/store/types/types";
+import { useFetchUserDepositBalance } from "@/hooks/useFetchUserBalance";
+import { LoadingText } from "@/common/LoadingText";
+import { useChainId, useSwitchChain } from "wagmi";
+import { avalancheFuji } from "viem/chains";
+
 
 interface Props{
   params : WithdrawPositionParams;
@@ -16,7 +21,21 @@ interface Props{
 
 export const WithdrawAmountCard= ({ params }:Props) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
-  console.log("I am being rendered")
+  const chainId=useChainId();
+  const {
+    switchChain
+  }=useSwitchChain();
+
+  const handleSwitchChain=()=>{
+    switchChain({
+      chainId:avalancheFuji.id
+    })
+}
+  const {
+    userDepositbalance,
+    isLoading:isDepositLoading
+  }=useFetchUserDepositBalance()
+
   const {
     withdrawUserAmount,
     isWithdrawError,
@@ -25,11 +44,11 @@ export const WithdrawAmountCard= ({ params }:Props) => {
   }=useWithdrawAmount();
   
 
-  if(params.amount === undefined) return;
+  if(params.withdrawAmount === undefined) return;
 
   const handleWithdrawal = async () => {
-    if(params.amount === undefined ) return;
-   await withdrawUserAmount(params.amount)
+    if(params.withdrawAmount === undefined ) return;
+   await withdrawUserAmount(params.withdrawAmount)
   }
 
 
@@ -41,28 +60,35 @@ export const WithdrawAmountCard= ({ params }:Props) => {
     >
       <div className="cardHeader">
         <div className="depositTitle">Withdraw USDC</div>
+        <div className="depositTitleBalance">
+        <span>Your Deposits  :</span>
+        <span> <Image src={getTokenImage("usdc")} height={25} width={25} className="perpTcon" alt="perpImg" style={{
+          borderRadius:"50%"
+        }} />{isDepositLoading ? <LoadingText text="0.00" size={16}/> : userDepositbalance}</span>
+        </div>
+      
       </div>
 
           <div className="parameter mainParameter">
             <div className="paramLabel">Withdrawal Amount</div>
             <div className="paramValue">
                 <Image src={getTokenImage("usdc")} height={25} width={25} className="perpIcon" alt="perpImg"/>
-                <span className="perpName">{params.amount} USDC</span>
+                <span className="perpName">{params.withdrawAmount} USDC</span>
             </div>
           </div>
 
       <div className="cardFooter">
         <button
           className={`closeBtn ${isLoading ? "loading" : ""}`}
-          onClick={handleWithdrawal}
-          disabled={params.amount === undefined || isLoading}
+          onClick={chainId=== avalancheFuji.id ? handleWithdrawal : handleSwitchChain}
+          disabled={params.withdrawAmount === undefined || isLoading || Number(params.withdrawAmount) > userDepositbalance}
         >
           {isLoading && !isWithdrawSuccess && !isWithdrawError ? (
             <>
               <LoadingSpinner/>
             </>
           ) : (
-           "Withdraw Amount"
+           Number(params.withdrawAmount) > userDepositbalance ? "Insufficient Deposits" : "Withdraw Amount"
           )}
         </button>
       </div>

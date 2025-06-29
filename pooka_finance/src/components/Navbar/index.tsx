@@ -7,24 +7,29 @@ import { ConnectButton } from "@rainbow-me/rainbowkit"
 import { useWalletStore } from "@/store/walletStore";
 import { useAccount, useDisconnect } from "wagmi"
 import { useRouter } from "next/navigation";
+import { POOKA_LOGO } from "@/utils/constants"
+import Image from "next/image"
 
 export const Navbar=() => {
   const [activeNav, setActiveNav] = useState("Dashboard");
   const {address, isConnected}=useAccount();
   const { disconnect } = useDisconnect();
-  const navItems = ["Dashboard", "Agent"];
+  const navItems = ["Dashboard", "Agent", "Home"];
   const router=useRouter();
   useEffect(() => {
     useWalletStore.getState().setUserWalletAddress(
       isConnected ? address : undefined
     );
   }, [address, isConnected]);
+
   return (
     <nav className="navbar">
       <div className="navbar-content">
         <div className="navbar-brand">
           <div className="logo">
-            <div className="logo-icon"></div>
+          <div className="logoIcon">
+            <Image src={POOKA_LOGO} className="logoPlaceholder" height={45} width={45} alt="logo"/>
+          </div>
             <span className="logo-text">PookaFinance</span>
           </div>
         </div>
@@ -35,7 +40,7 @@ export const Navbar=() => {
               className={`nav-link ${activeNav === item ? "active" : ""}`}
               onClick={() => {
                 setActiveNav(item)
-                router.push(item)
+                router.push(item==="Home" ? "/":item)
               }}
             >
               {item}

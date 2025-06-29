@@ -9,14 +9,15 @@ import { getChainImage, getPerpImage, getPerpName } from "@/utils/helperFunction
 import { getTokenImage } from "@/utils/helperFunction"
 import { useOpenPosition } from "@/hooks/useOpenPosition"
 import { LoadingSpinner } from "@/common/LoadingSpinner"
-
+import { useFetchUserDepositBalance } from "@/hooks/useFetchUserBalance"
+import { USDC_TOKEN } from "@/utils/constants"
+import { useChainId, useSwitchChain } from "wagmi"
+import { avalancheFuji } from "viem/chains"
 export type PositionParams = {
   perpName?: string
   leverage?: number
   collateral?: number
-  payToken?: string;
   positionType?: string;
-  chainName?: string
 }
 
 interface PositionCardProps {
@@ -26,17 +27,23 @@ interface PositionCardProps {
 
 export const PositionCard: React.FC<PositionCardProps> = ({ params, isLoading = false }) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
+
+  const chainId= useChainId();
+  const {
+    switchChain
+  }=useSwitchChain()
  
   const {
     openPosition,
-    isPositionLoading
+    isPositionLoading,
+    success
   }=useOpenPosition();
 
   useEffect(()=>{
-  if(params.chainName===undefined || !params.perpName || !params.payToken){
-    return 
+  if(params.collateral === null || params.perpName===null || !params.positionType === null){
+    return
   }
-  },[params.chainName, params.payToken, params.perpName])
+  },[params.collateral, params.perpName, params.positionType])
 
 
   const formatCurrency = (amount: number | undefined) => {
@@ -46,7 +53,13 @@ export const PositionCard: React.FC<PositionCardProps> = ({ params, isLoading = 
       currency: "USD",
       minimumFractionDigits: 2,
     }).format(amount)
+
   }
+
+  const {
+    userDepositbalance,
+    isLoading:isDepositLoading
+  }=useFetchUserDepositBalance()
 
   const handleOpenPosition=()=>{
 
@@ -59,6 +72,15 @@ export const PositionCard: React.FC<PositionCardProps> = ({ params, isLoading = 
       params.leverage?.toString()
     )
   }
+
+  const handleSwitchChain=()=>{
+      switchChain({
+        chainId:avalancheFuji.id
+      })
+
+  }
+ 
+
   return (
     <div
       className={`positionCard ${isHovered ? "hovered" : ""}`}
@@ -76,17 +98,13 @@ export const PositionCard: React.FC<PositionCardProps> = ({ params, isLoading = 
             </span>
           </div>
           </div>
+          <div className="userDepositBalance">
+            <span>
+              <Image src={USDC_TOKEN} height={22} width={22} alt="" className="perpIcon"/>
+              {userDepositbalance}
+            </span>
+          </div>
           
-        </div>
-        <div className="chainInfo">
-          <Image
-            src={getChainImage(params.chainName || "eth")}
-            alt={params.chainName || "eth"}
-            width={20}
-            height={20}
-            className="chainIcon"
-          />
-          <span className="chainName">{params.chainName || "Avalanche"}</span>
         </div>
       </div>
 
@@ -107,22 +125,6 @@ export const PositionCard: React.FC<PositionCardProps> = ({ params, isLoading = 
           </div>
 
           <div className="parameter">
-            <div className="paramLabel">Pay Token</div>
-            <div className="paramValue tokenValue">
-              {params.payToken && (
-                <Image
-                  src={getTokenImage(params.payToken) || "/usdc.svg"}
-                  alt={params.payToken}
-                  width={24}
-                  height={24}
-                  className="tokenIcon"
-                />
-              )}
-              <span className="tokenName">{params.payToken || "Unknown"}</span>
-            </div>
-          </div>
-
-          <div className="parameter">
             <div className="paramLabel">Position Size</div>
             <div className="paramValue">
               <span className="positionSize">{formatCurrency((params.collateral || 0) * (params.leverage || 1))}</span>
@@ -132,16 +134,23 @@ export const PositionCard: React.FC<PositionCardProps> = ({ params, isLoading = 
 
       <div className="cardFooter">
         <button
+         disabled={params.collateral === null || (userDepositbalance < Number(params.collateral) && chainId === avalancheFuji.id)}
           className={`openPositionBtn ${isLoading ? "loading" : ""}`}
-          onClick={handleOpenPosition}
+          onClick={()=>{
+            if(chainId !== avalancheFuji.id){
+              handleSwitchChain()
+            }else{
+              handleOpenPosition()
+            }
+          }}
         >
-          {isPositionLoading? (
+          {isPositionLoading ? (
             <>
               <LoadingSpinner/>
             </>
           ) : (
-            <>
-              <span>Open Position</span>
+            <>    
+            {chainId !== avalancheFuji.id ? "Switch Chain" : "Open Position"}
             </>
           )}
         </button>

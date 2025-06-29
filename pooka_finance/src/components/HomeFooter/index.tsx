@@ -3,6 +3,7 @@
 import type React from "react"
 import "./styles.scss"
 import Link from "next/link"
+import { DOCS_LINK } from "@/utils/constants"
 
 export const Footer: React.FC = () => {
   return (
@@ -19,7 +20,7 @@ export const Footer: React.FC = () => {
               <a href="#blog" className="footerLink">
                 Blog
               </a>
-              <a href="#docs" className="footerLink">
+              <a href={DOCS_LINK} className="footerLink">
                 Docs
               </a>
               <a href="#brand" className="footerLink">

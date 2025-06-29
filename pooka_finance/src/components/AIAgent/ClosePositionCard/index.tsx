@@ -8,6 +8,8 @@ import { useClosePosition } from "@/hooks/useClosePosition"
 import Image from "next/image";
 import { getPerpImage } from "@/utils/helperFunction";
 import { ClosePositionParams } from "@/store/types/types";
+import { useChainId, useSwitchChain } from "wagmi";
+import { avalancheFuji } from "viem/chains";
 
 interface Props{
   params:ClosePositionParams;
@@ -16,11 +18,13 @@ interface Props{
 
 export const ClosePositionCard= ({params}:Props) => {
   const [isHovered, setIsHovered] = useState<boolean>(false);
-
+  const {switchChain}=useSwitchChain();
+  const chainId=useChainId();
   const {
     closeUserPosition,
     isConfirming,
-    success
+    success,
+    isPending
   }=useClosePosition();
 
   
@@ -30,6 +34,11 @@ export const ClosePositionCard= ({params}:Props) => {
    await closeUserPosition(params.perpName)
   }
 
+  const handleSwitchChain=()=>{
+      switchChain({
+        chainId:avalancheFuji.id
+      })
+  }
 
   if(params.perpName === undefined) return;
   return (
@@ -53,15 +62,15 @@ export const ClosePositionCard= ({params}:Props) => {
       <div className="cardFooter">
         <button
           className={`closeBtn ${isConfirming ? "loading" : ""}`}
-          onClick={handleClosePosition}
-          disabled={params.perpName === undefined || isConfirming}
+          onClick={chainId === avalancheFuji.id ? handleClosePosition : handleSwitchChain}
+          disabled={params.perpName === undefined || (isConfirming || isPending)}
         >
-          {isConfirming && !success ? (
+          {(isPending || isConfirming) && !success ? (
             <>
               <LoadingSpinner/>
             </>
           ) : (
-           "Close Position"
+           chainId !== avalancheFuji.id ? "Switch Chain" : "Close Position"
           )}
         </button>
       </div>

@@ -52,17 +52,26 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  cursor: pointer;
+  gap:5px;
 }
 
-.logo-icon {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, #7bf179, #22c55e);
+.logoIcon {
   border-radius: 8px;
-  position: relative;
-  transition: transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  padding: 12px;
+  font-weight: 600;
+}
+
+.logoPlaceholder {
+  color: #000000;
+  font-size: 8px;
+  font-weight: 700;
+  border: 1px solid #163215;
+  border-radius: 50%;
+  padding: 5px;
 }
 
 .logo-icon::after {
@@ -99,7 +108,7 @@
   text-align: center;
   font-size: 16px;
   font-style: normal;
-  font-weight: 600;
+  font-weight: 500;
   border: 0;
   line-height: 175%;
   letter-spacing: 0.6px;
@@ -181,42 +190,3 @@
 .wallet-text {
   font-weight: 600;
 }
-
-/* Mobile responsive */
-// @media (max-width: 768px) {
-//   .navbar-content {
-//     padding: 0 1rem;
-//   }
-
-//   .navbar-nav {
-//     display: none;
-//   }
-
-//   .logo-text {
-//     display: none;
-//   }
-
-//   .navbar-actions {
-//     gap: 0.5rem;
-//   }
-
-//   .wallet-button {
-//     padding: 0.5rem 1rem;
-//     font-size: 12px;
-//   }
-
-//   .network-select {
-//     padding: 0.5rem;
-//     font-size: 12px;
-//   }
-// }
-
-// @media (max-width: 480px) {
-//   .network-selector {
-//     display: none;
-//   }
-
-//   .wallet-text {
-//     display: none;
-//   }
-// }
