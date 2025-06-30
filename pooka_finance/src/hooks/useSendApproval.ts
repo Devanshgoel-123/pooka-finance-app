@@ -23,7 +23,7 @@ export const useSendApprovalTraxn = ({callBackFunction}:Props) => {
   const {
     address
   }=useAccount();
-  const { writeContract, data: hash, error, isPending, isError } = useWriteContract();
+  const { writeContract, data: hash, error, isPending, isError, reset } = useWriteContract();
   const {
     approvalToken,
     approvalChain
@@ -66,6 +66,7 @@ export const useSendApprovalTraxn = ({callBackFunction}:Props) => {
         setTimeout(() => {
           setQuery(false);
           callBackFunctionRef.current();
+          reset();
         }, 200);
       }
     }

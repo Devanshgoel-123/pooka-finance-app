@@ -14,7 +14,7 @@ interface Props {
 
 export const useCreateCrossChainDeposit = ({callBackFunction}:Props) => {
   const [query, setQuery] = useState<boolean>(false);
-  const { writeContract, data: hash, error, isPending, isError } = useWriteContract();
+  const { writeContract, data: hash, error, isPending, isError, reset } = useWriteContract();
  
   const {
     address
@@ -44,6 +44,7 @@ export const useCreateCrossChainDeposit = ({callBackFunction}:Props) => {
         setTimeout(() => {
           setQuery(false);
           callBackFunctionRef.current();
+          reset()
         }, 200);
       }
     }

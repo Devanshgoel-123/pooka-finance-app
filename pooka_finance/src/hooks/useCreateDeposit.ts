@@ -17,7 +17,7 @@ export const useCreateDeposit = () => {
   const [query, setQuery] = useState<boolean>(false);
   const [amount, setAmount]=useState<number>(0);
   const [token, setToken]=useState<string>('');
-  const { writeContract, data: hash, error, isPending, isError } = useWriteContract();
+  const { writeContract, data: hash, error, isPending, isError, reset } = useWriteContract();
   const { isLoading: isConfirming, isSuccess} = useWaitForTransactionReceipt({
     hash,
     query: {
@@ -43,6 +43,7 @@ export const useCreateDeposit = () => {
         }
         existingDeposits.push(traxnDeposit);
         localStorage.setItem("deposits",JSON.stringify(existingDeposits));
+        reset()
         setQuery(false);
       }
     } else if (error) {

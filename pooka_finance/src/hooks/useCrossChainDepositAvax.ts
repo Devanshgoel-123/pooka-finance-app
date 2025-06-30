@@ -22,6 +22,7 @@ export const useCreateCrossChainDepositOnAvax = () => {
     error,
     isPending,
     isError,
+    reset
   } = useWriteContract();
 
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
@@ -48,6 +49,7 @@ export const useCreateCrossChainDepositOnAvax = () => {
         }
         existingDeposits.push(traxnDeposit);
         localStorage.setItem("deposits",JSON.stringify(existingDeposits));
+        reset()
         setQuery(false);
       }
     } else if (error) {

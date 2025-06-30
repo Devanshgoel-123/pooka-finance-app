@@ -8,7 +8,7 @@ import { avalancheFuji } from "viem/chains";
 
 export const useWithdrawAmount = () => {
   const [query, setQuery] = useState<boolean>(false);
-  const { writeContract, data: hash, error,isError, isPending } = useWriteContract();
+  const { writeContract, data: hash, error,isError, isPending, reset } = useWriteContract();
   const {
     address
   }=useAccount();
@@ -24,6 +24,7 @@ export const useWithdrawAmount = () => {
       alert(
         `Traxn sent successfully with hash:${hash} for withdrawing user's Position`
       );
+      reset()
       setQuery(false)
     } else if (error) {
       alert(
@@ -48,6 +49,7 @@ export const useWithdrawAmount = () => {
       });
     } catch (err) {
       setQuery(false);
+      reset()
       console.error("Error opening position for user", err);
     }
   };

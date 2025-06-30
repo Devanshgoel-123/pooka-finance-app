@@ -39,7 +39,7 @@
   flex-direction: row;
   padding: 12px 30px;
   font-weight: 500;
-  font-family: "Manrope";
+  font-family: var(--font-manrope), sans-serif;
   color: #e5e7eb;
   background-color: #111111;
   line-height: 150%;
