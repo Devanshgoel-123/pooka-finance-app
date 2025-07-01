@@ -69,6 +69,18 @@ export const getChainName=(chainName:string)=>{
     }
 }
 
+export const getExplorerLinkForHashAndChainId = (
+    chainId: number,
+    hash: string
+  ) => {
+    switch (chainId) {
+      case sepolia.id:
+        return `https://eth.blockscout.com/tx/${hash}/?utm_source=Eddy`;
+      case avalancheFuji.id:
+        return `https://bscscan.com/tx/${hash}`;
+    }
+  };
+
 /**
  * 
  * @param name name of the token

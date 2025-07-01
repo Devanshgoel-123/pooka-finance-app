@@ -16,6 +16,17 @@ export type DepositParams = {
   chainName?: string;
 };
 
+export enum TOAST_NAMES {
+  CUSTOM = "custom",
+}
+
+
+export enum TOAST_TYPE {
+  SUCCESS = "success",
+  INFO = "info",
+  ERROR = "error",
+}
+
 export interface DepositData{
   hash:string;
   time:number;

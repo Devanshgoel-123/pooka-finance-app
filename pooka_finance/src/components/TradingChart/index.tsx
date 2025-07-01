@@ -89,6 +89,7 @@ export const TradingChart = () => {
         setOhlcData(data.data);
         setLoading(false);
       } catch (err) {
+        setLoading(false)
         console.error("Failed to fetch OHLC data:", err);
       }
     };

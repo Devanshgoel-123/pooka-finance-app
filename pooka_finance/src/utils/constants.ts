@@ -1,3 +1,5 @@
+import { avalancheFuji, sepolia } from "viem/chains";
+
 export const MARKET_SYMBOLS=["BTC/USD","ETH/USD"];
 
 //SEPOLIA Address
@@ -19,6 +21,9 @@ export const enum PERP_MM {
     ETH = 6.67,
 }
 
+export const AVALANCHE_CHAIN_ID=avalancheFuji.id;
+export const SEPOLIA_CHAIN_ID=sepolia.id;
+
 export const enum PRICE_MM_TOKEN{
     NATIVE_TOKEN_AVAX = 'AVAX/USD',
     NATIVE_TOKEN_SEPOLIA = 'ETH/USD',
@@ -37,6 +42,7 @@ export const AVAX_TOKEN="/assets/avax.svg";
 export const LINK_TOKEN="/assets/link.svg";
 export const POOKA_LOGO="/assets/pookaLogo.svg";
 export const ONE_CLICK='/assets/oneClick.svg';
+export const CROSS_ICON = "/assets/cross.svg";
 
 export const markets = [
     { symbol: 'ETH/USD', name: 'Ethereum Perpetual', logo:"/assets/eth.svg"},

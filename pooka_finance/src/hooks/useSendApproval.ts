@@ -13,6 +13,10 @@ import { avalancheFuji, sepolia } from "viem/chains";
 import { useRef } from "react";
 import { usePerpStore } from "@/store/PerpStore";
 import { useShallow } from "zustand/react/shallow";
+import { useHandleToast } from "@/common/handleToast";
+import { APPROVAL_PENDING, APPROVAL_SUCCESS } from "@/utils/ToastNames";
+import { TOAST_TYPE } from "@/store/types/types";
+import { TRANSACTION_FAILED, TRANSACTION_REJECTED } from "@/utils/ToastNames";
 interface Props {
   callBackFunction: () => void;
 }
@@ -23,14 +27,28 @@ export const useSendApprovalTraxn = ({callBackFunction}:Props) => {
   const {
     address
   }=useAccount();
-  const { writeContract, data: hash, error, isPending, isError, reset } = useWriteContract();
+  const {handleToast}=useHandleToast();
+  const handleToastRef =
+  useRef<
+    (
+      heading: string,
+      subHeading: string,
+      type: string,
+      hash?: string | undefined,
+      chainId?: number | undefined
+    ) => void
+  >(handleToast);
+  const { writeContract, data: hash, error, isPending, reset } = useWriteContract();
   const {
     approvalToken,
     approvalChain
   }=usePerpStore(useShallow((state)=>({
     approvalToken:state.payToken,
     approvalChain:state.payChain
-  })))
+  })));
+
+  const payChainRef=useRef<number>(0);
+
   const {
     data
   }=useReadContract({
@@ -42,7 +60,7 @@ export const useSendApprovalTraxn = ({callBackFunction}:Props) => {
     ],
     chainId:approvalChain
   })
-  const { isLoading: isConfirming, isSuccess} = useWaitForTransactionReceipt({
+  const { isLoading: isConfirming, isSuccess, isError} = useWaitForTransactionReceipt({
     hash,
     query: {
       enabled: query,
@@ -56,31 +74,59 @@ export const useSendApprovalTraxn = ({callBackFunction}:Props) => {
   }, [callBackFunction]);
 
   useEffect(() => {
-    if (hash) {
-      if (isConfirming) {
-        alert(`Transaction sent successfully with hash: ${hash}`);
-      }
-      
-      if (isSuccess) {
-        alert(`Transaction confirmed successfully!`);
-        setTimeout(() => {
-          setQuery(false);
-          callBackFunctionRef.current();
-          reset();
-        }, 200);
-      }
+    if (hash && isConfirming) {
+      handleToastRef.current(
+       APPROVAL_PENDING.heading,
+      APPROVAL_PENDING.subHeading,
+      TOAST_TYPE.INFO,
+        hash,
+        payChainRef.current
+      );
+    }
+    if(isSuccess){
+      handleToastRef.current(
+        APPROVAL_SUCCESS.heading,
+        APPROVAL_SUCCESS.subHeading,
+        TOAST_TYPE.SUCCESS,
+        hash,
+        payChainRef.current
+      )
+      setTimeout(() => {
+        setQuery(false);
+        callBackFunctionRef.current();
+        reset();
+      }, 200);
     }
     
-    if (error) {
-      alert(`Unable to send the transaction: ${error.message}`);
+    if (error || isError) {
       setQuery(false);
+      if (
+        error?.message.includes(
+           "User rejected the request."
+         )
+       ) {
+         handleToastRef.current(
+           TRANSACTION_REJECTED.heading,
+           TRANSACTION_REJECTED.subHeading,
+           TOAST_TYPE.ERROR
+         );
+       } else {
+         handleToastRef.current(
+           TRANSACTION_FAILED.heading,
+           TRANSACTION_FAILED.subHeading,
+           TOAST_TYPE.ERROR,
+           hash,
+           payChainRef.current
+         );
+       }
     }
-  }, [error, hash, isConfirming, isSuccess]);
+  }, [error, hash, isConfirming, isSuccess, isError]);
 
   const sendApprovalTraxn = async (payToken:string, payChain:number, depositAmount:string) => {
-  
+    
     let contractAddress: string;
     let decimalUnits:number;
+    payChainRef.current=payChain;
     if (payChain === sepolia.id) {
       contractAddress = CROSS_CHAIN_MANAGER_SEPOLIA;
       decimalUnits=7;

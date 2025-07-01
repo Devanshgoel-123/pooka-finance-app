@@ -18,10 +18,18 @@ import {
   QueryClient,
 } from "@tanstack/react-query";
 import React from 'react';
+import { SnackbarProvider } from 'notistack'
+import CustomToast from '@/common/CustomToasts';
 
 
 
 const queryClient = new QueryClient();
+
+declare module "notistack" {
+  interface VariantOverrides {
+    custom:true
+  }
+}
 
 
 const connectors=connectorsForWallets(
@@ -59,7 +67,23 @@ export const AppKitProvider = ({ children }: { children: ReactNode }) => {
         initialChain={avalancheFuji}
         showRecentTransactions={true}
         >
+        <SnackbarProvider
+         maxSnack={2} 
+         autoHideDuration={120000}
+         anchorOrigin={{
+          vertical:'top',
+          horizontal:'right'
+         }}
+         transitionDuration={{
+          enter:300,
+          exit:200
+         }}
+         Components={{
+          custom:CustomToast
+         }}
+        >
           {children}
+        </SnackbarProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

@@ -3,6 +3,7 @@ import { Abi, parseEther, parseUnits } from "viem";
 import { POOL_MANAGER_ABI } from "@/components/ABI/PoolManagerABI";
 import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
 import {
+  AVALANCHE_CHAIN_ID,
   CONTRACT_ADDRESS_AVAX,
   CONTRACT_ADDRESS_POOL_MANAGER,
   LINK_TOKEN_AVAX,
@@ -12,11 +13,28 @@ import {
 import { useEffect, useState } from "react";
 import { avalancheFuji } from "viem/chains";
 import { DepositData } from "@/store/types/types";
+import { useHandleToast } from "@/common/handleToast";
+import { useRef } from "react";
+import { DEPOSIT_PENDING, DEPOSIT_SUCCESS, TRANSACTION_FAILED, TRANSACTION_REJECTED } from "@/utils/ToastNames";
+import { TOAST_TYPE } from "@/store/types/types";
 
 export const useCreateDeposit = () => {
   const [query, setQuery] = useState<boolean>(false);
   const [amount, setAmount]=useState<number>(0);
   const [token, setToken]=useState<string>('');
+  const {
+    handleToast
+  }=useHandleToast();
+  const handleToastRef =
+    useRef<
+      (
+        heading: string,
+        subHeading: string,
+        type: string,
+        hash?: string | undefined,
+        chainId?: number | undefined
+      ) => void
+    >(handleToast);
   const { writeContract, data: hash, error, isPending, isError, reset } = useWriteContract();
   const { isLoading: isConfirming, isSuccess} = useWaitForTransactionReceipt({
     hash,
@@ -28,13 +46,26 @@ export const useCreateDeposit = () => {
     address
   }=useAccount();
   useEffect(() => {
-    if (hash) {
-      alert(`Traxn sent successfully with hash:${hash}`);
-      if(isSuccess){
-        alert(`Traxn completed successfully, your amount has been deposited`);
-        const existingDeposits: DepositData[] = JSON.parse(localStorage.getItem("deposits") || "[]");
+    if (hash && isConfirming) {
+      handleToastRef.current(
+       DEPOSIT_PENDING.heading,
+      DEPOSIT_PENDING.subHeading,
+      TOAST_TYPE.INFO,
+        hash,
+        AVALANCHE_CHAIN_ID
+      );
+    }
+    if(isSuccess){
+      handleToastRef.current(
+        DEPOSIT_SUCCESS.heading,
+        DEPOSIT_SUCCESS.subHeading,
+        TOAST_TYPE.SUCCESS,
+        hash,
+        AVALANCHE_CHAIN_ID
+      )
+      const existingDeposits: DepositData[] = JSON.parse(localStorage.getItem("deposits") || "[]");
         const traxnDeposit:DepositData={
-          hash:hash,
+          hash:hash as string,
           time:Math.floor(new Date().getTime()/1000),
           amount:amount,
           chain:avalancheFuji.id,
@@ -43,13 +74,36 @@ export const useCreateDeposit = () => {
         }
         existingDeposits.push(traxnDeposit);
         localStorage.setItem("deposits",JSON.stringify(existingDeposits));
+      setTimeout(() => {
         reset()
         setQuery(false);
-      }
-    } else if (error) {
-      alert(`Unable to send the traxn:${error.message}`);
-      setQuery(false)
+      }, 200);
     }
+    if (
+      error || isError
+    ) {
+      setQuery(false);
+      if (
+       error?.message.includes(
+          "User rejected the request."
+        )
+      ) {
+        handleToastRef.current(
+          TRANSACTION_REJECTED.heading,
+          TRANSACTION_REJECTED.subHeading,
+          TOAST_TYPE.ERROR
+        );
+      } else {
+        handleToastRef.current(
+          TRANSACTION_FAILED.heading,
+          TRANSACTION_FAILED.subHeading,
+          TOAST_TYPE.ERROR,
+          hash,
+          AVALANCHE_CHAIN_ID
+        );
+      }
+    }
+    
   }, [error, hash, isConfirming, isPending, isSuccess]);
 
   const createDeposit = async (payToken:string, depositAmount:string) => {

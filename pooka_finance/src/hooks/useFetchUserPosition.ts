@@ -33,8 +33,11 @@ export const useFetchUserPosition=()=>{
     contracts: contractCalls,
     allowFailure: false, 
     query:{
-        enabled:isConnected && (address!==undefined)
-    }
+        enabled:isConnected && (address!==undefined),
+        refetchInterval:5000,
+        refetchIntervalInBackground:true
+    },
+    
   });
 
   const ETH=(data ?? [])[0];
