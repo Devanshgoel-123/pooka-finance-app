@@ -53,7 +53,6 @@ export const PositionRow=({
           let tokenPrice:number;
           if(position.perpName.toLowerCase().includes("eth")){
             tokenPrice=ethPrice
-            console.log("The token price is", tokenPrice, ethPrice)
             setTokenPrice(ethPrice)
           }else if(position.perpName.toLowerCase().includes("btc")){
             tokenPrice=btcPrice
@@ -61,8 +60,6 @@ export const PositionRow=({
           }else{
             tokenPrice=0;
           }
-          
-          console.log("The token price is", position.perpName, tokenPrice)
           const formattedEntryPrice: number = Number(position.entryPrice) / 10**8;
           const formattedPositionInUSDC: number = Number(position.size) / 10**6;
           const formattedPositionInPerpToken: number = formattedPositionInUSDC / formattedEntryPrice;

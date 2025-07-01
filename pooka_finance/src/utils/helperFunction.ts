@@ -69,20 +69,27 @@ export const getChainName=(chainName:string)=>{
     }
 }
 
+/**
+ * getExplorerLinkForHashAndChainId
+ * @param chainId chainId 
+ * @param hash hash of the transaction
+ * @returns explorer link for the traxn
+ */
+
 export const getExplorerLinkForHashAndChainId = (
     chainId: number,
     hash: string
   ) => {
     switch (chainId) {
       case sepolia.id:
-        return `https://eth.blockscout.com/tx/${hash}/?utm_source=Eddy`;
+        return `https://dashboard.tenderly.co/tx/${hash}`;
       case avalancheFuji.id:
-        return `https://bscscan.com/tx/${hash}`;
+        return `https://dashboard.tenderly.co/tx/${hash}`;
     }
   };
 
 /**
- * 
+ * getTokenAddressForName
  * @param name name of the token
  * @param chainId chainId of the token
  * @returns tokenAddress
@@ -102,6 +109,11 @@ export const getTokenAddressForName=(name:string, chainId:number):string=>{
     }
 }
 
+/**
+ * tokenImageForAddress
+ * @param address token address 
+ * @returns the image address of the token
+ */
 
 export const tokenImageForAddress=(address:string)=>{
     if(address === USDC_TOKEN_SEPOLIA || address===USDC_TOKEN_AVAX){

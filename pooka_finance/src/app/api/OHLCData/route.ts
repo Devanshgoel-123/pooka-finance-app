@@ -36,7 +36,6 @@ async function fetchDataWithRetries(url: string, retries = 3, delayMs = 1000) {
   for (let i = 0; i < retries; i++) {
     const API_KEY:string =getAPIKey(i);
     try {
-      console.log("THe url is", `${url}=${API_KEY}`);
       const result = await axios.get(`${url}=${API_KEY}`);
       return result;
     } catch (err) {
