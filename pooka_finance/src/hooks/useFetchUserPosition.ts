@@ -45,6 +45,7 @@ export const useFetchUserPosition=()=>{
 
   const eth_positions = Array.isArray(ETH) ? [ETH] : [[ETH]];
   const btc_position = Array.isArray(BTC) ? [BTC] : [[BTC]];
+  
   const formattedEthPositions: PositionData[] = eth_positions.map((item: unknown) => {
     const typedItem = item as [bigint, bigint, bigint, bigint, boolean, boolean, bigint, bigint];
     return {

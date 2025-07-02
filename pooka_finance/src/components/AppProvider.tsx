@@ -69,7 +69,7 @@ export const AppKitProvider = ({ children }: { children: ReactNode }) => {
         >
         <SnackbarProvider
          maxSnack={2} 
-         autoHideDuration={120000}
+         autoHideDuration={3500}
          anchorOrigin={{
           vertical:'top',
           horizontal:'right'

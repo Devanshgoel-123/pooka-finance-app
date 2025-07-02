@@ -39,7 +39,6 @@ async function fetchDataWithRetries(url: string, retries = 3, delayMs = 1000) {
       const result = await axios.get(`${url}=${API_KEY}`);
       return result;
     } catch (err) {
-      console.log("errror at retry", i)
       if (i === retries - 1) throw err;
       await new Promise((res) => setTimeout(res, delayMs));
     }

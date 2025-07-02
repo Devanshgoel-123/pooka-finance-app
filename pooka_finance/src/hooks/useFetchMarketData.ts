@@ -6,14 +6,8 @@ import { usePerpStore } from "@/store/PerpStore";
 import { useShallow } from "zustand/react/shallow";
 import { PRICE_ORACLE_ABI } from "@/components/ABI/PriceOracleABI";
 import { NormalizeContractData } from "@/utils/helperFunction";
+import { MarketData } from "@/store/types/types";
 
-interface MarketData{
-    price24hHigh:number,
-    price24hLow:number,
-    currentPrice:number,
-    priceChange : number,
-    changePercent: number
-}
 
 export const useFetchMarketData=()=>{
   const {
@@ -39,17 +33,15 @@ export const useFetchMarketData=()=>{
     },
   });
 
-  const marketData:MarketData= !isLoading && !isError && data && Array.isArray(data) ?{
-    currentPrice: NormalizeContractData((data as bigint[])[0]) as number || 0,
-    price24hHigh: NormalizeContractData((data as bigint[])[1]) as number || 0,
-    price24hLow: NormalizeContractData((data as bigint[])[2]) as number || 0,
-    priceChange: NormalizeContractData((data as bigint[])[3]) as number || 0,
-    changePercent: Number((data as bigint[])[4])/100 as number || 0,
-  } : {currentPrice: 0,
+  const marketData:MarketData= !isLoading && !isError && data && Array.isArray(data) ? 
+     NormalizeContractData((data as bigint[])[0])
+   : {
+    currentPrice: 0,
     price24hHigh: 0,
     price24hLow: 0,
     priceChange: 0,
-    changePercent: 0} as MarketData;
+    changePercent: 0
+  } as MarketData;
 
    return {
     marketData,
