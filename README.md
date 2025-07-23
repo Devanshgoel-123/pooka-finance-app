@@ -135,12 +135,6 @@ yarn dev
 
 App runs locally at: [http://localhost:3000](http://localhost:3000)
 
----
-
-## 🌐 Live Demo
-
-Try it live on Vercel:
-🔗 [https://pooka-finance-app.vercel.app](https://pooka-finance-app.vercel.app)
 
 ---
 
@@ -178,3 +172,12 @@ Distributed under the [MIT License](./LICENSE).
 Feel free to use and modify with attribution.
 
 ---
+
+## Project Links
+
+1. [Demo Video](https://youtu.be/byVYwKSZH78)
+2. [Pooka Finance Contracts](https://github.com/Dhruv-Varshney-developer/pooka-finance-contracts)
+3. [Pooka Finance App](https://github.com/Dhruv-Varshney-developer/pooka-finance-app)
+4. [Live Application](https://pooka-finance-app.vercel.app/)
+5. [User Documentation](https://pookafinance.gitbook.io/pookafinance-docs)
+6. [AI Agent Backend](https://github.com/Devanshgoel-123/AgenticBackendPooka)
