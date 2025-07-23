@@ -1,19 +1,34 @@
 import { useAccount, useWaitForTransactionReceipt, useWriteContract } from "wagmi";
 import { PERPS_ABI } from "@/components/ABI/PookaFinanceABI";
 import { Abi,parseUnits } from "viem";
-import { CONTRACT_ADDRESS_AVAX } from "@/utils/constants";
-import { useEffect, useState } from "react";
+import { AVALANCHE_CHAIN_ID, CONTRACT_ADDRESS_AVAX } from "@/utils/constants";
+import { useEffect, useRef, useState } from "react";
 import { avalancheFuji } from "viem/chains";
+import { useHandleToast } from "@/common/handleToast";
+import { OPEN_PENDING, OPEN_SUCCESS, TRANSACTION_FAILED, TRANSACTION_REJECTED } from "@/utils/ToastNames";
+import { TOAST_TYPE } from "@/store/types/types";
 
 export const useOpenPosition = () => {
   const [query, setQuery] = useState<boolean>(false);
-  const { writeContract, data: hash, error, isPending } = useWriteContract();
-
+  const { writeContract, data: hash, error, isPending, reset } = useWriteContract();
+  const {
+    handleToast
+  }=useHandleToast();
+  const handleToastRef =
+    useRef<
+      (
+        heading: string,
+        subHeading: string,
+        type: string,
+        hash?: string | undefined,
+        chainId?: number | undefined
+      ) => void
+    >(handleToast);
   const {
     address
   }=useAccount();
 
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
+  const { isLoading: isConfirming, isSuccess, isError } = useWaitForTransactionReceipt({
     hash,
     query: {
       enabled: query,
@@ -21,18 +36,53 @@ export const useOpenPosition = () => {
   });
 
   useEffect(() => {
-    if (hash) {
-      if (isConfirming) {
-        alert(`Transaction sent successfully with hash: ${hash}`);
-      }
-      
-      if (isSuccess) {
-        alert(`Transaction confirmed successfully!`);
-      }
-    } else if (error) {
-      alert(`Unable to open position:${error.message}`);
+    if (hash && isConfirming) {
+      handleToastRef.current(
+        OPEN_PENDING.heading,
+        OPEN_PENDING.subHeading,
+        TOAST_TYPE.INFO,
+        hash,
+        AVALANCHE_CHAIN_ID
+      );
     }
-  }, [error, hash, isConfirming]);
+    if (isSuccess) {
+      handleToastRef.current(
+        OPEN_SUCCESS.heading,
+        OPEN_SUCCESS.subHeading,
+        TOAST_TYPE.SUCCESS,
+        hash,
+        AVALANCHE_CHAIN_ID,
+      )
+      reset()
+      setTimeout(() => {
+        setQuery(false);
+      }, 200);
+    }
+    if (
+      error || isError
+    ) {
+      setQuery(false);
+      if (
+       error?.message.includes(
+          "User rejected the request."
+        )
+      ) {
+        handleToastRef.current(
+          TRANSACTION_REJECTED.heading,
+          TRANSACTION_REJECTED.subHeading,
+          TOAST_TYPE.ERROR
+        );
+      } else {
+        handleToastRef.current(
+          TRANSACTION_FAILED.heading,
+          TRANSACTION_FAILED.subHeading,
+          TOAST_TYPE.ERROR,
+          hash,
+          AVALANCHE_CHAIN_ID
+        );
+      }
+    }
+  }, [error, hash, isConfirming, isSuccess, isError]);
 
   const openPosition = async (
     symbol: string,

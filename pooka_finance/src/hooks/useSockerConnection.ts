@@ -52,36 +52,30 @@ export const useSocketConnection = () => {
     });
 
     socket_connections.on("general_query", (data)=>{
-      console.log("The received data", data);
       generalQuery.current.message=data.position;
       setElement('response')
     })
 
     socket_connections.on("model_response", (data)=>{
-      console.log("The received data from model is", data);
       generalQuery.current.message=data.position[0];
       setElement('response')
     })
     socket_connections.on("open_position", (data) => {
-      console.log("The received data", data);
       positionParams.current=data.position;
       setElement("trade")
     });
 
     socket_connections.on("close_position", (data) => {
-      console.log("The received data", data);
       closePositionParams.current=data.position;
       setElement("close")
     })
 
     socket_connections.on("withdraw_amount", (data) => {
-      console.log("The received data withdrawal amount", data);
      withdrawParams.current=data.position;
       setElement("withdraw")
     });
 
     socket_connections.on("deposit_collateral", (data) => {
-      console.log("Received deposit_collateral event:", data);
       depositParams.current=data.position;
       setElement("deposit")
     });

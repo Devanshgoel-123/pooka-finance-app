@@ -54,12 +54,10 @@ export const PositionRow=({
           if(position.perpName.toLowerCase().includes("eth")){
             tokenPrice=ethPrice
             setTokenPrice(ethPrice)
-          }
-          if(position.perpName.toLowerCase().includes("btc")){
+          }else if(position.perpName.toLowerCase().includes("btc")){
             tokenPrice=btcPrice
             setTokenPrice(btcPrice)
-          }
-          else{
+          }else{
             tokenPrice=0;
           }
           const formattedEntryPrice: number = Number(position.entryPrice) / 10**8;

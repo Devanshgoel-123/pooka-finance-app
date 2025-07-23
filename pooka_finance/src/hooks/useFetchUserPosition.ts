@@ -33,8 +33,11 @@ export const useFetchUserPosition=()=>{
     contracts: contractCalls,
     allowFailure: false, 
     query:{
-        enabled:isConnected && (address!==undefined)
-    }
+        enabled:isConnected && (address!==undefined),
+        refetchInterval:5000,
+        refetchIntervalInBackground:true
+    },
+    
   });
 
   const ETH=(data ?? [])[0];
@@ -42,6 +45,7 @@ export const useFetchUserPosition=()=>{
 
   const eth_positions = Array.isArray(ETH) ? [ETH] : [[ETH]];
   const btc_position = Array.isArray(BTC) ? [BTC] : [[BTC]];
+  
   const formattedEthPositions: PositionData[] = eth_positions.map((item: unknown) => {
     const typedItem = item as [bigint, bigint, bigint, bigint, boolean, boolean, bigint, bigint];
     return {

@@ -6,8 +6,10 @@ import { AppKitProvider } from "@/components/AppProvider";
 
 
 export const metadata:Metadata={
-  title:"Pooka Finance",
-  description:"Cross Chain Perps Exchange"
+  title:"Pooka Finance | Cross Chain Perps",
+  description:"Cross Chain Perps Exchange on Avalanche Network",
+  icons:"/assets/pookaLogo.svg",
+  colorScheme:'dark'
 }
 
 const manrope = Manrope({

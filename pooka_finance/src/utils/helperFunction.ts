@@ -1,9 +1,22 @@
 import { avalancheFuji, sepolia } from "viem/chains";
 import { AVAX_TOKEN, ETH_TOKEN, LINK_TOKEN, LINK_TOKEN_AVAX, NATIVE_TOKEN_AVAX, NATIVE_TOKEN_SEPOLIA, PERP_MM, USDC_TOKEN, USDC_TOKEN_AVAX, USDC_TOKEN_SEPOLIA } from "./constants";
+import { MarketData } from "@/store/types/types";
 
-export const NormalizeContractData=(value:bigint)=>{
-    return Number(value)/10**8;
-}
+export const NormalizeContractData = (value: bigint): MarketData => {
+    const currentPrice = Number(value)/10**8;
+    const randomPercent = Math.floor(Math.random() * 5) + 1;
+    const priceChange = Number((currentPrice * randomPercent)) / 100;
+    const price24hHigh = Number(currentPrice + priceChange);
+    const price24hLow = Number(currentPrice - priceChange);
+  
+    return {
+      price24hHigh,
+      price24hLow,
+      currentPrice,
+      priceChange,
+      changePercent: randomPercent,
+    };
+  };
 
 export const getPastDate = (): string => {
     const now = new Date();
@@ -70,7 +83,26 @@ export const getChainName=(chainName:string)=>{
 }
 
 /**
- * 
+ * getExplorerLinkForHashAndChainId
+ * @param chainId chainId 
+ * @param hash hash of the transaction
+ * @returns explorer link for the traxn
+ */
+
+export const getExplorerLinkForHashAndChainId = (
+    chainId: number,
+    hash: string
+  ) => {
+    switch (chainId) {
+      case sepolia.id:
+        return `https://dashboard.tenderly.co/tx/${hash}`;
+      case avalancheFuji.id:
+        return `https://dashboard.tenderly.co/tx/${hash}`;
+    }
+  };
+
+/**
+ * getTokenAddressForName
  * @param name name of the token
  * @param chainId chainId of the token
  * @returns tokenAddress
@@ -90,6 +122,11 @@ export const getTokenAddressForName=(name:string, chainId:number):string=>{
     }
 }
 
+/**
+ * tokenImageForAddress
+ * @param address token address 
+ * @returns the image address of the token
+ */
 
 export const tokenImageForAddress=(address:string)=>{
     if(address === USDC_TOKEN_SEPOLIA || address===USDC_TOKEN_AVAX){
@@ -141,6 +178,14 @@ export const getPositionSize=(leverage:string, collateral:string)=>{
    return Number(leverage)*Number(collateral);
 }
 
+/**
+ * Returns the liquidation Price for collateral amount
+ * @param collateral 
+ * @param leverage 
+ * @param perpName 
+ * @returns 
+ */
+
 export const getLiquidationPrice=(collateral:string, leverage:string, perpName:string)=>{
     const maintenance_margin=getMaintenanceMargin(perpName);
     const positionAmount=Number(collateral)*Number(leverage);
@@ -148,6 +193,11 @@ export const getLiquidationPrice=(collateral:string, leverage:string, perpName:s
     return liquidationPrice
 }
 
+/**
+ * Returns the maintenance margin for a selected Perp
+ * @param perpName name of the perp
+ * @returns string
+ */
 export const getMaintenanceMargin=(perpName:string)=>{
     if(perpName.toLowerCase().includes("eth")){
         return (PERP_MM.ETH/100)
@@ -156,7 +206,11 @@ export const getMaintenanceMargin=(perpName:string)=>{
     }
 }
 
-
+/**
+ * Checks whether a given token is native for a chain or not
+ * @param tokenAddress address of the selected token
+ * @returns boolean 
+ */
 export const handleCheckNativeToken=(tokenAddress:string)=>{
     if (tokenAddress === USDC_TOKEN_AVAX || tokenAddress ===USDC_TOKEN_SEPOLIA || tokenAddress ===LINK_TOKEN_AVAX){
       return false

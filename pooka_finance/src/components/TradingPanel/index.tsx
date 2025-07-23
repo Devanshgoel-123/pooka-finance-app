@@ -182,6 +182,7 @@ export const OrderComponent: React.FC = () => {
     if (!withdrawLoader) return; // Don't process if not currently loading
 
     if (isWithdrawError || isWithdrawSuccess) {
+      setWithDrawAmount("")
       setWithdrawLoader(false);
     }
   }, [isWithdrawError, isWithdrawSuccess, withdrawLoader]);
@@ -231,9 +232,11 @@ export const OrderComponent: React.FC = () => {
           className="tokenLogo"
         />
         <span>
-          {handleCheckNativeToken(payToken)
-            ? (Number(data.value)/1e18).toFixed(4)
-            : userTokenBalance.toFixed(4)}
+          {depositTab ? handleCheckNativeToken(payToken)
+            ? (Number(data.value)/1e18).toFixed(3)
+            : userTokenBalance.toFixed(3)
+            : userDepositbalance.toFixed(3)
+          }
         </span>
       </div>
     );

@@ -52,7 +52,6 @@ export function useUnifiedPriceFeeds(){
     if(setPrice){
       usePerpStore.getState().setCurrentPerpPrice(perpData.price)
     }
-   
   };
 
   // Helper function to use fallback values
@@ -98,6 +97,7 @@ export function useUnifiedPriceFeeds(){
 
       // VALIDATE AVALANCHE CONTRACT DATA
       const price = avaxMarketData.currentPrice;
+
 
       // Check for zero/invalid prices
       if (price <= 0) {
@@ -156,8 +156,10 @@ export function useUnifiedPriceFeeds(){
     try {
       // TIER 2: Try Avalanche Contract
       const contractOracleData = getAvaxContractData(selectedPerp);
+    
       if (contractOracleData !== null) {
-        updatePriceData(contractOracleData, true);
+
+      updatePriceData(contractOracleData, true);
       const datastreamResult = await fetchDataStreams();
       if(dataStreamsService !==undefined){
         updatePriceData(datastreamResult, false)
@@ -184,7 +186,7 @@ export function useUnifiedPriceFeeds(){
 
   useEffect(() => {
     fetchPrices();
-    const interval = setInterval(fetchPrices, 45 * 1000);
+    const interval = setInterval(fetchPrices, 35 * 1000);
     return () => clearInterval(interval);
   }, [selectedPerp]);
 
