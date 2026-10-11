@@ -120,3 +120,8 @@
       }
     }
   }
+// Phones: let the seven timeframe buttons wrap instead of running off-screen.
+@media only screen and (max-width: 767px) {
+  .time-selector .time-selector__container { flex-wrap: wrap; gap: 8px; }
+  .time-selector .time-selector__timeframe { padding: 6px 10px; }
+}
