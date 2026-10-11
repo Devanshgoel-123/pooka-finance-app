@@ -68,3 +68,10 @@
 .tradingLayoutWrapper::-webkit-scrollbar {
   display: none;
 }
+// Phones: tighter gutters, and the order panel uses the full width when shown alone.
+@media only screen and (max-width: 767px) {
+  .tradingAppWrapper .tradingLayoutWrapper {
+    padding-inline: 12px; padding-top: 12px;
+    .MidComponentWrapper { flex-direction: column; .OrderPlacingColumn { width: 100%; } }
+  }
+}

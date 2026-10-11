@@ -286,3 +286,19 @@
 
 
 
+
+// Phones: stack price and stats, give the Chart/Trade toggle full width.
+@media only screen and (max-width: 767px) {
+  .tradingHeaderMobile { padding: 12px; align-items: stretch; }
+  .statsSectionTrading {
+    flex-direction: column; gap: 12px;
+    .priceSection { width: 100%; flex-wrap: wrap; .symbolContainer { margin-right: 4px; } }
+    .statsData { width: 100%; justify-content: space-between; .statLabel, .statValue { font-size: 12px; } }
+  }
+  .depositWrapperMobile {
+    flex-direction: column; align-items: stretch; padding: 10px 12px;
+    .buttonContainer { width: 100%; gap: 8px; .selectBtn { flex: 1; } }
+    .depositHeader { font-size: 14px; }
+    .depositBalance { font-size: 16px; .depositCollateralBtn { padding: 6px 16px; margin-left: auto; } }
+  }
+}

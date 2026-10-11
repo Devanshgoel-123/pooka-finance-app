@@ -190,3 +190,14 @@
 .wallet-text {
   font-weight: 600;
 }
+
+// Phones: keep brand + wallet button on one row, nav links on a scrollable row below.
+@media only screen and (max-width: 767px) {
+  .navbar { padding-inline: 12px; }
+  .navbar-content { flex-wrap: wrap; row-gap: 4px; }
+  .logoIcon { padding: 6px; }
+  .logo-text { font-size: 1.05rem; }
+  .navbar-nav { order: 3; width: 100%; gap: 1.25rem; overflow-x: auto; }
+  .nav-link { padding: 6px 0; font-size: 14px; }
+  .connectWalletButton, .connectedWallet { padding: 8px 14px; font-size: 13px; white-space: nowrap; }
+}
