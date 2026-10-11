@@ -199,5 +199,6 @@
   .logo-text { font-size: 1.05rem; }
   .navbar-nav { order: 3; width: 100%; gap: 1.25rem; overflow-x: auto; }
   .nav-link { padding: 6px 0; font-size: 14px; }
-  .connectWalletButton, .connectedWallet { padding: 8px 14px; font-size: 13px; white-space: nowrap; }
+  // The order panel's .connectWalletButton sets a fixed 200px width; undo it in the navbar.
+  .navbar .connectWalletButton, .navbar .connectedWallet { width: auto; min-width: 0; padding: 8px 14px; font-size: 13px; white-space: nowrap; }
 }
