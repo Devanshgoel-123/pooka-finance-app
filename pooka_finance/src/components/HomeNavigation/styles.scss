@@ -89,3 +89,11 @@
   box-shadow: 0 8px 25px rgba(123, 241, 121, 0.3);
 }
 
+
+// Phones: compact bar, single-line Launch App button.
+@media only screen and (max-width: 767px) {
+  .navContainer { padding: 10px 14px; }
+  .logoIcon { padding: 6px; }
+  .logoText { font-size: 1.05rem; }
+  .launchButton { padding: 0.55rem 1rem; font-size: 14px; white-space: nowrap; }
+}

@@ -96,3 +96,14 @@
     }
   }
   
+
+// Phones: size the screenshot frame to the image instead of a fixed 500px.
+@media only screen and (max-width: 767px) {
+  .ctaSection .ctaImagePlaceholder {
+    width: 92%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    padding: 0.5rem;
+    margin: 1.5rem 0;
+  }
+}

@@ -222,3 +222,14 @@
     }
   }
   
+
+// Phones: smaller coins, kept in the margins so they don't sit on the headline.
+@media only screen and (max-width: 767px) {
+  .heroSection {
+    .statusBadge { white-space: nowrap; }
+    .floatingIcon { width: 28px; height: 28px; }
+    .bitcoin { top: 12%; right: 6%; }
+    .ethereum { top: 52%; right: 3%; }
+    .solana { top: 52%; left: 3%; }
+  }
+}
