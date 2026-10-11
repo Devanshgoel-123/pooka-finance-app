@@ -9,3 +9,8 @@
     padding-inline: 30px;
     padding-block: 20px;
 }
+
+// Phones: use the full screen and the dynamic viewport height (no clipping under the browser bar).
+@media only screen and (max-width: 767px) {
+  .AgentWrapper { padding: 8px; height: 100dvh; }
+}

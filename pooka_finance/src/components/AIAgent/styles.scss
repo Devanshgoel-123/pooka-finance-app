@@ -607,3 +607,20 @@
     transform: scale(0.8);
   }
 }
+
+// Phones: avatar/name + wallet on the first row, nav links on a second row; tighter padding.
+@media only screen and (max-width: 767px) {
+  .chatHeader {
+    flex-wrap: wrap;
+    row-gap: 6px;
+    padding: 12px;
+    .headerInfo { gap: 8px; }
+    .agentName { white-space: nowrap; font-size: 15px; }
+    .navbar-nav { order: 3; width: 100%; display: flex; gap: 1.25rem; }
+    .nav-link { padding: 4px 0; font-size: 14px; }
+    .connectWalletButtonAgent, .connectedWallet { padding: 8px 12px; font-size: 13px; white-space: nowrap; }
+  }
+  .chatMessages { padding: 12px; }
+  .message { max-width: 100%; }
+  .chatInput { padding: 12px; }
+}
