@@ -142,7 +142,7 @@ export const TradingHeader = ({
           </div>
         </div>
         <div className="depositWrapper">
-          <span className="depositHeader">YOUR DEPOSIT :</span>
+          <span className="depositLabel">YOUR DEPOSIT :</span>
           <div className="depositBalance">
             <Image
               src={"/assets/usdc.svg"}

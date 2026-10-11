@@ -153,8 +153,8 @@ export const TradingHeaderMobile = ({
             })
           }
         </div>
-        <div className="flex flex-row gap-[10px] align-center">
-        <span className="depositHeader">YOUR DEPOSIT :</span>
+        <div className="flex flex-row items-center gap-[10px]">
+        <span className="depositLabel">YOUR DEPOSIT :</span>
           <div className="depositBalance">
             <Image src={"/assets/usdc.svg"} alt="" height={22} width={22} className="usdcLogo"/>
           <span>
